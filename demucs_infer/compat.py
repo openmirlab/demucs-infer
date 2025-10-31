@@ -7,9 +7,15 @@
 """
 PyTorch 2.x compatibility utilities.
 Provides helper functions for torch operations that work across different PyTorch versions.
+Also provides module aliasing for backward compatibility with pretrained models.
 """
 
+import sys
 import torch
+
+# Module aliasing for backward compatibility with pretrained models
+# Models saved with 'demucs' module name need this aliasing to load correctly
+sys.modules['demucs'] = sys.modules['demucs_infer']
 
 
 def get_torch_arange(*args, **kwargs):

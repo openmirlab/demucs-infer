@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
+[![Tests](https://github.com/ChenPaulYu/demucs-infer/actions/workflows/python-package.yml/badge.svg)](https://github.com/ChenPaulYu/demucs-infer/actions/workflows/python-package.yml)
 
 High-quality audio source separation models for extracting vocals, drums, bass, and other instruments from music tracks.
 
@@ -386,7 +387,7 @@ pip install "demucs-infer[mp3,quantized]"
 ```bash
 # Install in editable mode from local directory
 cd /path/to/demucs-infer
-uv pip install -e .
+uv pip install -e ".[dev]"
 
 # Or add to your project as editable dependency
 uv add -e ../path/to/demucs-infer
@@ -401,9 +402,32 @@ cd /path/to/demucs-infer
 python -m venv .venv
 source .venv/bin/activate
 
-# Install in editable mode
-pip install -e .
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
 ```
+
+### Running Tests
+
+The package includes a comprehensive test suite using pytest:
+
+```bash
+# Run all tests
+uv run pytest tests/ -v
+
+# Run specific test file
+uv run pytest tests/test_log.py -v
+
+# Run with coverage
+uv run pytest tests/ --cov=demucs_infer
+
+# Run slow tests (requires model download)
+uv run pytest tests/ -v -m "slow"
+```
+
+**Continuous Integration:**
+- GitHub Actions automatically runs tests on every push/PR
+- Tests validate both library API and CLI commands
+- Python 3.10 with PyTorch 2.x compatibility verified
 
 ---
 

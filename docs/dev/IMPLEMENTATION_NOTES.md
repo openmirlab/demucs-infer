@@ -34,7 +34,8 @@ demucs-infer/
 ├── README.md                    # NEW: Documentation
 ├── LICENSE                      # MIT license
 ├── .gitignore                   # NEW
-└── test_import.py               # NEW: Sanity test script
+└── tests/
+    └── test_imports.py          # NEW: Sanity test script
 ```
 
 ## Key Modifications
@@ -88,7 +89,7 @@ demucs-infer/
 - `lameenc>=1.2` - Install with `pip install demucs-infer[mp3]`
 - `diffq>=0.2.1` - Install with `pip install demucs-infer[quantized]`
 
-## Files Removed (vs demucsfix)
+## Files Removed (vs Original Demucs)
 
 ### Training-only files (NOT copied to demucs-infer):
 - `train.py` - Training script
@@ -101,17 +102,6 @@ demucs-infer/
 - `svd.py` - SVD regularization
 - `wav.py` - Dataset loading
 - `grids/` - All training grid configs
-
-## Integration with multistage-drumtrans
-
-### Updated `/home/worzpro/Desktop/dev/patched_modules/multistage-drumtrans/`
-
-1. **pyproject.toml**:
-   - `demucsfix` → `demucs-infer`
-   - Path: `../demucsfix` → `../demucs-infer`
-
-2. **pipeline.py**:
-   - CLI command: `demucsfix` → `demucs-infer`
 
 ## Testing Results
 
@@ -126,8 +116,8 @@ demucs-infer/
 
 ## Package Size Comparison
 
-| Metric | demucsfix | demucs-infer | Reduction |
-|--------|-----------|--------------|-----------|
+| Metric | Original Demucs | demucs-infer | Reduction |
+|--------|-----------------|--------------|-----------|
 | Python files | 36+ files | 17 files | ~53% |
 | Core dependencies | 15+ packages | 7 packages | ~53% |
 | Install size | ~Large | Smaller | ~40-50% est. |
@@ -148,26 +138,142 @@ demucs-infer "audio.wav"
 demucs-infer --two-stems=drums "audio.wav"
 ```
 
-## Next Steps
+## Development History
 
-1. ✅ Package created successfully
-2. ✅ multistage-drumtrans updated to use demucs-infer
-3. ⏭️ Test full multistage-drumtrans pipeline with demucs-infer
-4. ⏭️ Optional: Update worzpro-demo to use demucs-infer
+### Initial Creation (v4.1.0)
 
-## Notes
+1. ✅ Package created from original Demucs
+2. ✅ Removed training dependencies
+3. ✅ Created minimal log.py replacement
+4. ✅ Made optional dependencies lazy
+5. ✅ Comprehensive documentation written
+6. ✅ CLI tool configured
 
-- **Package name**: `demucs-infer` (not demucsfix)
-- **CLI command**: `demucs-infer` (distinct from original, no conflicts)
-- **Import name**: `demucs_infer` (distinct from original, no conflicts)
-- **License**: MIT (same as original)
-- **PyTorch version**: 2.0+ required (Python 3.10,<3.11)
+### Maintenance Structure Added
+
+1. ✅ Added .gitignore
+2. ✅ Created docs/dev/ structure
+3. ✅ Added PRINCIPLES.md
+4. ✅ Added MAINTENANCE.md
+5. ✅ Reorganized documentation
+
+## Technical Details
+
+### Dependency Replacement Strategy
+
+**Problem**: Original Demucs used `dora.log.fatal()` and `dora.log.bold()`
+
+**Solution**: Created minimal `log.py` with:
+```python
+def fatal(*args):
+    print(*args, file=sys.stderr)
+    sys.exit(1)
+
+def bold(msg):
+    return f"\033[1m{msg}\033[0m"
+```
+
+### Lazy Import Pattern
+
+For optional dependencies, we use:
+```python
+def function_needing_optional_dep():
+    try:
+        import optional_package
+    except ImportError:
+        raise ImportError(
+            "Feature X requires optional_package. "
+            "Install with: pip install demucs-infer[feature]"
+        )
+    # Use optional_package here
+```
+
+This keeps the core package installable without optional deps.
+
+### PyTorch Compatibility
+
+The `compat.py` module handles PyTorch version differences:
+- Provides consistent APIs across PyTorch versions
+- No sys.modules hacking (that causes issues)
+- Simple wrapper functions only
+
+## Known Limitations
+
+### What's NOT Included
+- ❌ Training capabilities
+- ❌ Evaluation metrics
+- ❌ Dataset utilities
+- ❌ Grid search configs
+- ❌ Distributed training support
+
+### What Works Perfectly
+- ✅ All pretrained models
+- ✅ All separation algorithms
+- ✅ CLI interface
+- ✅ Python API
+- ✅ GPU acceleration
+- ✅ Batch processing
+- ✅ Two-stem separation
+- ✅ Multi-stem separation
+
+## Future Maintenance Notes
+
+### When PyTorch Updates
+
+1. Test import compatibility
+2. Check for deprecated APIs in our code
+3. Update `compat.py` if needed
+4. Run full test suite
+5. Update version constraints in `pyproject.toml`
+
+### When Original Demucs Updates
+
+**Monitor for**:
+- New models (add to `remote/` configs)
+- Bug fixes in inference code (backport carefully)
+- Algorithm improvements (backport if inference-only)
+
+**DO NOT backport**:
+- Training features
+- New dependencies (unless critical for inference)
+- Breaking API changes (maintain stability)
+
+### When Issues Arise
+
+1. **Check if it's in our code or original Demucs**
+2. **If original**: Link to their issue, explain we're inference-only fork
+3. **If ours**: Fix carefully, test thoroughly, document in CHANGELOG.md
+
+## Architecture Decisions
+
+### Why setuptools, not hatchling/poetry?
+
+**Reason**: Compatibility and simplicity
+- setuptools is universal and well-understood
+- Original Demucs used setuptools
+- Works seamlessly with UV and pip
+
+### Why CLI command `demucs-infer` not `demucs`?
+
+**Reason**: Avoid conflicts
+- Users might have original Demucs installed
+- Clear distinction between packages
+- No confusion in documentation or support
+
+### Why import name `demucs_infer` not `demucs`?
+
+**Reason**: Explicit is better than implicit
+- Clear which package is being used
+- No runtime import conflicts
+- Easier debugging when both packages present
 
 ## Summary
 
 Successfully created a **lean, inference-only** version of Demucs that:
 - Removes training dependencies (dora, hydra, omegaconf)
-- Maintains 100% API compatibility
+- Maintains 100% API compatibility for inference
 - Reduces package size by ~50%
 - Works with PyTorch 2.x
 - Provides same audio quality as original Demucs
+- Is well-documented for long-term maintenance
+

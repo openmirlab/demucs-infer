@@ -1,24 +1,14 @@
-# Python
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
 # Virtual environments
 .venv/
@@ -26,15 +16,19 @@ venv/
 ENV/
 env/
 
-# UV package manager
-uv.lock
+# UV
+.uv/
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Testing
 .pytest_cache/
@@ -42,14 +36,6 @@ uv.lock
 htmlcov/
 .tox/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Demucs specific
-*.wav
-*.mp3
-*.flac
-separated/
-outputs/
-models/
+# Distribution
+*.tar.gz
+*.whl
