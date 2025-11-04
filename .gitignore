@@ -39,3 +39,13 @@ htmlcov/
 # Distribution
 *.tar.gz
 *.whl
+
+# UV lock file (not needed for library packages)
+uv.lock
+
+# Documentation (internal guides)
+PUBLISHING_GUIDE.md
+TRUSTED_PUBLISHING_SETUP.md
+
+# Claude Code
+.claude/
