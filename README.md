@@ -5,7 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
-[![Tests](https://github.com/ChenPaulYu/demucs-infer/actions/workflows/python-package.yml/badge.svg)](https://github.com/ChenPaulYu/demucs-infer/actions/workflows/python-package.yml)
 
 High-quality audio source separation models for extracting vocals, drums, bass, and other instruments from music tracks.
 
