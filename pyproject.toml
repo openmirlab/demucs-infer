@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "demucs-infer"
@@ -51,38 +51,22 @@ quantized = [
 ]
 # Development dependencies
 dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
+    "black",
+    "ruff",
 ]
 
 [project.scripts]
 demucs-infer = "demucs_infer.separate:main"
 
 [project.urls]
-Homepage = "https://github.com/ChenPaulYu/demucs-infer"
-Repository = "https://github.com/ChenPaulYu/demucs-infer"
+Homepage = "https://github.com/openmirlab/demucs-infer"
+Repository = "https://github.com/openmirlab/demucs-infer"
 "Original Demucs" = "https://github.com/facebookresearch/demucs"
-"Bug Reports" = "https://github.com/ChenPaulYu/demucs-infer/issues"
-Changelog = "https://github.com/ChenPaulYu/demucs-infer/blob/main/CHANGELOG.md"
+"Bug Reports" = "https://github.com/openmirlab/demucs-infer/issues"
+Changelog = "https://github.com/openmirlab/demucs-infer/blob/main/CHANGELOG.md"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["demucs_infer*"]
+[tool.hatch.build.targets.wheel]
+packages = ["demucs_infer"]
 
-[tool.setuptools.package-data]
-demucs_infer = ["remote/*.txt", "remote/*.yaml"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "-v",
-    "--strict-markers",
-    "--tb=short",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-]
+[tool.hatch.build.targets.sdist]
+packages = ["demucs_infer"]
