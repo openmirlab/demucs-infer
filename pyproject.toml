@@ -7,7 +7,7 @@ name = "demucs-infer"
 version = "4.1.0"
 description = "Music source separation in the waveform domain - Inference-only (PyTorch 2.x)"
 readme = "README.md"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.8"
 license = {text = "MIT"}
 # Note: license-files automatically includes LICENSE by default
 authors = [
@@ -24,7 +24,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
