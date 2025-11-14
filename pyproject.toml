@@ -74,3 +74,11 @@ packages = ["demucs_infer"]
 
 [tool.hatch.build.targets.sdist]
 packages = ["demucs_infer"]
+
+[tool.hatch.build]
+include = [
+    "demucs_infer/**/*.py",
+    "demucs_infer/**/*.yaml",  # Include YAML config files (remote/*.yaml)
+    "demucs_infer/**/*.yml",   # Include YAML config files
+    "demucs_infer/**/*.txt",   # Include files.txt in remote/
+]

@@ -1,36 +1,3 @@
-# Changelog
-
-All notable changes to demucs-infer will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-- **Comprehensive test suite** with pytest
-  - Unit tests for logging, API, and model loading
-  - Integration tests (marked with `@pytest.mark.slow`)
-  - GitHub Actions CI workflow for automated testing on every push/PR
-  - Test coverage validation in CI pipeline
-- **Pytest configuration** in `pyproject.toml` with markers and test paths
-- **Module aliasing** in `compat.py` for backward compatibility with pretrained models
-
-### Changed
-- **CI/CD Pipeline**: Updated GitHub Actions workflow to use UV and Python 3.10 only
-- **Developer Documentation**: Updated PRINCIPLES.md and MAINTENANCE.md with pytest testing instructions
-- **README.md**: Added testing section with examples and CI badge
-
-### Fixed
-- **CLI naming**: Fixed argument parser name from "demucsfix.separate" to "demucs-infer" in `separate.py`
-- **Documentation cleanup**: Removed redundant files (docs/IMPLEMENTATION_NOTES.md, docs/dev/SETUP_COMPLETE.md)
-- Fixed YAML config files inclusion in package distribution
-- Updated GitHub Actions workflow to use release-based publishing
-- Updated build configuration to explicitly include YAML and TXT files from remote/ directory
-- Improved PyPI publishing workflow with package validation step
-
-## [4.1.0] - 2025-10-03
-
 ### Overview
 
 **demucs-infer** is an inference-only fork of the original [Demucs](https://github.com/facebookresearch/demucs) by Alexandre Défossez and Meta AI Research. This package was created to provide ongoing maintenance and PyTorch 2.x compatibility for Demucs inference capabilities, as the original repository is no longer actively maintained.
@@ -97,22 +64,3 @@ All core functionality from original Demucs is preserved with **zero modificatio
 
 **Maintenance and PyTorch 2.x compatibility:**
 - Bo-Yu Chen and worzpro Development Team
-
----
-
-## Version History
-
-- **[4.1.0]** - 2025-10-03: Initial release of demucs-infer with PyTorch 2.x support
-
----
-
-## Future Plans
-
-- Continue maintaining PyTorch compatibility
-- Address community bug reports and issues
-- Keep dependencies up-to-date
-- Maintain 100% compatibility with original Demucs inference API
-
----
-
-**Note**: Version numbering follows the original Demucs versioning (4.x series) to indicate compatibility level with original model architectures.
