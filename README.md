@@ -89,7 +89,7 @@ This follow-up research integrated transformer architectures into the hybrid app
 
 ### Installation
 
-demucs-infer supports both **UV** (recommended, faster) and **pip** (traditional) installation methods.
+demucs-infer is available on [PyPI](https://pypi.org/project/demucs-infer/) and supports both **UV** (recommended, faster) and **pip** (traditional) installation methods.
 
 #### Option 1: UV (Recommended) ⚡
 
