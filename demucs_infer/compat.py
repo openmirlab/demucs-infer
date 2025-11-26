@@ -15,7 +15,23 @@ import torch
 
 # Module aliasing for backward compatibility with pretrained models
 # Models saved with 'demucs' module name need this aliasing to load correctly
+# This includes models like drumsep that were trained with the original demucs package
 sys.modules['demucs'] = sys.modules['demucs_infer']
+
+# Import and alias submodules for models that reference specific demucs submodules
+# (e.g., drumsep uses demucs.hdemucs.HDemucs)
+from . import hdemucs, htdemucs, demucs, states, spec, apply, repo, pretrained, audio, utils
+
+sys.modules['demucs.hdemucs'] = hdemucs
+sys.modules['demucs.htdemucs'] = htdemucs
+sys.modules['demucs.demucs'] = demucs
+sys.modules['demucs.states'] = states
+sys.modules['demucs.spec'] = spec
+sys.modules['demucs.apply'] = apply
+sys.modules['demucs.repo'] = repo
+sys.modules['demucs.pretrained'] = pretrained
+sys.modules['demucs.audio'] = audio
+sys.modules['demucs.utils'] = utils
 
 
 def get_torch_arange(*args, **kwargs):

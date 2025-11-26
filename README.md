@@ -3,7 +3,7 @@
 **Inference-only distribution of Demucs for PyTorch 2.x**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![PyPI](https://img.shields.io/pypi/v/demucs-infer)](https://pypi.org/project/demucs-infer/)
 
@@ -23,6 +23,8 @@ High-quality audio source separation models for extracting vocals, drums, bass, 
 - **API Compatible**: Drop-in replacement for inference workflows
 - **Same Quality**: Zero changes to separation algorithms
 - **All Models Supported**: HTDemucs, MDX, and all variants
+- **Model Info API**: Query model capabilities, separation types, and source translations
+- **Third-Party Model Support**: Compatible with community models (drumsep, cinematic, etc.)
 
 ---
 
@@ -222,7 +224,9 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository is 
 
 ## 🎵 Available Models
 
-### 4-Source Models (drums, bass, other, vocals)
+### Official Demucs Models
+
+#### 4-Source Models (drums, bass, other, vocals)
 
 | Model | Quality | Speed | Description |
 |-------|---------|-------|-------------|
@@ -233,11 +237,30 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository is 
 | `mdx_q` | ⭐⭐⭐ | Very Fast | Quantized MDX |
 | `mdx_extra_q` | ⭐⭐⭐⭐ | Fast | Quantized enhanced MDX |
 
-### 6-Source Models (drums, bass, other, vocals, guitar, piano)
+#### 6-Source Models (drums, bass, other, vocals, guitar, piano)
 
 | Model | Quality | Speed | Description |
 |-------|---------|-------|-------------|
 | `htdemucs_6s` | ⭐⭐⭐⭐⭐ | Medium | 6-source separation |
+
+### Compatible Third-Party Models
+
+demucs-infer supports loading community-trained Demucs models. Place `.th` model files in a local directory and use the `repo` parameter.
+
+| Model Signature | Name | Separation Type | Sources |
+|-----------------|------|-----------------|---------|
+| `49469ca8` | [Drumsep](https://github.com/inagoy/drumsep) | Drum Kit | kick, snare, cymbals, toms |
+| `97d170e1` | CDX23 Cinematic | Film/Video | dialog, music, sfx |
+| `phantom_center` | Phantom Center Extractor | Stereo Center/Sides | similarity, difference |
+| `ebf34a2d` | UVR Demucs Model 1 | Vocal/Instrumental | vocals, non_vocals |
+
+```python
+from pathlib import Path
+from demucs_infer.pretrained import get_model
+
+# Load third-party model from local directory
+model = get_model("49469ca8", repo=Path("/path/to/models"))
+```
 
 ### Usage
 
@@ -267,6 +290,78 @@ model = get_model("htdemucs_6s")  # 6 sources
 - Music information retrieval (MIR)
 - Audio signal processing research
 - Music transcription
+
+---
+
+## 📋 Model Info API
+
+Query model capabilities, separation types, and get source name translations programmatically.
+
+### Get Model Information
+
+```python
+from demucs_infer.api import get_model_info, list_supported_separation_types
+
+# Get detailed info about a model
+info = get_model_info("htdemucs_ft")
+print(info)
+# Output:
+# HT-Demucs Fine-tuned (htdemucs_ft)
+#   Type: Music Separation (4 stems)
+#   Architecture: HTDemucs (ensemble of 4)
+#   Sources: drums, bass, other, vocals
+#   Sample Rate: 44100 Hz
+#   Use Case: High quality music separation
+
+# Access individual properties
+print(info.sources)          # ['drums', 'bass', 'other', 'vocals']
+print(info.separation_type)  # 'music_4stem'
+print(info.is_bag)           # True (ensemble model)
+print(info.num_models)       # 4
+
+# Get info for third-party model with source translation
+from pathlib import Path
+info = get_model_info("49469ca8", repo=Path("/path/to/drumsep"))
+print(info.sources)          # ['bombo', 'redoblante', 'platillos', 'toms'] (Spanish)
+print(info.sources_english)  # ['kick', 'snare', 'cymbals', 'toms'] (English)
+```
+
+### List Supported Separation Types
+
+```python
+from demucs_infer.api import list_supported_separation_types
+
+types = list_supported_separation_types()
+for key, info in types.items():
+    print(f"{key}: {info['name']}")
+
+# Output:
+# music_4stem: Music Separation (4 stems)
+# music_6stem: Music Separation (6 stems)
+# drum_kit: Drum Kit Separation
+# cinematic: Cinematic/Film Audio Separation
+# speech: Speech Separation
+# stereo_center: Stereo Center/Sides Separation
+# vocal_instrumental: Vocal/Instrumental Separation
+```
+
+### ModelInfo Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | str | Model name/signature |
+| `display_name` | str | Human-readable name |
+| `architecture` | str | Model architecture (HTDemucs, HDemucs, etc.) |
+| `sources` | List[str] | Original source names |
+| `sources_english` | List[str] | English-translated source names |
+| `separation_type` | str | Type key (e.g., 'music_4stem') |
+| `separation_type_name` | str | Human-readable type name |
+| `description` | str | Model description |
+| `use_case` | str | Recommended use case |
+| `sample_rate` | int | Audio sample rate (Hz) |
+| `audio_channels` | int | Number of audio channels |
+| `is_bag` | bool | Whether it's an ensemble model |
+| `num_models` | int | Number of models in ensemble |
 
 ---
 
@@ -433,7 +528,7 @@ uv run pytest tests/ -v -m "slow"
 
 ## 📋 Requirements
 
-- **Python**: 3.10
+- **Python**: 3.8+
 - **PyTorch**: 2.0 or later
 - **OS**: Linux, macOS, Windows
 - **GPU**: Optional (CUDA-capable GPU recommended for speed)
@@ -445,10 +540,13 @@ uv run pytest tests/ -v -m "slow"
 ### ✅ What We Built
 
 - **PyTorch 2.x compatibility layer** - Removed version restrictions
+- **PyTorch 2.6+ support** - Compatible with `weights_only` default changes
 - **Minimal logging module** - Replaced dora-search dependency
 - **Lazy imports** - Made optional dependencies truly optional
 - **Inference-only packaging** - Removed training code
 - **Clean dependency tree** - 7 core packages instead of 15+
+- **Model Info API** - Query model capabilities, separation types, and source translations
+- **Third-party model support** - Module aliasing for community-trained models
 
 ### ✅ What Stays Unchanged
 
