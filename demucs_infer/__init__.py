@@ -7,7 +7,7 @@
 # demucs-infer: Inference-only distribution of Demucs for PyTorch 2.x
 # Original Demucs version: 4.1.0
 
-__version__ = "4.1.0"
+__version__ = "4.1.1"
 
 # Import compatibility module to ensure demucs module is available
 from . import compat

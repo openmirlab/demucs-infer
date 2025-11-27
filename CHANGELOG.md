@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+No changes yet.
+
+## [4.1.1] - 2025-11-27
+
 ### Added
 - **Comprehensive test suite** with pytest
   - Unit tests for logging, API, and model loading
