@@ -422,10 +422,27 @@ class Separator:
         if wav is None:
             try:
                 wav, sr = ta.load(str(track))
-            except RuntimeError as err:
-                errors["torchaudio"] = err.args[0]
+            except (RuntimeError, ImportError) as err:
+                errors["torchaudio"] = str(err.args[0]) if err.args else str(err)
             else:
                 wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
+
+        # Fallback to soundfile if both ffmpeg and torchaudio fail
+        if wav is None:
+            try:
+                import soundfile as sf
+                audio_np, sr = sf.read(str(track))
+                # Convert from [time, channels] to [channels, time]
+                if len(audio_np.shape) == 1:
+                    # Mono
+                    wav = th.tensor(audio_np, dtype=th.float32).unsqueeze(0)
+                else:
+                    wav = th.tensor(audio_np.T, dtype=th.float32)
+                wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
+            except ImportError:
+                errors["soundfile"] = "soundfile is not installed. Install with: pip install soundfile"
+            except Exception as err:
+                errors["soundfile"] = str(err)
 
         if wav is None:
             raise LoadAudioError(
