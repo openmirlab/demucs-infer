@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 No changes yet.
 
+## [4.1.2] - 2026-01-14
+
+### Added
+- **Google Colab notebook** (`notebooks/quickstart_colab.ipynb`)
+  - 7-section workflow: install, download model, upload audio, run separation, check outputs, preview results, download results
+  - Support for both CLI and Python API methods
+  - Colab badge and "Try it in Colab" section in README
+- **Soundfile fallback** for audio I/O operations
+  - `save_audio()` falls back to soundfile when torchaudio fails
+  - `_load_audio()` now has 3 fallback levels: ffmpeg → torchaudio → soundfile
+
+### Fixed
+- **Python 3.12+ compatibility**: Fixed torchaudio/torchcodec dependency issue in newer Python environments (e.g., Google Colab)
+
 ## [4.1.1] - 2025-11-27
 
 ### Added

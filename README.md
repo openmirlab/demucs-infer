@@ -6,7 +6,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![PyPI](https://img.shields.io/pypi/v/demucs-infer)](https://pypi.org/project/demucs-infer/)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openmirlab/demucs-infer/blob/main/notebooks/quickstart_colab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cWELsXIFuqeEHStAKm8oP-1kME7Jfd4-)
 
 High-quality audio source separation models for extracting vocals, drums, bass, and other instruments from music tracks.
 
@@ -33,7 +33,7 @@ High-quality audio source separation models for extracting vocals, drums, bass, 
 
 No installation needed! Try the demo directly in Google Colab:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/openmirlab/demucs-infer/blob/main/notebooks/quickstart_colab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cWELsXIFuqeEHStAKm8oP-1kME7Jfd4-)
 
 ---
 
