@@ -422,7 +422,7 @@ class Separator:
         if wav is None:
             try:
                 wav, sr = ta.load(str(track))
-            except (RuntimeError, ImportError) as err:
+            except Exception as err:
                 errors["torchaudio"] = str(err.args[0]) if err.args else str(err)
             else:
                 wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
