@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "demucs-infer"
-version = "4.1.3"
+version = "4.2.0"
 description = "Music source separation in the waveform domain - Inference-only (PyTorch 2.x)"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -78,6 +78,11 @@ packages = ["demucs_infer"]
 
 [tool.hatch.build.targets.sdist]
 packages = ["demucs_infer"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
 
 [tool.hatch.build]
 include = [
