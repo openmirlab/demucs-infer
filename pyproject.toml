@@ -53,6 +53,10 @@ mp3 = [
 quantized = [
     "diffq>=0.2.1",
 ]
+# Optional: Community model downloads (Google Drive)
+community = [
+    "gdown>=5.0.0",
+]
 # Development dependencies
 dev = [
     "black",
