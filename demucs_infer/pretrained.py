@@ -81,14 +81,17 @@ def get_model(name: str,
     try:
         model = any_repo.get_model(name)
     except (ModelLoadingError, ImportError) as exc:
-        if isinstance(exc, ImportError) and 'diffq' in exc.args[0]:
+        if isinstance(exc, ImportError) and exc.args and 'diffq' in exc.args[0]:
             _check_diffq()
             raise
         # Try community repo (GDrive-hosted models)
         if repo is None:
             community_repo = GDriveRepo()
             if community_repo.has_model(name):
-                model = community_repo.get_model(name)
+                try:
+                    model = community_repo.get_model(name)
+                except ImportError:
+                    raise  # gdown missing — surface without ModelLoadingError context
             else:
                 raise
         else:
