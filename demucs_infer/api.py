@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 
 from .apply import apply_model, _replace_dict, BagOfModels
 from .audio import AudioFile, convert_audio, save_audio
+from .community import GDriveRepo
 from .pretrained import get_model, _parse_remote_files, REMOTE_ROOT
 from .repo import RemoteRepo, LocalRepo, ModelOnlyRepo, BagOnlyRepo
 
@@ -547,8 +548,8 @@ def list_models(repo: Optional[Path] = None) -> Dict[str, Dict[str, Union[str, P
 
     Returns
     -------
-    A dict with two keys ("single" for single models and "bag" for bag of models). The values are
-    lists whose components are strs.
+    A dict with keys "single" (single models), "bag" (bag of models), and
+    "community" (community models downloadable from Google Drive).
     """
     model_repo: ModelOnlyRepo
     if repo is None:
@@ -560,7 +561,15 @@ def list_models(repo: Optional[Path] = None) -> Dict[str, Dict[str, Union[str, P
             fatal(f"{repo} must exist and be a directory.")
         model_repo = LocalRepo(repo)
         bag_repo = BagOnlyRepo(repo, model_repo)
-    return {"single": model_repo.list_model(), "bag": bag_repo.list_model()}
+
+    result = {"single": model_repo.list_model(), "bag": bag_repo.list_model()}
+
+    # Include community models when listing from default repo
+    if repo is None:
+        community_repo = GDriveRepo()
+        result["community"] = community_repo.list_model()
+
+    return result
 
 
 def _translate_source(source: str) -> str:

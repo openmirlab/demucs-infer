@@ -12,6 +12,7 @@ import typing as tp
 
 from .log import fatal, bold
 
+from .community import GDriveRepo
 from .hdemucs import HDemucs
 from .repo import RemoteRepo, LocalRepo, ModelOnlyRepo, BagOnlyRepo, AnyModelRepo, ModelLoadingError  # noqa
 from .states import _check_diffq
@@ -59,7 +60,8 @@ def _parse_remote_files(remote_file_list) -> tp.Dict[str, str]:
 def get_model(name: str,
               repo: tp.Optional[Path] = None):
     """`name` must be a bag of models name or a pretrained signature
-    from the remote AWS model repo or the specified local repo if `repo` is not None.
+    from the remote AWS model repo, a community model, or the specified
+    local repo if `repo` is not None.
     """
     if name == 'demucs_unittest':
         return demucs_unittest()
@@ -74,12 +76,23 @@ def get_model(name: str,
         model_repo = LocalRepo(repo)
         bag_repo = BagOnlyRepo(repo, model_repo)
     any_repo = AnyModelRepo(model_repo, bag_repo)
+
+    # Try official repos first, fall back to community models
     try:
         model = any_repo.get_model(name)
-    except ImportError as exc:
-        if 'diffq' in exc.args[0]:
+    except (ModelLoadingError, ImportError) as exc:
+        if isinstance(exc, ImportError) and 'diffq' in exc.args[0]:
             _check_diffq()
-        raise
+            raise
+        # Try community repo (GDrive-hosted models)
+        if repo is None:
+            community_repo = GDriveRepo()
+            if community_repo.has_model(name):
+                model = community_repo.get_model(name)
+            else:
+                raise
+        else:
+            raise
 
     model.eval()
     return model
