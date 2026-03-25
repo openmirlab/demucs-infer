@@ -39,9 +39,9 @@ def test_cache_dir_default():
     assert repo.cache_dir == Path.home() / '.cache' / 'demucs-infer'
 
 
-def test_get_model_no_gdown():
+def test_get_model_no_gdown(tmp_path):
     """GDriveRepo.get_model raises ImportError when gdown not installed."""
-    repo = GDriveRepo()
+    repo = GDriveRepo(cache_dir=tmp_path)
     with patch.dict('sys.modules', {'gdown': None}):
         with pytest.raises(ImportError, match='gdown'):
             repo.get_model('49469ca8')

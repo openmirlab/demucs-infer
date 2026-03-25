@@ -8,6 +8,7 @@ import logging
 from pathlib import Path
 import typing as tp
 
+from .apply import Model
 from .repo import ModelOnlyRepo, ModelLoadingError
 from .states import load_model
 
@@ -40,7 +41,7 @@ class GDriveRepo(ModelOnlyRepo):
     def has_model(self, sig: str) -> bool:
         return sig in COMMUNITY_MODELS
 
-    def get_model(self, sig: str):
+    def get_model(self, sig: str) -> Model:
         if sig not in COMMUNITY_MODELS:
             raise ModelLoadingError(
                 f'Could not find community model with signature {sig}.')
