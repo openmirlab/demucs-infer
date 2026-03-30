@@ -603,7 +603,7 @@ uv run python your_script.py
 **With pip:**
 ```bash
 # Make sure you installed demucs-infer, not demucs
-pip uninstall demucs demucsfix
+pip uninstall demucs
 pip install demucs-infer
 ```
 

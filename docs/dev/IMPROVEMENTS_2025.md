@@ -47,7 +47,7 @@ Added comprehensive testing infrastructure, CI/CD automation, and cleaned up doc
 ### 3. ✅ Code Fixes
 
 **Fixed critical issues:**
-- `demucs_infer/separate.py:25` - Changed ArgumentParser name from "demucsfix.separate" to "demucs-infer"
+- `demucs_infer/separate.py:25` - Changed ArgumentParser name to "demucs-infer"
 - `demucs_infer/compat.py` - Added module aliasing back for pretrained model compatibility
   - Required for models saved with 'demucs' module name to load correctly
 
@@ -100,7 +100,7 @@ uv run demucs-infer --list-models
 - ⚠️ No CI/CD automation
 - ⚠️ Manual testing required
 - ⚠️ Outdated GitHub Actions
-- ⚠️ "demucsfix" references in code
+- ⚠️ Legacy naming references in code
 - ⚠️ Duplicate documentation files
 
 ### After Improvements

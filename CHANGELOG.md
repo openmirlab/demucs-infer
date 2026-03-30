@@ -40,7 +40,7 @@ No changes yet.
 - **README.md**: Added testing section with examples and CI badge
 
 ### Fixed
-- **CLI naming**: Fixed argument parser name from "demucsfix.separate" to "demucs-infer" in `separate.py`
+- **CLI naming**: Fixed argument parser name to "demucs-infer" in `separate.py`
 - **Documentation cleanup**: Removed redundant files (docs/IMPLEMENTATION_NOTES.md, docs/dev/SETUP_COMPLETE.md)
 - Fixed YAML config files inclusion in package distribution
 - Updated GitHub Actions workflow to use release-based publishing

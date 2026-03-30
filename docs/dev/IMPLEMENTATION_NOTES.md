@@ -46,7 +46,7 @@ demucs-infer/
 - Simple stderr printing + sys.exit(1)
 
 ### 2. Modified `demucs_infer/compat.py`
-**Before**: Complex sys.modules manipulation from demucsfix
+**Before**: Complex sys.modules manipulation from legacy fork
 **After**: Simple PyTorch compatibility functions only
 - Removed: Module aliasing that caused import errors
 - Kept: PyTorch compatibility wrappers (`get_torch_arange`, etc.)
