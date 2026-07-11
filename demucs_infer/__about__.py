@@ -17,4 +17,4 @@ from here instead of hardcoding its own copy. Bump only this file.
 Reads: (nothing internal)
 """
 
-__version__ = "4.2.0"
+__version__ = "4.2.1"
