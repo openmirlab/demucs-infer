@@ -84,6 +84,12 @@ dev = [
     "pytest>=8.3.5",
 ]
 
+[tool.pytest.ini_options]
+markers = [
+    "network: hits real network endpoints (checkpoint URL liveness); deselected by default, run with `pytest -m network`",
+]
+addopts = "-m \"not network\""
+
 [tool.hatch.build]
 include = [
     "demucs_infer/**/*.py",
