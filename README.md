@@ -440,8 +440,8 @@ model = model.to("cpu")     # CPU
 ## 📚 Documentation
 
 - **[Migration Guide](docs/MIGRATION.md)** - Migrate from original Demucs
-- **[Implementation Notes](docs/IMPLEMENTATION_NOTES.md)** - Technical details
-- **[Test Examples](docs/test_imports.py)** - Import verification
+- **[Implementation Notes](docs/dev/IMPLEMENTATION_NOTES.md)** - Technical details
+- **[Test Examples](tests/test_import.py)** - Import verification
 
 ---
 
@@ -476,8 +476,11 @@ uv add "demucs-infer[mp3]"
 # For quantized models
 uv add "demucs-infer[quantized]"
 
+# For downloading community models (Google Drive)
+uv add "demucs-infer[community]"
+
 # Or install all optional features
-uv add "demucs-infer[mp3,quantized]"
+uv add "demucs-infer[mp3,quantized,community]"
 ```
 
 **With pip:**
@@ -488,8 +491,11 @@ pip install demucs-infer[mp3]  # Adds: lameenc>=1.2
 # For quantized models
 pip install demucs-infer[quantized]  # Adds: diffq>=0.2.1
 
+# For downloading community models (Google Drive)
+pip install demucs-infer[community]  # Adds: gdown>=5.0.0
+
 # Or install all optional features
-pip install "demucs-infer[mp3,quantized]"
+pip install "demucs-infer[mp3,quantized,community]"
 ```
 
 ### Development Installation
@@ -526,17 +532,17 @@ The package includes a comprehensive test suite using pytest:
 uv run pytest tests/ -v
 
 # Run specific test file
-uv run pytest tests/test_log.py -v
+uv run pytest tests/test_import.py -v
 
 # Run with coverage
 uv run pytest tests/ --cov=demucs_infer
 
-# Run slow tests (requires model download)
-uv run pytest tests/ -v -m "slow"
+# Run network tests too (checkpoint URL liveness; deselected by default)
+uv run pytest tests/ -v -m "network"
 ```
 
 **Continuous Integration:**
-- GitHub Actions automatically runs tests on every push/PR
+- GitHub Actions runs the test suite as a release gate: nothing publishes to PyPI without it passing first (`.github/workflows/publish.yml`)
 - Tests validate both library API and CLI commands
 - Python 3.10 with PyTorch 2.x compatibility verified
 
