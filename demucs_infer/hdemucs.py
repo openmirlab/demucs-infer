@@ -3,8 +3,20 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-"""
+"""Hybrid Demucs (`HDemucs`): time-domain + spectrogram dual-branch model.
+
 This code contains the spectrogram and Hybrid version of Demucs.
+
+Backs the mdx/mdx_extra/hdemucs_mmi pretrained models (htdemucs.py's
+`HTDemucs` is the newer transformer-based successor). `_mask`/`_wiener`
+route through wiener filtering only when a given checkpoint's `cac`
+(complex-as-channels) config is False -- some mdx/mdx_extra bag members are,
+htdemucs never is. Deep-module file: internals intentionally untouched by
+this campaign (forward-pass layout is tied to pickled checkpoint
+args/kwargs; see demucs.py's header for the same constraint).
+
+Reads: demucs (DConv, rescale_module), states (capture_init), spec
+(spectro, ispectro), wiener (wiener, vendored from openunmix)
 """
 from copy import deepcopy
 import math

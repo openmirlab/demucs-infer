@@ -2,6 +2,12 @@
 
 Provides GDriveRepo, a ModelOnlyRepo subclass that downloads .th checkpoint
 files via gdown to a local cache (~/.cache/demucs-infer/) on first use.
+Every download is checksum-verified via repo.check_checksum against the
+`sha256` recorded in COMMUNITY_MODELS (ADOPT campaign P3 -- previously
+unverified; see docs/checkpoints_provenance.json).
+
+Reads: apply (Model), repo (ModelOnlyRepo, ModelLoadingError, check_checksum),
+states (load_model)
 """
 
 import logging

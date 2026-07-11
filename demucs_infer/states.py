@@ -3,8 +3,20 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-"""
-Utilities to save and load models.
+"""Utilities to save and load models.
+
+`load_model`/`set_state` are the inference-time checkpoint loader every
+Repo (repo.py, community.py) calls after fetching a `.th` file: reconstructs
+the model class from the pickled `klass`/`args`/`kwargs`, then loads its
+state dict (transparently handling diffq-quantized states via
+`restore_quantized_state`). `capture_init` is the decorator model
+`__init__`s use to record those args/kwargs at construction time so they
+round-trip through pickling. Training-only counterparts (quantizer setup
+with an optimizer, checkpoint-saving/EMA-state-swapping helpers) were
+removed as dead code in the ADOPT campaign's P2 -- this file only retains
+the inference-time load path.
+
+Reads: log (fatal)
 """
 import functools
 import inspect

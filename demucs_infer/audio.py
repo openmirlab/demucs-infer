@@ -3,6 +3,19 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+"""Audio I/O: loading (AudioFile), resampling/channel conversion, and saving
+(save_audio) stems back to disk (wav via torchaudio/soundfile, or mp3 via
+encode_mp3's ffmpeg subprocess).
+
+save_audio's defaults (clip mode, bit depth) are load-bearing beyond this
+package: downstream callers that read stems back off disk (e.g.
+all-in-one-infer's madmom-compatible in-memory fast path) reproduce this
+module's rounding/clipping behavior bit-for-bit, so changing save_audio's
+defaults is a breaking change for anyone who depends on that byte-exact
+round trip, not just an internal cleanup.
+
+Reads: utils (temp_filenames)
+"""
 import json
 import subprocess as sp
 from pathlib import Path

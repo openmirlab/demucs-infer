@@ -4,6 +4,18 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 """Loading pretrained models.
+
+`get_model(name)` is the top-level resolver: tries the official Meta-hosted
+registry first (remote/files.txt signatures + remote/*.yaml bag configs,
+via repo.RemoteRepo/BagOnlyRepo), then falls back to community.GDriveRepo
+for community-contributed signatures. `REMOTE_ROOT`/`_parse_remote_files`
+are also reused directly by tools/build_checkpoints_provenance.py and
+tests/test_checkpoints_liveness.py to enumerate every official checkpoint
+URL without re-implementing the files.txt parsing.
+
+Reads: community (GDriveRepo), hdemucs (HDemucs, for demucs_unittest),
+repo (RemoteRepo, LocalRepo, BagOnlyRepo, AnyModelRepo, ModelLoadingError),
+states (_check_diffq)
 """
 
 import logging

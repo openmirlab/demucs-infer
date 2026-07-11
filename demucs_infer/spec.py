@@ -3,7 +3,13 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-"""Conveniance wrapper to perform STFT and iSTFT"""
+"""Conveniance wrapper to perform STFT and iSTFT
+
+Small, self-contained numerics used by both hdemucs.py and htdemucs.py's
+spectrogram branch (`_spec`/`_ispec`). No internal demucs_infer imports.
+
+Reads: (nothing internal)
+"""
 
 import torch as th
 

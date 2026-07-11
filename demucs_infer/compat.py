@@ -4,10 +4,25 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""
+"""Checkpoint-unpickling compatibility shim -- import this before loading any
+pretrained model.
+
 PyTorch 2.x compatibility utilities.
 Provides helper functions for torch operations that work across different PyTorch versions.
 Also provides module aliasing for backward compatibility with pretrained models.
+
+Old checkpoints (including community ones like drumsep) were pickled with
+class references under the `demucs.*` module path. This module registers
+`demucs` and `demucs.{hdemucs,htdemucs,demucs,states,spec,apply,repo,
+pretrained,audio,utils}` as aliases into `sys.modules` at IMPORT TIME (a
+side effect, not a function call) so `torch.load(..., weights_only=False)`
+can still resolve those classes under this renamed, inference-only package.
+Both __init__.py and separate.py import this module first for exactly that
+ordering reason -- removing or reordering the import breaks old-checkpoint
+loading silently (it only surfaces as an unpickling error).
+
+Reads: hdemucs, htdemucs, demucs, states, spec, apply, repo, pretrained,
+audio, utils (imported solely to populate the sys.modules aliases above)
 """
 
 import sys

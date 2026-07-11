@@ -6,6 +6,16 @@
 """Represents a model repository, including pre-trained models and bags of models.
 A repo can either be the main remote repository stored in AWS, or a local repository
 with your own models.
+
+RemoteRepo downloads via torch.hub.load_state_dict_from_url(check_hash=True),
+which verifies against the 8-hex-char sha256 prefix embedded in each
+checkpoint's filename (see pretrained.py's files.txt parsing). LocalRepo
+verifies the same prefix explicitly via `check_checksum`, which
+community.py's GDriveRepo also reuses (its Google Drive downloads have no
+equivalent built-in check, unlike torch.hub's URLs) -- see the ADOPT
+campaign's P3 for the provenance inventory this file's checks feed into.
+
+Reads: apply (BagOfModels, Model), states (load_model)
 """
 
 from hashlib import sha256

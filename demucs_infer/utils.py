@@ -3,6 +3,16 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+"""Foundation-layer grab-bag: tensor framing helpers (`unfold`, `center_trim`)
+used by demucs.py/apply.py's chunking logic, plus small process/threading
+utilities (`temp_filenames`, `DummyPoolExecutor`) used by audio.py and
+apply.py respectively.
+
+No internal demucs_infer imports -- this sits at the bottom of the
+dependency graph so it can't accidentally create an import cycle.
+
+Reads: (nothing internal)
+"""
 
 from collections import defaultdict
 from concurrent.futures import CancelledError
