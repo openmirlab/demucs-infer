@@ -5,6 +5,14 @@ All notable changes to demucs-infer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+- Google Colab quickstart notebook (`notebooks/quickstart_colab.ipynb`) and
+  the README's Colab badge/section — maintaining a separate notebook
+  environment alongside the PyPI package was more upkeep than the audience
+  justified.
+
 ## [4.2.1] - 2026-07-11
 
 (Version note: 4.2.0 on PyPI is an inadvertent re-publish of the pre-campaign
