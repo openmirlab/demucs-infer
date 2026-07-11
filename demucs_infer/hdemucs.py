@@ -10,7 +10,7 @@ from copy import deepcopy
 import math
 import typing as tp
 
-from openunmix.filtering import wiener
+from .wiener import wiener
 import torch
 from torch import nn
 from torch.nn import functional as F

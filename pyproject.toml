@@ -39,7 +39,7 @@ dependencies = [
     "torchaudio>=2.0.0",
     "einops",
     "julius>=0.2.3",
-    "openunmix",
+    "numpy",
     "pyyaml",
     "tqdm",
 ]
