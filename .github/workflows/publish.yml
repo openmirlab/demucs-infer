@@ -15,14 +15,40 @@ on:
         type: string
 
 jobs:
+  test:
+    # Test-gate (constitution art.7 amendment, ADOPT campaign P5): nothing
+    # publishes to PyPI without the test suite passing first. Network-marked
+    # tests (checkpoint URL liveness) are deselected by default (see
+    # pyproject.toml's `addopts = -m "not network"`) and intentionally not
+    # run here.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install package + test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest
+
+      - name: Run test suite
+        run: pytest tests/
+
   publish:
+    needs: [test]
     runs-on: ubuntu-latest
     # Note: Environment is optional. If you want to add protection rules later,
     # create an environment named "pypi" in repository settings → Environments
     permissions:
       id-token: write  # Required for trusted publishing (OIDC)
       contents: read    # Required to checkout code
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

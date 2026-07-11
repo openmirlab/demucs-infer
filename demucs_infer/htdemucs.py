@@ -4,12 +4,27 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 # First author is Simon Rouard.
-"""
+"""Hybrid Transformer Demucs (`HTDemucs`): the default `htdemucs` model.
+
 This code contains the spectrogram and Hybrid version of Demucs.
+
+Reuses hdemucs.py's encoder/decoder layers (HEncLayer, HDecLayer, ...) but
+replaces its LSTM/attention bottleneck with transformer.py's
+CrossTransformerEncoder. Every shipped htdemucs config has `cac=True`,
+which makes `_mask()` return before ever calling `_wiener()` -- htdemucs
+never exercises the vendored wiener path (see wiener.py's header; verified
+during the ADOPT campaign's P1). Deep-module file: internals intentionally
+untouched by this campaign (forward-pass layout is tied to pickled
+checkpoint args/kwargs; see demucs.py's header for the same constraint).
+
+Reads: wiener (wiener, vendored from openunmix), transformer
+(CrossTransformerEncoder), demucs (rescale_module), states (capture_init),
+spec (spectro, ispectro), hdemucs (pad1d, ScaledEmbedding, HEncLayer,
+MultiWrap, HDecLayer)
 """
 import math
 
-from openunmix.filtering import wiener
+from .wiener import wiener
 import torch
 from torch import nn
 from torch.nn import functional as F

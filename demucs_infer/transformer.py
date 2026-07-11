@@ -4,6 +4,17 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 # First author is Simon Rouard.
+"""CrossTransformerEncoder: the transformer bottleneck htdemucs.py's
+`HTDemucs` uses in place of hdemucs.py's LSTM/local-attention bottleneck.
+
+Largest file in the package (840 lines): positional embeddings (sinusoidal,
+2D, CAPE), the cross-attention encoder layer stack, and a from-scratch
+`MultiheadAttention` with optional dynamic-sparse attention. Deep-module
+file: internals intentionally untouched by this campaign -- see demucs.py's
+header for why (pickled checkpoint args/kwargs pin the current layout).
+
+Reads: compat (import side effect only, see compat.py's header)
+"""
 
 import random
 import typing as tp

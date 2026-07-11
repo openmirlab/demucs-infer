@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "demucs-infer"
-version = "4.2.0"
+dynamic = ["version"]
 description = "Music source separation in the waveform domain - Inference-only (PyTorch 2.x)"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -39,7 +39,7 @@ dependencies = [
     "torchaudio>=2.0.0",
     "einops",
     "julius>=0.2.3",
-    "openunmix",
+    "numpy",
     "pyyaml",
     "tqdm",
 ]
@@ -73,6 +73,9 @@ Repository = "https://github.com/openmirlab/demucs-infer"
 "Bug Reports" = "https://github.com/openmirlab/demucs-infer/issues"
 Changelog = "https://github.com/openmirlab/demucs-infer/blob/main/CHANGELOG.md"
 
+[tool.hatch.version]
+path = "demucs_infer/__about__.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["demucs_infer"]
 
@@ -83,6 +86,12 @@ packages = ["demucs_infer"]
 dev = [
     "pytest>=8.3.5",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "network: hits real network endpoints (checkpoint URL liveness); deselected by default, run with `pytest -m network`",
+]
+addopts = "-m \"not network\""
 
 [tool.hatch.build]
 include = [

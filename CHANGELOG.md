@@ -7,7 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No changes yet.
+### Changed
+- **Dropped the `openunmix` dependency**: the only thing this package used
+  from it (`openunmix.filtering.wiener`, optional Wiener-filter
+  post-processing on some model configs) is now vendored into
+  `demucs_infer/wiener.py` (MIT-licensed, with attribution to
+  open-unmix-pytorch v1.3.0). Verified bit-identical output, both via a
+  direct unit test against the original across all softmask/residual/
+  iterations code paths and a real end-to-end run (mdx_extra, whose
+  cac=False bag members exercise this at inference; htdemucs's shipped
+  config never does).
+- **api.py split**: model discovery/metadata (`ModelInfo`, `get_model_info`,
+  `list_models`, `list_supported_separation_types`, `KNOWN_MODELS`,
+  `SEPARATION_TYPES`, `SOURCE_TRANSLATIONS`) moved to the new
+  `demucs_infer/model_info.py`; `api.py` re-exports all of them, so
+  existing `from demucs_infer.api import ...` usage is unaffected.
+  `api.py`: 783 -> 412 lines.
+- **Version single-sourcing**: `__version__` now lives only in
+  `demucs_infer/__about__.py`; `pyproject.toml`'s `version` is `dynamic`
+  and hatchling reads it from that file. (Previously duplicated in both
+  places and had drifted.)
+- File-top navigability headers added across `demucs_infer/*.py`.
+
+### Added
+- **Numpy** added as an explicit dependency (it was always imported
+  directly by `audio.py`/`transformer.py`, but had been an unlisted
+  transitive dependency pulled in via `openunmix`/the `community` extra's
+  `gdown`).
+- **Checksum verification for community models**: `GDriveRepo` downloads
+  are now sha256-verified via the existing `repo.check_checksum` helper
+  (previously unverified). See `docs/checkpoints_provenance.json`.
+- **`tests/test_checkpoints_liveness.py`**: HEADs every official + community
+  checkpoint URL; marked `network`, deselected by default
+  (`pytest -m network` to run).
+- **`tests/test_baseline_regression.py`** and **`tests/test_import.py`**:
+  seeded htdemucs output regression test and an import smoke test.
+- **`CLAUDE.md`**: repo scope, verification commands, header convention,
+  and the two known-unfixed issues (unseeded `shifts` randomness, the
+  `segment=` + HTDemucs crash) with rationale for leaving them as-is.
+- **CI test gate**: `publish.yml` now runs the test suite in a `test` job
+  before `publish` (`needs: [test]`) -- nothing publishes to PyPI without
+  tests passing.
+
+### Removed
+- Leftover training-only dead code: `states.py`'s `get_quantizer`,
+  `get_state`, `save_with_checksum`, `copy_state`, `swap_state`, and
+  `utils.py`'s `random_subset` -- none reachable from any inference path
+  (confirmed via repo-wide grep before removal).
 
 ## [4.1.2] - 2026-01-14
 

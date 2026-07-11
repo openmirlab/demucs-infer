@@ -3,6 +3,18 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+"""Original (time-domain, non-hybrid) Demucs model architecture.
+
+Defines `Demucs` (the encoder/decoder conv stack with BLSTM + DConv local
+attention) plus its building blocks (BLSTM, DConv, LocalState) and
+`rescale_module`, which hdemucs.py also imports for its own conv init.
+Deep-module file: internals intentionally untouched by this campaign (a
+model's forward-pass code layout is tied to how its pickled checkpoint
+`args`/`kwargs` were captured via states.capture_init -- restructuring here
+risks breaking old-checkpoint loading, not just readability).
+
+Reads: states (capture_init), utils (center_trim, unfold)
+"""
 
 import math
 import typing as tp

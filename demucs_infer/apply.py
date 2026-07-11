@@ -3,9 +3,24 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
-"""
+"""Inference-time driver: chunking, overlap-add, and the random-shift trick.
+
 Code to apply a model to a mix. It will handle chunking with overlaps and
 inteprolation between chunks, as well as the "shift trick".
+
+`apply_model` is the low-level function every separation call eventually
+goes through (api.Separator and downstream callers like all-in-one-infer's
+DemucsProvider both call it directly). KNOWN QUIRK -- shifts (default 1)
+draws its random time-offset from the unseeded stdlib `random` module (see
+`random.randint` below), not torch's RNG, so reproducibility across runs
+requires callers to `random.seed(...)` immediately before calling
+apply_model (see tools/capture_baseline.py). KNOWN BUG -- passing an
+explicit `segment=` here crashes HTDemucs models whose
+`use_train_segment=True` (ValueError in htdemucs.py's valid_length); out of
+scope for this campaign, not fixed here.
+
+Reads: demucs (Demucs), hdemucs (HDemucs), htdemucs (HTDemucs), utils
+(center_trim, DummyPoolExecutor)
 """
 from concurrent.futures import ThreadPoolExecutor
 import copy

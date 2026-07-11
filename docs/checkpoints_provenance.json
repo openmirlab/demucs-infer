@@ -1,0 +1,174 @@
+{
+  "community": {
+    "49469ca8": {
+      "gdrive_id": "1-Dm666ScPkg8Gt2-lK3Ua0xOudWHZBGC",
+      "name": "Drumsep",
+      "origin": "https://github.com/inagoy/drumsep",
+      "sha256": "aefaa8543c9b9c75e22f5f32b53ab86dfe416457849af1383ff1aef83401423f"
+    }
+  },
+  "official": {
+    "04573f0d": {
+      "embedded_prefix": "f3cf25b2",
+      "prefix_matches_embedded": true,
+      "sha256": "f3cf25b222c4eed7cd49dd8b2c9597d50c18bd154090f7b919cfa5f93cf22c49",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"
+    },
+    "0d19c1c6": {
+      "embedded_prefix": "0f06f20e",
+      "prefix_matches_embedded": true,
+      "sha256": "0f06f20ed6ddc8058fa72ccc4845f3a88916eff7d007b623924193de217bbcf4",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/0d19c1c6-0f06f20e.th"
+    },
+    "14fc6a69": {
+      "embedded_prefix": "a89dd0ee",
+      "prefix_matches_embedded": true,
+      "sha256": "a89dd0eeb547221dcfd6c0a47baa768ce0bce548eaf86b9a404d6b1088b5d22f",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/14fc6a69-a89dd0ee.th"
+    },
+    "1ef250f1": {
+      "embedded_prefix": "592467ce",
+      "note": "not cached locally; not downloaded by this tool",
+      "sha256": null,
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/1ef250f1-592467ce.th"
+    },
+    "305bc58f": {
+      "embedded_prefix": "18378783",
+      "prefix_matches_embedded": true,
+      "sha256": "18378783cf76d44213f7a0c87da872a35b976c31ac11c4b367438b4674a2f0fe",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/305bc58f-18378783.th"
+    },
+    "42e558d4": {
+      "embedded_prefix": "196e0e1b",
+      "prefix_matches_embedded": true,
+      "sha256": "196e0e1bc5e83ea6ffbf0750b1abae1305b83de12ec98e5b50915a7139c52759",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/42e558d4-196e0e1b.th"
+    },
+    "464b36d7": {
+      "embedded_prefix": "e5a9386e",
+      "prefix_matches_embedded": true,
+      "sha256": "e5a9386ecbf6f30bb2bdc7ae162f471d87f3b5bffba1a8cb2cebe4403280967e",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/464b36d7-e5a9386e.th"
+    },
+    "5c90dfd2": {
+      "embedded_prefix": "34c22ccb",
+      "prefix_matches_embedded": true,
+      "sha256": "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/5c90dfd2-34c22ccb.th"
+    },
+    "5d2d6c55": {
+      "embedded_prefix": "db83574e",
+      "prefix_matches_embedded": true,
+      "sha256": "db83574e05b2308f76e2764819da673f2d16d437b9e619f5fcb72f275fc0e24f",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/5d2d6c55-db83574e.th"
+    },
+    "6b9c2ca1": {
+      "embedded_prefix": "3fd82607",
+      "prefix_matches_embedded": true,
+      "sha256": "3fd82607b051e9f8ed0e86a30791023a3b589a427fb994c8bbfdff8c1903eeff",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/6b9c2ca1-3fd82607.th"
+    },
+    "75fc33f5": {
+      "embedded_prefix": "1941ce65",
+      "prefix_matches_embedded": true,
+      "sha256": "1941ce654b11df4132b9f4eae408556b4c83fad6fe26b4bc0dbcb36b975befb3",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/75fc33f5-1941ce65.th"
+    },
+    "7d865c68": {
+      "embedded_prefix": "3d5dd56b",
+      "prefix_matches_embedded": true,
+      "sha256": "3d5dd56b5bc986f136dff98655ded22b2b033f465ccec7a28640a6b15fd71ed6",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/7d865c68-3d5dd56b.th"
+    },
+    "7ecf8ec1": {
+      "embedded_prefix": "70f50cc9",
+      "prefix_matches_embedded": true,
+      "sha256": "70f50cc947d08f32e6dd8e2b687d398fa5ef9e51d1bd7600e32205d1f44be6b9",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/7ecf8ec1-70f50cc9.th"
+    },
+    "7fd6ef75": {
+      "embedded_prefix": "a905dd85",
+      "prefix_matches_embedded": true,
+      "sha256": "a905dd8548f7389f1a3686c24c09d7bee61b716e3372e778e2acec88333ecdf4",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/7fd6ef75-a905dd85.th"
+    },
+    "83fc094f": {
+      "embedded_prefix": "4a16d450",
+      "prefix_matches_embedded": true,
+      "sha256": "4a16d450fd8c9277494e23865cadaa4a3e64141c45411d84243b8c95ea4b7cae",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/83fc094f-4a16d450.th"
+    },
+    "902315c2": {
+      "embedded_prefix": "b39ce9c9",
+      "note": "not cached locally; not downloaded by this tool",
+      "sha256": null,
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/902315c2-b39ce9c9.th"
+    },
+    "92cfc3b6": {
+      "embedded_prefix": "ef3bcb9c",
+      "prefix_matches_embedded": true,
+      "sha256": "ef3bcb9c8b40d14ae5d51b6db2587339cc12c6b77c0be151ce6d69002e087bf2",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th"
+    },
+    "955717e8": {
+      "embedded_prefix": "8726e21a",
+      "prefix_matches_embedded": true,
+      "sha256": "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"
+    },
+    "9a6b4851": {
+      "embedded_prefix": "03af0aa6",
+      "note": "not cached locally; not downloaded by this tool",
+      "sha256": null,
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/9a6b4851-03af0aa6.th"
+    },
+    "a1d90b5c": {
+      "embedded_prefix": "ae9d2452",
+      "prefix_matches_embedded": true,
+      "sha256": "ae9d245283bf24b552913ee233a1101dcd0aeaed59b1c0a2da0e1f6eda15101b",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/a1d90b5c-ae9d2452.th"
+    },
+    "b72baf4e": {
+      "embedded_prefix": "8778635e",
+      "prefix_matches_embedded": true,
+      "sha256": "8778635e98a9d4b34b3d132300597758f8f3f2978510eb20c202fd0d54a7bbf0",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/b72baf4e-8778635e.th"
+    },
+    "c511e2ab": {
+      "embedded_prefix": "fe698775",
+      "prefix_matches_embedded": true,
+      "sha256": "fe6987756a7087d339bf63b19bb481b12cea02d3bc0de7583df7597210209649",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/c511e2ab-fe698775.th"
+    },
+    "cfa93e08": {
+      "embedded_prefix": "61801ae1",
+      "prefix_matches_embedded": true,
+      "sha256": "61801ae1567d606c97a9c3469e943ae306d0a873eeb60d623ae7cfc7042b3f68",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/cfa93e08-61801ae1.th"
+    },
+    "d12395a8": {
+      "embedded_prefix": "e57c48e6",
+      "prefix_matches_embedded": true,
+      "sha256": "e57c48e6b0e38af4f7118d7bd08c49f0a0c0edf7d09143bdd902ea0d237303e6",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th"
+    },
+    "e51eebcc": {
+      "embedded_prefix": "c1b80bdd",
+      "prefix_matches_embedded": true,
+      "sha256": "c1b80bdd6de58274abf359e66822a76f49ce2b9f086fc5dc917ac14598e6bebf",
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/e51eebcc-c1b80bdd.th"
+    },
+    "f7e0c4bc": {
+      "embedded_prefix": "ba3fe64a",
+      "prefix_matches_embedded": true,
+      "sha256": "ba3fe64ae8ef66ac9a4857222ce48efbdc5eb3ad375cb79dd13debee5aaa4066",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th"
+    },
+    "fa0cb7f9": {
+      "embedded_prefix": "100d8bf4",
+      "note": "not cached locally; not downloaded by this tool",
+      "sha256": null,
+      "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/fa0cb7f9-100d8bf4.th"
+    }
+  }
+}

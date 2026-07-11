@@ -3,6 +3,16 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+"""CLI entry point (the `demucs-infer` console script / `python -m
+demucs_infer`): argument parsing + a thin main() that wires them into
+api.Separator and save_audio.
+
+Imports `compat` first, before anything else, so its sys.modules aliasing
+(see compat.py's header) is in place before any model-loading code runs.
+
+Reads: api (Separator, save_audio, list_models), apply (BagOfModels),
+htdemucs (HTDemucs), pretrained (add_model_flags, ModelLoadingError)
+"""
 
 # Import compatibility module to ensure demucs module is available
 from . import compat

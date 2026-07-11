@@ -3,6 +3,16 @@
 #
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
+"""Foundation-layer grab-bag: tensor framing helpers (`unfold`, `center_trim`)
+used by demucs.py/apply.py's chunking logic, plus small process/threading
+utilities (`temp_filenames`, `DummyPoolExecutor`) used by audio.py and
+apply.py respectively.
+
+No internal demucs_infer imports -- this sits at the bottom of the
+dependency graph so it can't accidentally create an import cycle.
+
+Reads: (nothing internal)
+"""
 
 from collections import defaultdict
 from concurrent.futures import CancelledError
@@ -14,7 +24,6 @@ import typing as tp
 
 import torch
 from torch.nn import functional as F
-from torch.utils.data import Subset
 
 
 def unfold(a, kernel_size, stride):
@@ -108,15 +117,6 @@ def temp_filenames(count: int, delete=True):
         if delete:
             for name in names:
                 os.unlink(name)
-
-
-def random_subset(dataset, max_samples: int, seed: int = 42):
-    if max_samples >= len(dataset):
-        return dataset
-
-    generator = torch.Generator().manual_seed(seed)
-    perm = torch.randperm(len(dataset), generator=generator)
-    return Subset(dataset, perm[:max_samples].tolist())
 
 
 class DummyPoolExecutor:
