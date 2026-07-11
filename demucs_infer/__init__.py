@@ -9,13 +9,16 @@
 # sys.modules aliasing must run before any pretrained-model unpickling) and
 # to expose __version__.
 #
-# NOTE: __version__ below is a second source of truth alongside
-# pyproject.toml's `version` field; they have drifted before (see ADOPT P5).
+# __version__ is single-sourced from __about__.py (ADOPT campaign P5;
+# pyproject.toml's `version` is `dynamic` and reads from the same file via
+# hatchling -- see [tool.hatch.version] there). Previously duplicated here
+# as a literal, which drifted from pyproject.toml.
 # Original Demucs version: 4.1.0
 
-__version__ = "4.1.3"
+from .__about__ import __version__  # noqa: F401
 
 # Import compatibility module to ensure demucs module is available
 from . import compat
 
-# Reads: compat (import side effect only, see compat.py's header)
+# Reads: __about__ (__version__), compat (import side effect only, see
+# compat.py's header)

@@ -16,7 +16,9 @@ if [ -z "$1" ]; then
 fi
 
 BUMP_TYPE=$1
-CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+# Version is single-sourced in demucs_infer/__about__.py (ADOPT campaign P5);
+# pyproject.toml's `version` is `dynamic` and hatchling reads it from there.
+CURRENT_VERSION=$(grep '^__version__ = ' demucs_infer/__about__.py | sed 's/__version__ = "\(.*\)"/\1/')
 
 IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
 MAJOR=${VERSION_PARTS[0]}
@@ -46,11 +48,10 @@ NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
 
 echo "Bumping version from $CURRENT_VERSION to $NEW_VERSION"
 
-# Update pyproject.toml
-sed -i "s/^version = \".*\"/version = \"$NEW_VERSION\"/" pyproject.toml
-
-# Update demucs_infer/__init__.py
-sed -i "s/^__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" demucs_infer/__init__.py
+# Update the single source of truth: demucs_infer/__about__.py
+# (pyproject.toml's `version` is dynamic and reads from this file at build
+# time -- do not add a static `version = "..."` back to pyproject.toml)
+sed -i "s/^__version__ = \".*\"/__version__ = \"$NEW_VERSION\"/" demucs_infer/__about__.py
 
 # Update README.md if it has version references (optional, may not exist)
 if grep -q "Current Version\|Version:" README.md 2>/dev/null; then
@@ -58,7 +59,7 @@ if grep -q "Current Version\|Version:" README.md 2>/dev/null; then
     sed -i "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/" README.md || true
 fi
 
-echo "✅ Updated pyproject.toml, demucs_infer/__init__.py, and README.md to version $NEW_VERSION"
+echo "✅ Updated demucs_infer/__about__.py and README.md to version $NEW_VERSION"
 echo ""
 echo "Next steps:"
 echo "1. Update CHANGELOG.md with your changes"

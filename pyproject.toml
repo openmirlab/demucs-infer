@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "demucs-infer"
-version = "4.2.0"
+dynamic = ["version"]
 description = "Music source separation in the waveform domain - Inference-only (PyTorch 2.x)"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -72,6 +72,9 @@ Repository = "https://github.com/openmirlab/demucs-infer"
 "Original Demucs" = "https://github.com/facebookresearch/demucs"
 "Bug Reports" = "https://github.com/openmirlab/demucs-infer/issues"
 Changelog = "https://github.com/openmirlab/demucs-infer/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "demucs_infer/__about__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["demucs_infer"]

@@ -147,9 +147,17 @@ demucs-infer --two-stems=drums "audio.wav"
 - ✅ `torchaudio>=2.0.0`
 - ✅ `einops`
 - ✅ `julius>=0.2.3`
-- ✅ `openunmix`
+- ✅ `numpy`
 - ✅ `pyyaml`
 - ✅ `tqdm`
+
+### Vendored (no longer a dependency)
+
+- `openunmix` -- only ever used for `openunmix.filtering.wiener` (optional
+  Wiener-filter post-processing on some model configs); vendored directly
+  into `demucs_infer/wiener.py` (MIT-licensed, with attribution) so the
+  whole open-unmix-pytorch package no longer needs installing for one
+  function.
 
 ### Optional
 

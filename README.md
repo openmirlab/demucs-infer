@@ -454,10 +454,17 @@ torch>=2.0.0
 torchaudio>=2.0.0
 einops
 julius>=0.2.3
-openunmix
+numpy
 pyyaml
 tqdm
 ```
+
+> `openunmix` was dropped as a dependency: the only thing this package ever
+> used from it (`openunmix.filtering.wiener`, for optional Wiener-filter
+> post-processing on some model configs) is now vendored directly into
+> `demucs_infer/wiener.py` (MIT-licensed, with attribution). `numpy` was
+> added explicitly -- it was always used directly by this package, but had
+> been an unlisted transitive dependency (pulled in by openunmix) until now.
 
 ### Optional Dependencies
 
