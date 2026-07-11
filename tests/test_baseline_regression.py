@@ -26,9 +26,26 @@ import capture_baseline  # noqa: E402
 FIXTURE_PATH = REPO_ROOT / "tests" / "fixtures" / "baseline_htdemucs.json"
 
 
+def _env_matches(meta):
+    """Bit-exact digests are only valid on the recording environment: float
+    kernels differ across torch builds/BLAS/hardware (the madmom-infer P1
+    lesson). Elsewhere this test SKIPS -- the accuracy gate is enforced on
+    the recording environment, not re-litigated per-machine."""
+    import torch
+    if torch.__version__ != meta.get("torch_version"):
+        return False, f"torch {torch.__version__} != recorded {meta.get('torch_version')}"
+    if meta.get("device") == "cuda" and not torch.cuda.is_available():
+        return False, "fixture recorded on cuda; no cuda here"
+    return True, ""
+
+
 def test_baseline_matches_fixture():
     with open(FIXTURE_PATH) as f:
         expected = json.load(f)
+    import pytest
+    ok, why = _env_matches(expected["meta"])
+    if not ok:
+        pytest.skip("bit-exact baseline valid only on recording env: " + why)
 
     import torch
     device = "cuda" if torch.cuda.is_available() else "cpu"
