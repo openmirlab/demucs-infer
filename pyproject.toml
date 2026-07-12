@@ -34,9 +34,16 @@ classifiers = [
 ]
 
 # Minimal inference-only dependencies
+# soundfile is the wav/flac load+save fallback for when torchaudio's own
+# decoders are unavailable (torchaudio>=2.11 dropped its bundled FFmpeg/sox
+# backends in favor of the separate `torchcodec` package -- see the
+# `torchcodec` extra below and README's "torchaudio 2.11+" note). Unlike
+# torchcodec, soundfile ships self-contained wheels (bundled libsndfile, no
+# system FFmpeg needed), so it is safe as a hard floor rather than an extra.
 dependencies = [
     "torch>=2.0.0",
     "torchaudio>=2.0.0",
+    "soundfile>=0.12.1",
     "einops",
     "julius>=0.2.3",
     "numpy",
@@ -45,6 +52,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Optional: restore torchaudio's own decoders on torchaudio>=2.11 (which
+# requires torchcodec for torchaudio.load/save; needs system FFmpeg libs,
+# so it is opt-in rather than a hard dependency). Not required for normal
+# use -- the soundfile fallback above already covers wav/flac on 2.11+.
+torchcodec = [
+    "torchcodec",
+]
 # Optional: MP3 encoding support
 mp3 = [
     "lameenc>=1.2",

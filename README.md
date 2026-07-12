@@ -19,7 +19,7 @@ High-quality audio source separation models for extracting vocals, drums, bass, 
 
 - **PyTorch 2.x Support**: Compatible with modern PyTorch versions (no `torchaudio<2.1` restriction)
 - **Inference-Only**: ~50% smaller than original package (removed training code)
-- **Minimal Dependencies**: 7 core packages (vs 15+ in original)
+- **Minimal Dependencies**: 8 core packages (vs 15+ in original)
 - **API Compatible**: Drop-in replacement for inference workflows
 - **Same Quality**: Zero changes to separation algorithms
 - **All Models Supported**: HTDemucs, MDX, and all variants
@@ -136,16 +136,18 @@ pip install demucs-infer
 ```python
 from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model
-from demucs_infer.audio import save_audio
+from demucs_infer.audio import AudioFile, save_audio
 import torch
-import torchaudio
 
 # Load model
 model = get_model("htdemucs_ft")
 model.eval()
 
-# Load audio
-wav, sr = torchaudio.load("song.wav")
+# Load audio (AudioFile is demucs-infer's own FFmpeg-based reader -- see
+# "torchaudio 2.11+ and audio decoders" below for why this is preferred
+# over calling torchaudio.load directly)
+sr = model.samplerate
+wav = AudioFile("song.wav").read(streams=0, samplerate=sr, channels=model.audio_channels)
 wav = wav.unsqueeze(0)  # Add batch dimension
 
 # Separate audio
@@ -212,7 +214,7 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository is 
 | **Maintenance Status** | ⚠️ No longer actively maintained | ✅ Active |
 | **PyTorch Support** | 1.8.x - 2.0.x (with `torchaudio<2.1`) | 2.0+ (no restrictions) ✅ |
 | **Package Size** | ~Full codebase | ~50% smaller ✅ |
-| **Dependencies** | 15+ packages | 7 core packages ✅ |
+| **Dependencies** | 15+ packages | 8 core packages ✅ |
 | **Training Code** | ✅ Included | ❌ Removed (inference-only) |
 | **Inference Code** | ✅ Included | ✅ Included |
 | **CLI Command** | `demucs` | `demucs-infer` (no conflicts) |
@@ -387,14 +389,17 @@ import torch
 from pathlib import Path
 from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model
-import torchaudio
+from demucs_infer.audio import AudioFile, save_audio
 
 model = get_model("htdemucs_ft").cuda().eval()
 
 audio_files = list(Path("input/").glob("*.wav"))
 
 for audio_file in audio_files:
-    wav, sr = torchaudio.load(str(audio_file))
+    wav = AudioFile(audio_file).read(
+        streams=0, samplerate=model.samplerate, channels=model.audio_channels
+    )
+    sr = model.samplerate
     wav = wav.unsqueeze(0).cuda()
 
     with torch.no_grad():
@@ -438,11 +443,12 @@ model = model.to("cpu")     # CPU
 
 ## 🛠 Dependencies
 
-### Core Dependencies (7 packages)
+### Core Dependencies (8 packages)
 
 ```toml
 torch>=2.0.0
 torchaudio>=2.0.0
+soundfile>=0.12.1
 einops
 julius>=0.2.3
 numpy
@@ -456,6 +462,53 @@ tqdm
 > `demucs_infer/wiener.py` (MIT-licensed, with attribution). `numpy` was
 > added explicitly -- it was always used directly by this package, but had
 > been an unlisted transitive dependency (pulled in by openunmix) until now.
+> `soundfile` was added in 4.2.2 as the wav/flac decoder used whenever
+> FFmpeg isn't available (see "torchaudio 2.11+ and audio decoders" below)
+> -- unlike `torchcodec`, it ships self-contained wheels with no system
+> FFmpeg requirement, so it's safe as a hard dependency.
+
+### torchaudio 2.11+ and audio decoders
+
+`torchaudio>=2.11` removed its bundled wav/flac/mp3 decoders; `torchaudio.load`
+and `torchaudio.save` now require the separate
+[`torchcodec`](https://github.com/pytorch/torchcodec) package (which itself
+needs system FFmpeg shared libraries), and raise `ImportError` without it.
+
+demucs-infer handles this automatically for the vast majority of installs
+(anyone with FFmpeg on `PATH`, which is already how tracks are read
+primarily) and degrades predictably otherwise:
+
+- **Loading** tries FFmpeg first (unaffected by any of this), same as
+  always. If FFmpeg isn't available:
+  - **wav/flac** go through `soundfile` directly -- verified bit-identical
+    to torchaudio's own decode (`np.array_equal`, PCM 16/24/32-bit + FLAC,
+    mono/stereo), so there's no accuracy difference either way.
+  - **mp3** (and anything else) stays on `torchaudio` only -- its mp3
+    decode was measured to differ slightly from soundfile's (~7e-7 max
+    per-sample difference, different underlying decoders), so
+    demucs-infer does **not** silently switch decoders for lossy formats.
+    If torchaudio itself can't decode (missing `torchcodec` on
+    torchaudio>=2.11), you'll get a clear error telling you to install
+    `torchcodec` or convert the file to wav/flac.
+- **Saving** tries `torchaudio.save` first and uses `soundfile` only if
+  that raises. This one is intentionally *not* soundfile-first: writing
+  identical samples as 16-bit PCM wav via `torchaudio.save` vs
+  `soundfile.write` was measured to differ by ±1 LSB in about half of
+  samples (a real rounding-convention difference, not noise), so
+  soundfile can't be the default encoder without changing output for
+  installs where torchaudio already works -- it's used only when
+  torchaudio itself is already broken.
+
+Two ways to opt back into torchaudio's own decoders instead of relying on
+these fallbacks, if you prefer:
+
+```bash
+# Option A: install torchcodec (needs system FFmpeg shared libraries)
+pip install demucs-infer[torchcodec]
+
+# Option B: pin an older torchaudio that still bundles its own decoders
+pip install "torchaudio<2.11"
+```
 
 ### Optional Dependencies
 
@@ -470,8 +523,12 @@ uv add "demucs-infer[quantized]"
 # For downloading community models (Google Drive)
 uv add "demucs-infer[community]"
 
+# To restore torchaudio's own decoders on torchaudio>=2.11 (optional --
+# see "torchaudio 2.11+ and audio decoders" above; needs system FFmpeg)
+uv add "demucs-infer[torchcodec]"
+
 # Or install all optional features
-uv add "demucs-infer[mp3,quantized,community]"
+uv add "demucs-infer[mp3,quantized,community,torchcodec]"
 ```
 
 **With pip:**
@@ -485,8 +542,11 @@ pip install demucs-infer[quantized]  # Adds: diffq>=0.2.1
 # For downloading community models (Google Drive)
 pip install demucs-infer[community]  # Adds: gdown>=5.0.0
 
+# To restore torchaudio's own decoders on torchaudio>=2.11 (optional)
+pip install demucs-infer[torchcodec]  # Adds: torchcodec
+
 # Or install all optional features
-pip install "demucs-infer[mp3,quantized,community]"
+pip install "demucs-infer[mp3,quantized,community,torchcodec]"
 ```
 
 ### Development Installation
@@ -584,7 +644,7 @@ uv run pytest tests/ -v -m "network"
 | Metric | Original Demucs | demucs-infer | Improvement |
 |--------|----------------|--------------|-------------|
 | **Python Files** | 36+ files | 17 files | ~47% smaller |
-| **Core Dependencies** | 15+ packages | 7 packages | ~53% fewer |
+| **Core Dependencies** | 15+ packages | 8 packages | ~47% fewer |
 | **PyTorch Restriction** | `torchaudio<2.1` ❌ | No restriction ✅ | Flexible |
 | **Training Code** | Included | Removed | Focused |
 | **Inference Quality** | High | **Same** ✅ | Identical |
@@ -620,6 +680,18 @@ model = model.to("cpu")
 # Or use two-stems mode (faster)
 # demucs-infer --two-stems=drums "audio.wav"
 ```
+
+### `ImportError: TorchCodec is required for ...` / `LoadAudioError` mentioning torchcodec
+
+This comes from `torchaudio` itself (`torchaudio>=2.11` requires the
+separate `torchcodec` package for its own decoders). For **wav/flac**,
+demucs-infer catches it internally and uses `soundfile` instead, so you
+shouldn't normally see this surface for those formats. For **mp3** (and
+other lossy formats), demucs-infer deliberately does *not* silently switch
+to `soundfile` (see "torchaudio 2.11+ and audio decoders" above for why),
+so if FFmpeg also isn't available you'll see this error for real -- either
+`pip install demucs-infer[torchcodec]`, pin `torchaudio<2.11`, install
+FFmpeg, or convert the file to wav/flac.
 
 ### Model Download Issues
 
