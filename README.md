@@ -11,37 +11,46 @@ High-quality audio source separation models for extracting vocals, drums, bass, 
 
 ---
 
-## 📌 Overview
+## Why This Exists
 
-**demucs-infer** is a streamlined, inference-only version of [Demucs](https://github.com/facebookresearch/demucs) by Meta AI Research, optimized for PyTorch 2.x with minimal dependencies.
+The original [Demucs](https://github.com/facebookresearch/demucs) repository by Meta AI Research is **no longer actively maintained**. The models remain state-of-the-art, but the package never received updates for modern PyTorch: it pins `torchaudio<2.1`, carries training-only dependencies (`dora-search`, `hydra`) that most inference users never need, and its packaging predates PEP 621.
 
-### 🎯 Key Features
+**demucs-infer** re-provides the same models and separation quality as an inference-only, PyPI-installable package:
 
-- **PyTorch 2.x Support**: Compatible with modern PyTorch versions (no `torchaudio<2.1` restriction)
-- **Inference-Only**: ~50% smaller than original package (removed training code)
-- **Minimal Dependencies**: 8 core packages (vs 15+ in original)
-- **API Compatible**: Drop-in replacement for inference workflows
-- **Same Quality**: Zero changes to separation algorithms
-- **All Models Supported**: HTDemucs, MDX, and all variants
-- **Model Info API**: Query model capabilities, separation types, and source translations
-- **Third-Party Model Support**: Compatible with community models (drumsep, cinematic, etc.)
+1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+.
+2. **Continue development** — addresses issues and papers over gaps (e.g. torchaudio 2.11+ dropping its bundled decoders) that the unmaintained upstream never will.
+3. **Focus on inference** — training code, evaluation scripts, and dataset utilities are removed for a leaner package.
+4. **Serve the community** — lets researchers and developers keep using these models without maintaining a fork themselves.
 
----
+### Before / After
 
-## 🙏 Acknowledgments
+| Aspect | Original Demucs | demucs-infer |
+|--------|----------------|--------------|
+| **Maintenance status** | No longer actively maintained | Active |
+| **PyTorch support** | 1.8.x – 2.0.x (with `torchaudio<2.1`) | 2.0+, no restriction |
+| **Python files** | 36+ files | 17 files (~47% smaller) |
+| **Core dependencies** | 15+ packages | 8 packages (~47% fewer) |
+| **Training code** | Included | Removed (inference-only) |
+| **Inference code / quality** | High | Identical (zero algorithm changes) |
+| **CLI / import name** | `demucs` / `demucs` | `demucs-infer` / `demucs_infer` (no conflicts) |
+| **Model weights** | Official Meta checkpoints | Same official checkpoints, same host |
 
-### Original Research by Alexandre Défossez and Meta AI Research
+## Acknowledgments
 
-**demucs-infer** is built upon the groundbreaking work of [Demucs](https://github.com/facebookresearch/demucs) by **Alexandre Défossez** and **Meta AI Research**. The original Demucs represents a major advancement in music source separation, achieving state-of-the-art results through innovative hybrid architectures and transformer-based approaches.
+**demucs-infer** is built entirely on the research and models of the original Demucs project. All algorithms, model architectures, and pretrained weights originate there — this package only maintains the packaging and PyTorch 2.x compatibility layer around them.
 
-### Research Papers
+- **Upstream organization:** [Meta AI Research (FAIR)](https://ai.meta.com/research/)
+- **Individual authors:** Alexandre Défossez (both papers below, see [Citation](#citation)); Simon Rouard and Francisco Massa (Hybrid Transformer Demucs, co-authors — see [arXiv:2211.08553](https://arxiv.org/abs/2211.08553))
+- **Source repository:** [github.com/facebookresearch/demucs](https://github.com/facebookresearch/demucs)
+- **Pretrained weights host:** [dl.fbaipublicfiles.com/demucs](https://dl.fbaipublicfiles.com/demucs/) — Meta's own public checkpoint CDN; demucs-infer downloads directly from it and hosts no mirror
 
-The models in this package are based on two pioneering research papers:
+**What this package changed vs. upstream:** PyTorch 2.x compatibility, inference-only packaging, and modern dependency management. **What stayed identical:** every model architecture, every separation algorithm, and every pretrained weight — see [Scope](#scope) below for the full breakdown.
 
-#### Hybrid Demucs (2021)
-**[Hybrid Spectrogram and Waveform Source Separation](https://arxiv.org/abs/2111.03600)**
+## Citation
 
-This seminal work introduced the hybrid time-frequency domain approach that significantly improved separation quality by combining the strengths of both spectrogram and waveform-based processing.
+If you use demucs-infer in your research, please cite the original Demucs papers — this package is a maintenance fork; all credit for the models, algorithms, and research belongs to the original authors.
+
+**Hybrid Demucs (2021):**
 
 ```bibtex
 @inproceedings{defossez2021hybrid,
@@ -52,10 +61,7 @@ This seminal work introduced the hybrid time-frequency domain approach that sign
 }
 ```
 
-#### Hybrid Transformer Demucs (2022)
-**[Hybrid Transformers for Music Source Separation](https://arxiv.org/abs/2211.08553)**
-
-This follow-up research integrated transformer architectures into the hybrid approach, further pushing the boundaries of separation quality and establishing new benchmarks in the field.
+**Hybrid Transformer Demucs (2022):**
 
 ```bibtex
 @article{rouard2022hybrid,
@@ -66,72 +72,91 @@ This follow-up research integrated transformer architectures into the hybrid app
 }
 ```
 
-### Citation
+## Features
 
-**If you use demucs-infer in your research, please cite the original Demucs papers above.** This package is merely a maintenance fork to ensure continued compatibility with modern PyTorch versions - all credit for the models, algorithms, and research belongs to the original authors.
+- **PyTorch 2.x Support**: Compatible with modern PyTorch versions (no `torchaudio<2.1` restriction)
+- **Inference-Only**: ~50% smaller than original package (removed training code)
+- **Minimal Dependencies**: 8 core packages (vs 15+ in original)
+- **API Compatible**: Drop-in replacement for inference workflows
+- **Same Quality**: Zero changes to separation algorithms
+- **All Models Supported**: HTDemucs, MDX, and all variants
+- **Model Info API**: Query model capabilities, separation types, and source translations
+- **Third-Party Model Support**: Compatible with community models (drumsep, cinematic, etc.)
 
-### About This Fork
+## Scope
 
-> **Note**: The original Demucs repository is no longer actively maintained by Meta AI Research. This package was created to continue the excellent work by providing ongoing maintenance and PyTorch 2.x compatibility for the inference capabilities, while preserving 100% of the original model quality and algorithms.
+### In scope — what we built
 
-**What we maintain:**
-- PyTorch 2.x compatibility
-- Modern dependency management
-- Inference-only packaging
+- PyTorch 2.x compatibility layer (removed version restrictions)
+- PyTorch 2.6+ support (compatible with `weights_only` default changes)
+- A minimal logging module replacing the `dora-search` dependency
+- Lazy imports so optional dependencies are truly optional
+- Inference-only packaging (7 core packages instead of 15+)
+- Model Info API — query model capabilities, separation types, and source translations
+- Third-party model support (module aliasing for community-trained models)
 
-**What remains unchanged:**
-- All model architectures (100% original)
-- All separation algorithms (100% original)
-- All model weights (100% original)
-- Audio quality (100% identical to original)
+### In scope — what stays unchanged from upstream
 
----
+- All separation models: HTDemucs, MDX, and all variants
+- Model architectures: zero modifications to the neural networks
+- Separation algorithms: identical audio processing
+- Model weights: same pretrained checkpoints, same host
+- Audio quality: 100% identical output (bit-for-bit gated — see [CLAUDE.md](CLAUDE.md))
 
-## 🚀 Quick Start
+### Out of scope, forever
 
-### Installation
+- Training code (`train.py`, `solver.py`, etc.) — this is an inference-only package by design, not a temporary gap
+- Evaluation scripts (`evaluate.py`)
+- Training-only dependencies (`hydra`, `dora-search`, `omegaconf`)
+- Dataset utilities (`musdb`, `museval`)
+- Distributed training tools (`submitit`)
 
-demucs-infer is available on [PyPI](https://pypi.org/project/demucs-infer/) and supports both **UV** (recommended, faster) and **pip** (traditional) installation methods.
+To retrain or evaluate against the original benchmarks, use the upstream [facebookresearch/demucs](https://github.com/facebookresearch/demucs) repository directly.
 
-#### Option 1: UV (Recommended) ⚡
+## Install
 
-[UV](https://github.com/astral-sh/uv) is a blazing-fast Python package installer and resolver.
+demucs-infer is available on [PyPI](https://pypi.org/project/demucs-infer/) and supports both **UV** (recommended, faster) and **pip** (traditional).
 
+**With UV:**
 ```bash
-# Install UV if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Add to existing project
+curl -LsSf https://astral.sh/uv/install.sh | sh   # if you don't have UV yet
 uv add demucs-infer
-
-# Or create new project with demucs-infer
-uv init my-audio-project
-cd my-audio-project
-uv add demucs-infer
-
-# Run Python with demucs-infer available
-uv run python your_script.py
 ```
 
-**Benefits of UV:**
-- ⚡ 10-100x faster than pip
-- 🔒 Automatic virtual environment management
-- 📦 Consistent dependency resolution
-- 🎯 Works seamlessly with PyPI packages
-
-#### Option 2: pip (Traditional)
-
+**With pip:**
 ```bash
-# Install in current environment
-pip install demucs-infer
-
-# Or create virtual environment first (recommended)
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate  # recommended
 pip install demucs-infer
 ```
 
-### Python API
+### Requirements
+
+- **Python**: 3.8+
+- **PyTorch**: 2.0 or later
+- **OS**: Linux, macOS, Windows
+- **GPU**: Optional (CUDA-capable GPU recommended for speed)
+
+### Optional Dependencies
+
+**With UV:**
+```bash
+uv add "demucs-infer[mp3]"         # MP3 output support
+uv add "demucs-infer[quantized]"   # Quantized models
+uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
+uv add "demucs-infer[torchcodec]"  # Restore torchaudio's own decoders on torchaudio>=2.11
+uv add "demucs-infer[mp3,quantized,community,torchcodec]"  # all of the above
+```
+
+**With pip:**
+```bash
+pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
+pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
+pip install demucs-infer[community]   # Adds: gdown>=5.0.0
+pip install demucs-infer[torchcodec]  # Adds: torchcodec
+pip install "demucs-infer[mp3,quantized,community,torchcodec]"
+```
+
+## Quick Start
 
 ```python
 from demucs_infer.pretrained import get_model
@@ -162,69 +187,19 @@ for i, source_name in enumerate(model.sources):
     save_audio(source, f"output/{source_name}.wav", sr)
 ```
 
-### CLI
+Equivalent from the CLI:
 
-**With UV:**
 ```bash
-# Basic usage
-uv run demucs-infer "song.wav"
-
-# Extract specific stems (drums only)
-uv run demucs-infer --two-stems=drums "song.wav"
-
-# Use specific model
-uv run demucs-infer -n htdemucs_ft "song.wav"
-
-# Specify output directory
-uv run demucs-infer -o output/ "song.wav"
+demucs-infer "song.wav"                      # basic usage (all 4 stems)
+demucs-infer --two-stems=drums "song.wav"    # drums only, faster
+demucs-infer -n htdemucs_ft -o output/ "song.wav"   # pick a model + output dir
 ```
 
-**With pip:**
-```bash
-# Basic usage
-demucs-infer "song.wav"
-
-# Extract specific stems (drums only)
-demucs-infer --two-stems=drums "song.wav"
-
-# Use specific model
-demucs-infer -n htdemucs_ft "song.wav"
-
-# Specify output directory
-demucs-infer -o output/ "song.wav"
-```
+(Prefix any of these with `uv run` if you installed with UV into a project environment rather than activating a venv.)
 
 ---
 
-## 📦 Why demucs-infer?
-
-The original [Demucs](https://github.com/facebookresearch/demucs) repository is **no longer actively maintained** by Meta AI Research. While the models remain state-of-the-art, the package has not received updates for modern PyTorch versions.
-
-**demucs-infer** was created to:
-
-1. **Maintain compatibility** - Keep working with PyTorch 2.x and Python 3.10+
-2. **Continue development** - Address issues and improve user experience
-3. **Focus on inference** - Remove training code for a leaner package
-4. **Serve the community** - Ensure researchers and developers can keep using these excellent models
-
-### Comparison with Original Demucs
-
-| Feature | Original Demucs | demucs-infer |
-|---------|----------------|--------------|
-| **Maintenance Status** | ⚠️ No longer actively maintained | ✅ Active |
-| **PyTorch Support** | 1.8.x - 2.0.x (with `torchaudio<2.1`) | 2.0+ (no restrictions) ✅ |
-| **Package Size** | ~Full codebase | ~50% smaller ✅ |
-| **Dependencies** | 15+ packages | 8 core packages ✅ |
-| **Training Code** | ✅ Included | ❌ Removed (inference-only) |
-| **Inference Code** | ✅ Included | ✅ Included |
-| **CLI Command** | `demucs` | `demucs-infer` (no conflicts) |
-| **Import Name** | `demucs` | `demucs_infer` (no conflicts) |
-| **Model Weights** | ✅ Same repositories | ✅ Same repositories |
-| **Audio Quality** | ✅ High quality | ✅ Same quality (zero algorithm changes) |
-
----
-
-## 🎵 Available Models
+## Available Models
 
 ### Official Demucs Models
 
@@ -264,42 +239,17 @@ from demucs_infer.pretrained import get_model
 model = get_model("49469ca8", repo=Path("/path/to/models"))
 ```
 
-### Usage
+## Use Cases
 
-```python
-# Load specific model
-model = get_model("htdemucs_ft")  # Best quality
-model = get_model("mdx")          # Faster
-model = get_model("htdemucs_6s")  # 6 sources
-```
+**Music Production** — extract vocals for remixing, isolate drums for sampling, remove vocals for karaoke, separate instruments for analysis.
 
----
+**Machine Learning** — prepare training data for downstream music ML models, audio preprocessing, dataset augmentation.
 
-## 💡 Use Cases
+**Research** — music information retrieval (MIR), audio signal processing, music transcription.
 
-### Music Production
-- Extract vocals for remixing
-- Isolate drums for sampling
-- Remove vocals for karaoke tracks
-- Separate instruments for analysis
-
-### Machine Learning
-- Prepare training data for music ML models
-- Audio preprocessing for downstream tasks
-- Dataset augmentation
-
-### Research
-- Music information retrieval (MIR)
-- Audio signal processing research
-- Music transcription
-
----
-
-## 📋 Model Info API
+## Model Info API
 
 Query model capabilities, separation types, and get source name translations programmatically.
-
-### Get Model Information
 
 ```python
 from demucs_infer.api import get_model_info, list_supported_separation_types
@@ -328,7 +278,7 @@ print(info.sources)          # ['bombo', 'redoblante', 'platillos', 'toms'] (Spa
 print(info.sources_english)  # ['kick', 'snare', 'cymbals', 'toms'] (English)
 ```
 
-### List Supported Separation Types
+List supported separation types:
 
 ```python
 from demucs_infer.api import list_supported_separation_types
@@ -347,8 +297,6 @@ for key, info in types.items():
 # vocal_instrumental: Vocal/Instrumental Separation
 ```
 
-### ModelInfo Properties
-
 | Property | Type | Description |
 |----------|------|-------------|
 | `name` | str | Model name/signature |
@@ -365,13 +313,11 @@ for key, info in types.items():
 | `is_bag` | bool | Whether it's an ensemble model |
 | `num_models` | int | Number of models in ensemble |
 
----
-
-## 🔧 Advanced Usage
+## Advanced Usage
 
 ### Two-Stems Separation (Faster)
 
-```python
+```bash
 # CLI: Extract drums only (faster than 4-source)
 demucs-infer --two-stems=drums "song.wav"
 ```
@@ -411,7 +357,7 @@ for audio_file in audio_files:
     for i, source_name in enumerate(model.sources):
         save_audio(sources[0, i].cpu(), output_dir / f"{source_name}.wav", sr)
 
-    print(f"✅ Processed: {audio_file.name}")
+    print(f"Processed: {audio_file.name}")
 ```
 
 ### Custom Device Selection
@@ -431,17 +377,7 @@ model = model.to("cuda:0")  # GPU 0
 model = model.to("cpu")     # CPU
 ```
 
----
-
-## 📚 Documentation
-
-- **[Migration Guide](docs/MIGRATION.md)** - Migrate from original Demucs
-- **[Implementation Notes](docs/dev/IMPLEMENTATION_NOTES.md)** - Technical details
-- **[Test Examples](tests/test_import.py)** - Import verification
-
----
-
-## 🛠 Dependencies
+## Dependencies
 
 ### Core Dependencies (8 packages)
 
@@ -481,7 +417,7 @@ primarily) and degrades predictably otherwise:
 - **Loading** tries FFmpeg first (unaffected by any of this), same as
   always. If FFmpeg isn't available:
   - **wav/flac** go through `soundfile` directly -- verified bit-identical
-    to torchaudio's own decode (`np.array_equal`, PCM 16/24/32-bit + FLAC,
+    to torchaudio's own decode (`np.array_equal` exact, PCM 16/24/32-bit + FLAC,
     mono/stereo), so there's no accuracy difference either way.
   - **mp3** (and anything else) stays on `torchaudio` only -- its mp3
     decode was measured to differ slightly from soundfile's (~7e-7 max
@@ -489,7 +425,7 @@ primarily) and degrades predictably otherwise:
     demucs-infer does **not** silently switch decoders for lossy formats.
     If torchaudio itself can't decode (missing `torchcodec` on
     torchaudio>=2.11), you'll get a clear error telling you to install
-    `torchcodec` or convert the file to wav/flac.
+    `torchcodec` or convert the file to wav/flac first.
 - **Saving** tries `torchaudio.save` first and uses `soundfile` only if
   that raises. This one is intentionally *not* soundfile-first: writing
   identical samples as 16-bit PCM wav via `torchaudio.save` vs
@@ -510,161 +446,10 @@ pip install demucs-infer[torchcodec]
 pip install "torchaudio<2.11"
 ```
 
-### Optional Dependencies
-
-**With UV:**
-```bash
-# For MP3 output support
-uv add "demucs-infer[mp3]"
-
-# For quantized models
-uv add "demucs-infer[quantized]"
-
-# For downloading community models (Google Drive)
-uv add "demucs-infer[community]"
-
-# To restore torchaudio's own decoders on torchaudio>=2.11 (optional --
-# see "torchaudio 2.11+ and audio decoders" above; needs system FFmpeg)
-uv add "demucs-infer[torchcodec]"
-
-# Or install all optional features
-uv add "demucs-infer[mp3,quantized,community,torchcodec]"
-```
-
-**With pip:**
-```bash
-# For MP3 output support
-pip install demucs-infer[mp3]  # Adds: lameenc>=1.2
-
-# For quantized models
-pip install demucs-infer[quantized]  # Adds: diffq>=0.2.1
-
-# For downloading community models (Google Drive)
-pip install demucs-infer[community]  # Adds: gdown>=5.0.0
-
-# To restore torchaudio's own decoders on torchaudio>=2.11 (optional)
-pip install demucs-infer[torchcodec]  # Adds: torchcodec
-
-# Or install all optional features
-pip install "demucs-infer[mp3,quantized,community,torchcodec]"
-```
-
-### Development Installation
-
-**With UV:**
-```bash
-# Install in editable mode from local directory
-cd /path/to/demucs-infer
-uv pip install -e ".[dev]"
-
-# Or add to your project as editable dependency
-uv add -e ../path/to/demucs-infer
-```
-
-**With pip:**
-```bash
-# Install in editable mode from local directory
-cd /path/to/demucs-infer
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Install in editable mode with dev dependencies
-pip install -e ".[dev]"
-```
-
-### Running Tests
-
-The package includes a comprehensive test suite using pytest:
-
-```bash
-# Run all tests
-uv run pytest tests/ -v
-
-# Run specific test file
-uv run pytest tests/test_import.py -v
-
-# Run with coverage
-uv run pytest tests/ --cov=demucs_infer
-
-# Run network tests too (checkpoint URL liveness; deselected by default)
-uv run pytest tests/ -v -m "network"
-```
-
-**Continuous Integration:**
-- GitHub Actions runs the test suite as a release gate: nothing publishes to PyPI without it passing first (`.github/workflows/publish.yml`)
-- Tests validate both library API and CLI commands
-- Python 3.10 with PyTorch 2.x compatibility verified
-
----
-
-## 📋 Requirements
-
-- **Python**: 3.8+
-- **PyTorch**: 2.0 or later
-- **OS**: Linux, macOS, Windows
-- **GPU**: Optional (CUDA-capable GPU recommended for speed)
-
----
-
-## 🔍 What demucs-infer Changes
-
-### ✅ What We Built
-
-- **PyTorch 2.x compatibility layer** - Removed version restrictions
-- **PyTorch 2.6+ support** - Compatible with `weights_only` default changes
-- **Minimal logging module** - Replaced dora-search dependency
-- **Lazy imports** - Made optional dependencies truly optional
-- **Inference-only packaging** - Removed training code
-- **Clean dependency tree** - 7 core packages instead of 15+
-- **Model Info API** - Query model capabilities, separation types, and source translations
-- **Third-party model support** - Module aliasing for community-trained models
-
-### ✅ What Stays Unchanged
-
-- ✅ **All separation models** - HTDemucs, MDX, all variants
-- ✅ **Model architectures** - Zero modifications to neural networks
-- ✅ **Separation algorithms** - Identical audio processing
-- ✅ **Model weights** - Same pretrained checkpoints
-- ✅ **Audio quality** - 100% identical output
-
-### ❌ What's Not Included
-
-- ❌ Training code (`train.py`, `solver.py`, etc.)
-- ❌ Evaluation scripts (`evaluate.py`)
-- ❌ Training dependencies (hydra, dora-search, omegaconf)
-- ❌ Dataset utilities (musdb, museval)
-- ❌ Distributed training tools (submitit)
-
----
-
-## 📊 Package Comparison
-
-| Metric | Original Demucs | demucs-infer | Improvement |
-|--------|----------------|--------------|-------------|
-| **Python Files** | 36+ files | 17 files | ~47% smaller |
-| **Core Dependencies** | 15+ packages | 8 packages | ~47% fewer |
-| **PyTorch Restriction** | `torchaudio<2.1` ❌ | No restriction ✅ | Flexible |
-| **Training Code** | Included | Removed | Focused |
-| **Inference Quality** | High | **Same** ✅ | Identical |
-
----
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### ImportError: No module named 'demucs_infer'
 
-**With UV:**
-```bash
-# Make sure you added demucs-infer to your project
-uv add demucs-infer
-
-# Or run with UV
-uv run python your_script.py
-```
-
-**With pip:**
 ```bash
 # Make sure you installed demucs-infer, not demucs
 pip uninstall demucs
@@ -693,21 +478,92 @@ so if FFmpeg also isn't available you'll see this error for real -- either
 `pip install demucs-infer[torchcodec]`, pin `torchaudio<2.11`, install
 FFmpeg, or convert the file to wav/flac.
 
-### Model Download Issues
+## What This Project Will NEVER Bundle
 
-```python
-# Models are downloaded from official Demucs repositories
-# Check internet connection and firewall settings
+demucs-infer downloads pretrained model weights at runtime; it does not, and
+will never, ship them inside the git repository or the published package.
 
-# Default model cache location:
-# Linux: ~/.cache/torch/hub/checkpoints/
-# macOS: ~/Library/Caches/torch/hub/checkpoints/
+- **No weight files in the repo or the PyPI package.** `.th` checkpoints are
+  never committed to git and never included in the sdist/wheel — the package
+  is source code only.
+- **No re-hosted or mirrored weights.** Official models are always fetched
+  directly from Meta's own CDN, [dl.fbaipublicfiles.com/demucs](https://dl.fbaipublicfiles.com/demucs/)
+  — demucs-infer does not run its own mirror or CDN.
+- **No silently altered or re-derived weights.** What you get from the
+  official checkpoint URLs is bit-for-bit what upstream Demucs produced;
+  this package does not quantize, prune, or fine-tune models and ship the
+  result as a default.
+- **Community/third-party models stay opt-in and user-supplied.** Models
+  like Drumsep or UVR variants (see [Available Models](#available-models))
+  are loaded only from a local directory or Google Drive link you provide
+  via the optional `[community]` extra — never bundled or auto-downloaded
+  by default.
+
+Default cache location (where downloaded weights land on disk):
+
+```
+# Linux:   ~/.cache/torch/hub/checkpoints/
+# macOS:   ~/Library/Caches/torch/hub/checkpoints/
 # Windows: %USERPROFILE%\.cache\torch\hub\checkpoints\
 ```
 
----
+If a download fails, check your internet connection and firewall settings —
+these are live fetches from Meta's CDN, not files shipped with the package.
 
-## 📄 License
+## Development
+
+### Development Installation
+
+**With UV:**
+```bash
+cd /path/to/demucs-infer
+uv pip install -e ".[dev]"
+# Or add to your project as editable dependency
+uv add -e ../path/to/demucs-infer
+```
+
+**With pip:**
+```bash
+cd /path/to/demucs-infer
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+The package includes a comprehensive test suite using pytest:
+
+```bash
+# Run all tests
+uv run pytest tests/ -v
+
+# Run specific test file
+uv run pytest tests/test_import.py -v
+
+# Run with coverage
+uv run pytest tests/ --cov=demucs_infer
+
+# Run network tests too (checkpoint URL liveness; deselected by default)
+uv run pytest tests/ -v -m "network"
+```
+
+See [CLAUDE.md](CLAUDE.md) for the bit-for-bit accuracy gate that any change
+to `demucs_infer/` must pass.
+
+**Continuous Integration:**
+- GitHub Actions runs the test suite as a release gate: nothing publishes to PyPI without it passing first (`.github/workflows/publish.yml`)
+- Tests validate both library API and CLI commands
+- Python 3.10 with PyTorch 2.x compatibility verified
+
+### Documentation
+
+- **[Migration Guide](docs/MIGRATION.md)** - Migrate from original Demucs
+- **[Implementation Notes](docs/dev/IMPLEMENTATION_NOTES.md)** - Technical details
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+- **[Test Examples](tests/test_import.py)** - Import verification
+
+## License
 
 **MIT License** (same as original Demucs)
 
@@ -716,17 +572,13 @@ Copyright (c) 2025 (demucs-infer modifications)
 
 See [LICENSE](LICENSE) for details.
 
---
-
----
-
-## 📞 Support
+## Support
 
 - **Migration Help**: See [MIGRATION.md](docs/MIGRATION.md)
+- **Version History**: See [CHANGELOG.md](CHANGELOG.md)
+- **Bug Reports**: [GitHub Issues](https://github.com/openmirlab/demucs-infer/issues)
 - **Original Demucs**: [facebookresearch/demucs](https://github.com/facebookresearch/demucs)
 
 ---
 
-**Made with ❤️ for the ML community**
-
-Based on the excellent work by Alexandre Défossez and Meta AI Research.
+Made for the ML community. Based on the excellent work by Alexandre Défossez and Meta AI Research.

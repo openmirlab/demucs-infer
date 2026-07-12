@@ -4,6 +4,31 @@ Inference-only fork of Meta's Demucs (music source separation). Training
 code has been stripped; this package only loads pretrained checkpoints and
 runs separation.
 
+## Status
+
+Beta, actively maintained (`Development Status :: 4 - Beta` in
+`pyproject.toml`; current version in `demucs_infer/__about__.py`). Published
+to PyPI as `demucs-infer`; GitHub Actions gates every release on the test
+suite (`.github/workflows/publish.yml`) -- nothing publishes without it
+passing. Upstream `facebookresearch/demucs` is no longer actively
+maintained; this fork exists specifically to keep pretrained-model inference
+working on current PyTorch/torchaudio, not to extend the model family.
+
+## Testing philosophy
+
+Two tiers, both pytest-based:
+
+1. **Accuracy-preservation gate** (below): any change to `demucs_infer/`
+   must reproduce the pinned baseline fixture bit-for-bit. This is the
+   overriding constraint -- it exists because this package's entire value
+   proposition is "same models, same weights, same output," not "improved
+   models."
+2. **Fast unit/regression suite** (`tests/`): runs by default, network tests
+   deselected (`-m "not network"` in `pyproject.toml`'s `addopts`). A
+   separate `network` marker covers checkpoint URL liveness against Meta's
+   real CDN and is opt-in (`pytest -m network`) since it depends on
+   external infrastructure being reachable.
+
 ## Scope
 
 - `demucs_infer/` -- the package. Model architecture files (`demucs.py`,
