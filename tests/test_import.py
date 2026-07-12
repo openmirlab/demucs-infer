@@ -1,6 +1,7 @@
 """Smoke test: every public-facing module must import cleanly with only
-this package's declared dependencies installed (torch, torchaudio, einops,
-julius, numpy, pyyaml, tqdm -- no openunmix, see ADOPT P1)."""
+this package's declared dependencies installed (torch, torchaudio,
+soundfile, einops, julius, numpy, pyyaml, tqdm -- no openunmix, see ADOPT
+P1)."""
 import importlib
 
 import pytest

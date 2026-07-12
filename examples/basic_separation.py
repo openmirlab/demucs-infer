@@ -11,10 +11,15 @@ Usage:
 
 from pathlib import Path
 import torch
-import torchaudio
 from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model
-from demucs_infer.audio import save_audio
+from demucs_infer.audio import AudioFile, save_audio
+
+# Note: this loads via AudioFile (demucs-infer's own FFmpeg-based reader,
+# the same one Separator._load_audio tries first) rather than calling
+# torchaudio.load directly. torchaudio>=2.11 dropped its bundled decoders
+# and raises ImportError without the separate torchcodec package -- see
+# README's "torchaudio 2.11+ and audio decoders" section.
 
 
 def separate_audio(
@@ -46,8 +51,11 @@ def separate_audio(
     
     # Load audio
     print(f"Loading audio: {input_file}")
-    wav, sr = torchaudio.load(input_file)
-    
+    sr = model.samplerate
+    wav = AudioFile(input_file).read(
+        streams=0, samplerate=sr, channels=model.audio_channels
+    )
+
     # Add batch dimension
     wav = wav.unsqueeze(0).to(device)
     

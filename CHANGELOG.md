@@ -13,6 +13,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   environment alongside the PyPI package was more upkeep than the audience
   justified.
 
+## [4.2.2] - 2026-07-12
+
+### Fixed
+- **Fresh installs were completely unable to save (and, without FFmpeg,
+  load) audio on the latest torch/torchaudio stack.** torchaudio>=2.11
+  removed its bundled wav/flac/mp3 decoders in favor of a separate
+  `torchcodec` package that nothing in our dependency tree declared; a
+  brand-new `pip install demucs-infer` resolving the latest torchaudio
+  hit `ImportError('TorchCodec is required for save_with_torchcodec...')`
+  on every `save_audio()` call (reproduced with torch 2.13.0+cpu /
+  torchaudio 2.11.0+cpu). The load path already degraded to a
+  `soundfile`-based fallback (added earlier, see `0d21e4d` / `5d844c6`),
+  but the save path's fallback and the `soundfile` package itself were
+  never actually declared as a dependency — the fallback code existed
+  but silently depended on a package that wasn't installed, so it failed
+  too, just with a worse error message.
+- `soundfile` is now a declared core dependency (`soundfile>=0.12.1`).
+  It ships self-contained wheels (bundled `libsndfile`, no system FFmpeg
+  needed, unlike `torchcodec`), so unlike `torchcodec` it's safe as a
+  hard floor.
+- Added a `torchcodec` extra (`pip install demucs-infer[torchcodec]`)
+  for users who want torchaudio's own decoders back on torchaudio>=2.11;
+  not required for normal use, since the fixes below cover it.
+- `examples/basic_separation.py` no longer calls `torchaudio.load`
+  directly (the same fragile pattern the library itself moved away from
+  in `api.py`); it now loads via `demucs_infer.audio.AudioFile`, the
+  package's own FFmpeg-based primary loader.
+
+### Changed (decoder selection, evidence-based — see below for the numbers)
+- **Load** (`Separator._load_audio`, used whenever FFmpeg — the primary
+  path — is unavailable): wav/flac now go through `soundfile` directly,
+  ahead of `torchaudio`, rather than only as a last-resort fallback.
+  Verified bit-identical first: decoded `torchaudio==2.7.0+cpu` and
+  `soundfile==0.14.0` against the same 16/24/32-bit PCM wav and FLAC
+  files (mono + stereo) and asserted `np.array_equal` — exact match on
+  every file. mp3 (and any other extension) is deliberately **not**
+  included: the same comparison measured mp3 decode to differ by up to
+  `7.15e-7` per sample between torchaudio (ffmpeg-backed) and soundfile
+  (libmpg123-backed) — small, but not zero, so silently switching would
+  have changed existing users' output. mp3/lossy loads stay on
+  `torchaudio` only; if it raises (torchaudio>=2.11 without
+  `torchcodec`), `_load_audio` now raises a clear, actionable error
+  ("install torchcodec, or convert the file to wav/flac") instead of
+  silently decoding via `soundfile`.
+- **Save** (`demucs_infer.audio.save_audio`): explicitly **kept
+  unchanged** — `torchaudio.save` is tried first, `soundfile` only on
+  failure — after the same kind of check found the opposite result for
+  encoding: writing identical float32 samples as 16-bit PCM wav via
+  `torchaudio.save` vs `soundfile.write` differ by ±1 LSB in ~50% of
+  samples (a real rounding-convention difference between the two
+  encoders' float→int16 quantization, not measurement noise; file sizes
+  also differ slightly due to header/chunk differences). Since bit-
+  identity for encode does **not** hold, `soundfile` cannot become the
+  default encoder without an unproven, silent output change for anyone
+  currently on a working torchaudio install — so it stays a fallback,
+  engaged only when torchaudio itself is already broken (nothing to
+  regress in that case).
+- Added `tests/test_audio_fallback.py` (11 tests) covering: soundfile-
+  first-not-fallback for wav/flac loads; torchaudio-only (no soundfile)
+  for mp3 loads, with an actionable error message on failure; save
+  keeping torchaudio-first ordering; soundfile never invoked when
+  torchaudio already works (zero behavior change); the broad `except
+  Exception` around `torchaudio.load` from `5d844c6` not regressing to a
+  narrower catch; and `soundfile` being a declared dependency.
+
+### Investigated (no change)
+- Confirmed `torchaudio` is used for I/O only in the shipped package —
+  exactly two call sites (`audio.py`'s `ta.save`, `api.py`'s `ta.load`),
+  nothing from `torchaudio.functional`/`torchaudio.transforms`/models.
+  `tools/capture_baseline.py` (a dev-only script, not part of the
+  installed package) additionally calls `torchaudio.functional.resample`
+  for baseline capture. This means a future major version could
+  plausibly make `torchaudio` itself optional (soundfile covers wav/flac;
+  something FFmpeg-based would be needed for mp3) — not done here, flagged
+  for a future decision.
+
 ## [4.2.1] - 2026-07-11
 
 (Version note: 4.2.0 on PyPI is an inadvertent re-publish of the pre-campaign

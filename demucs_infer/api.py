@@ -73,6 +73,24 @@ class LoadAudioError(Exception):
     pass
 
 
+# Extensions where soundfile's decode is empirically bit-identical to
+# torchaudio's (verified: torchaudio==2.7.0+cpu vs soundfile==0.14.0,
+# 16/24/32-bit PCM wav + flac, mono and stereo, `np.array_equal` exact --
+# see tests/test_audio_fallback.py and the 4.2.2 CHANGELOG entry). For
+# these, soundfile is tried as soon as ffmpeg is unavailable, ahead of
+# torchaudio -- not merely as a last-resort fallback -- since there is no
+# accuracy cost either way.
+#
+# mp3 (and anything else) is deliberately excluded: the same verification
+# measured torchaudio's and soundfile's mp3 decodes to differ by up to
+# ~7e-7 per sample (different underlying decoders, ffmpeg vs libmpg123),
+# so silently decoding mp3 via soundfile would change existing users'
+# output. Lossy formats stay on torchaudio only; if it can't decode
+# (torchaudio>=2.11 without the separate torchcodec package), _load_audio
+# raises a clear, actionable error instead of silently switching decoders.
+_LOSSLESS_SOUNDFILE_EXTS = {".wav", ".flac"}
+
+
 class _NotProvided:
     pass
 
@@ -238,6 +256,13 @@ class Separator:
         self._samplerate = self._model.samplerate
 
     def _load_audio(self, track: Path):
+        """Load `track`, preferring ffmpeg (via AudioFile), then falling
+        back by format: soundfile first for lossless wav/flac (bit-identical
+        to torchaudio, see `_LOSSLESS_SOUNDFILE_EXTS`'s comment above),
+        otherwise torchaudio only -- lossy formats never silently fall back
+        to soundfile, since its decode isn't guaranteed to match
+        torchaudio's for those."""
+        track = Path(track)
         errors = {}
         wav = None
 
@@ -249,30 +274,27 @@ class Separator:
         except subprocess.CalledProcessError:
             errors["ffmpeg"] = "FFmpeg could not read the file."
 
-        if wav is None:
-            try:
-                wav, sr = ta.load(str(track))
-            except Exception as err:
-                errors["torchaudio"] = str(err.args[0]) if err.args else str(err)
-            else:
-                wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
+        is_lossless = track.suffix.lower() in _LOSSLESS_SOUNDFILE_EXTS
 
-        # Fallback to soundfile if both ffmpeg and torchaudio fail
+        if wav is None and is_lossless:
+            wav = self._try_soundfile_load(track, errors)
+
         if wav is None:
             try:
-                import soundfile as sf
-                audio_np, sr = sf.read(str(track))
-                # Convert from [time, channels] to [channels, time]
-                if len(audio_np.shape) == 1:
-                    # Mono
-                    wav = th.tensor(audio_np, dtype=th.float32).unsqueeze(0)
-                else:
-                    wav = th.tensor(audio_np.T, dtype=th.float32)
-                wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
-            except ImportError:
-                errors["soundfile"] = "soundfile is not installed. Install with: pip install soundfile"
+                raw, sr = ta.load(str(track))
             except Exception as err:
-                errors["soundfile"] = str(err)
+                msg = str(err.args[0]) if err.args else str(err)
+                if not is_lossless:
+                    msg += (
+                        " -- demucs-infer does not fall back to soundfile for "
+                        "lossy formats like this one (different decoders "
+                        "produce different samples); install torchcodec "
+                        "(`pip install demucs-infer[torchcodec]`) or convert "
+                        "the file to wav/flac."
+                    )
+                errors["torchaudio"] = msg
+            else:
+                wav = convert_audio(raw, sr, self._samplerate, self._audio_channels)
 
         if wav is None:
             raise LoadAudioError(
@@ -284,6 +306,27 @@ class Separator:
                 )
             )
         return wav
+
+    def _try_soundfile_load(self, track: Path, errors: dict):
+        """soundfile-based load for lossless formats (wav/flac) -- see
+        `_LOSSLESS_SOUNDFILE_EXTS`. Returns None (and records into `errors`)
+        on failure instead of raising, so callers can continue falling
+        back."""
+        try:
+            import soundfile as sf
+            audio_np, sr = sf.read(str(track))
+            # Convert from [time, channels] to [channels, time]
+            if len(audio_np.shape) == 1:
+                # Mono
+                wav = th.tensor(audio_np, dtype=th.float32).unsqueeze(0)
+            else:
+                wav = th.tensor(audio_np.T, dtype=th.float32)
+            return convert_audio(wav, sr, self._samplerate, self._audio_channels)
+        except ImportError:
+            errors["soundfile"] = "soundfile is not installed. Install with: pip install soundfile"
+        except Exception as err:
+            errors["soundfile"] = str(err)
+        return None
 
     def separate_tensor(
         self, wav: th.Tensor, sr: Optional[int] = None
