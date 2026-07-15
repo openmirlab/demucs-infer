@@ -158,6 +158,62 @@ pip install "demucs-infer[mp3,quantized,community,torchcodec]"
 
 ## Quick Start
 
+### Task-level facade
+
+For a small, package-qualified entry point, use `DemucsSeparator`. It accepts
+audio paths or tensors and returns the existing Demucs output tuple: the
+normalized mixture tensor and a mapping of source names to separated tensors.
+Tensor inputs require their original sample rate; path inputs are decoded and
+resampled by the existing `Separator` loader.
+
+```python
+import torch
+
+from demucs_infer import DemucsSeparator, separate_file
+
+# One-shot calls create and discard a fresh model helper.
+mixture, stems = separate_file("song.wav", model="htdemucs")
+
+# Reuse a loaded model across calls (calls are serialized for safety).
+separator = DemucsSeparator(model="htdemucs", device="cpu")
+mixture, stems = separator("song.wav")
+waveform = torch.zeros(2, 44100)  # or a loaded [channels, time] waveform
+mixture, stems = separator(waveform, sample_rate=44100)
+```
+
+### Model lifecycle and checkpoint customization
+
+`DemucsSession` is the package-qualified lifecycle surface. It owns model
+loading, checkpoint verification, the in-process model, and release while
+leaving the existing `Separator` API unchanged:
+
+```python
+from demucs_infer import DemucsSession
+
+with DemucsSession(model="htdemucs", device="cpu") as session:
+    stems = session.infer("song.wav")
+    print(session.status, session.cache_info())
+```
+
+`load()` may be called explicitly; the session-level `infer()` requires the
+session to be `ready` after `load()` (or context-manager entry). The legacy
+callable form, `session(...)`, remains lazy for backward compatibility.
+`release()` (also available as `close()`) clears the in-memory model but keeps
+disk checkpoints cached, and `status` reports `new`, `loading`, `ready`,
+`failed`, or `released`. A custom checkpoint
+can be supplied with `checkpoint_path`, or downloaded with
+`checkpoint_url` plus its required full `checkpoint_sha256`. The package ships
+its release-pinned metadata in the package-local
+`demucs_infer/config/checkpoints.toml` file (URLs, SHA-256 digests, license,
+provenance, and source revision). Runtime inference reads this local snapshot
+and does not depend on a remote catalog. Use `checkpoint_catalog()` or
+`checkpoint_config_path()` to inspect it.
+
+The facade is additive: advanced users can continue composing
+`demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and
+`demucs_infer.apply.apply_model` directly. Optional backends remain lazy and
+retain their existing installation requirements.
+
 ```python
 from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model

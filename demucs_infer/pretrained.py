@@ -70,7 +70,7 @@ def _parse_remote_files(remote_file_list) -> tp.Dict[str, str]:
 
 
 def get_model(name: str,
-              repo: tp.Optional[Path] = None):
+              repo: tp.Optional[tp.Union[Path, ModelOnlyRepo]] = None):
     """`name` must be a bag of models name or a pretrained signature
     from the remote AWS model repo, a community model, or the specified
     local repo if `repo` is not None.
@@ -78,7 +78,14 @@ def get_model(name: str,
     if name == 'demucs_unittest':
         return demucs_unittest()
     model_repo: ModelOnlyRepo
-    if repo is None:
+    explicit_model_repo = isinstance(repo, ModelOnlyRepo)
+    if explicit_model_repo:
+        # Clean API sessions may supply a package-owned, release-pinned
+        # repository.  Keep the existing Path-based local repository path
+        # unchanged while allowing callers to select an explicit URL map.
+        model_repo = repo
+        bag_repo = None
+    elif repo is None:
         models = _parse_remote_files(REMOTE_ROOT / 'files.txt')
         model_repo = RemoteRepo(models)
         bag_repo = BagOnlyRepo(REMOTE_ROOT, model_repo)
@@ -87,7 +94,7 @@ def get_model(name: str,
             fatal(f"{repo} must exist and be a directory.")
         model_repo = LocalRepo(repo)
         bag_repo = BagOnlyRepo(repo, model_repo)
-    any_repo = AnyModelRepo(model_repo, bag_repo)
+    any_repo = AnyModelRepo(model_repo, bag_repo) if bag_repo is not None else model_repo
 
     # Try official repos first, fall back to community models
     try:

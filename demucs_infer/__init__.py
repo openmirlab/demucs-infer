@@ -20,5 +20,16 @@ from .__about__ import __version__  # noqa: F401
 # Import compatibility module to ensure demucs module is available
 from . import compat
 
+# Clean task-level facade. Imports remain lightweight; model/audio dependencies
+# are loaded only when a facade call initializes ``DemucsSeparator``.
+from .clean_api import DemucsSeparator, DemucsSession, separate, separate_file, separate_tensor
+from .checkpoint_catalog import (
+    CHECKPOINT_CATALOG,
+    checkpoint_catalog,
+    checkpoint_config_path,
+    get_checkpoint_metadata,
+    validate_checkpoint_config,
+)
+
 # Reads: __about__ (__version__), compat (import side effect only, see
 # compat.py's header)

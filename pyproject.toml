@@ -113,4 +113,5 @@ include = [
     "demucs_infer/**/*.yaml",  # Include YAML config files (remote/*.yaml)
     "demucs_infer/**/*.yml",   # Include YAML config files
     "demucs_infer/**/*.txt",   # Include files.txt in remote/
+    "demucs_infer/**/*.toml",  # Include package-owned checkpoint metadata
 ]

@@ -1,0 +1,61 @@
+# Release-pinned checkpoint metadata shipped with demucs-infer.
+[schema]
+version = 1
+
+[package]
+name = "demucs-infer"
+config_revision = "2026-07-15"
+
+[metadata]
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[models.htdemucs]
+model = "htdemucs"
+signature = "955717e8"
+[[models.htdemucs.files]]
+path = "955717e8-8726e21a.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"
+sha256 = "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4"
+
+[models.htdemucs_6s]
+model = "htdemucs_6s"
+signature = "5c90dfd2"
+[[models.htdemucs_6s.files]]
+path = "5c90dfd2-34c22ccb.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/5c90dfd2-34c22ccb.th"
+sha256 = "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd"
+
+[models.htdemucs_ft]
+model = "htdemucs_ft"
+signature = "f7e0c4bc"
+[[models.htdemucs_ft.files]]
+path = "f7e0c4bc-ba3fe64a.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th"
+sha256 = "ba3fe64ae8ef66ac9a4857222ce48efbdc5eb3ad375cb79dd13debee5aaa4066"
+
+[models.htdemucs_ft_2]
+model = "htdemucs_ft"
+signature = "d12395a8"
+[[models.htdemucs_ft_2.files]]
+path = "d12395a8-e57c48e6.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th"
+sha256 = "e57c48e6b0e38af4f7118d7bd08c49f0a0c0edf7d09143bdd902ea0d237303e6"
+
+[models.htdemucs_ft_3]
+model = "htdemucs_ft"
+signature = "92cfc3b6"
+[[models.htdemucs_ft_3.files]]
+path = "92cfc3b6-ef3bcb9c.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th"
+sha256 = "ef3bcb9c8b40d14ae5d51b6db2587339cc12c6b77c0be151ce6d69002e087bf2"
+
+[models.htdemucs_ft_4]
+model = "htdemucs_ft"
+signature = "04573f0d"
+[[models.htdemucs_ft_4.files]]
+path = "04573f0d-f3cf25b2.th"
+url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"
+sha256 = "f3cf25b222c4eed7cd49dd8b2c9597d50c18bd154090f7b919cfa5f93cf22c49"
