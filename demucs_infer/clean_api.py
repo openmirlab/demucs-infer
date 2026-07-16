@@ -7,12 +7,17 @@ The module deliberately avoids importing torch (or the heavier API module)
 until a separation call is made.
 """
 
+import os
+import tempfile
+from hashlib import sha256
 from pathlib import Path
 from threading import RLock
-from hashlib import sha256
 from urllib.request import urlopen
 
-from .checkpoint_catalog import get_checkpoint_metadata
+from .checkpoint_catalog import checkpoint_catalog, get_checkpoint_metadata
+
+
+_IO_CHUNK_SIZE = 1024 * 1024
 
 
 class DemucsSeparator:
@@ -41,22 +46,76 @@ class DemucsSeparator:
     def status(self):
         return self._status
 
+    @property
+    def samplerate(self):
+        if self._separator is None:
+            raise RuntimeError("session must be loaded before samplerate is available")
+        return self._separator.samplerate
+
+    @property
+    def sources(self):
+        if self._separator is None:
+            raise RuntimeError("session must be loaded before sources are available")
+        return tuple(self._separator.model.sources)
+
     def _verify(self, path, expected):
-        digest = sha256(path.read_bytes()).hexdigest()
-        if digest != expected:
-            raise ValueError(f"checkpoint SHA-256 mismatch: expected {expected}, got {digest}")
+        digest = sha256()
+        with path.open("rb") as checkpoint:
+            while chunk := checkpoint.read(_IO_CHUNK_SIZE):
+                digest.update(chunk)
+        actual = digest.hexdigest()
+        if actual != expected:
+            raise ValueError(f"checkpoint SHA-256 mismatch: expected {expected}, got {actual}")
+
+    def _cache_root(self):
+        root = self.cache_dir or (Path.home() / ".cache" / "demucs-infer")
+        root.mkdir(parents=True, exist_ok=True)
+        return root
+
+    def _download_checkpoint(self, url, path, expected):
+        if path.exists():
+            try:
+                self._verify(path, expected)
+                return path
+            except ValueError:
+                path.unlink()
+
+        temporary_path = None
+        try:
+            with urlopen(url) as source:
+                with tempfile.NamedTemporaryFile(
+                    mode="wb",
+                    dir=path.parent,
+                    prefix=f".{path.name}.",
+                    suffix=".tmp",
+                    delete=False,
+                ) as target:
+                    temporary_path = Path(target.name)
+                    while chunk := source.read(_IO_CHUNK_SIZE):
+                        target.write(chunk)
+                    target.flush()
+                    os.fsync(target.fileno())
+            self._verify(temporary_path, expected)
+            os.replace(temporary_path, path)
+        except BaseException:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+            raise
+        return path
+
+    def _materialize_named_checkpoint(self, metadata):
+        path = self._cache_root() / metadata["path"]
+        return self._download_checkpoint(metadata["url"], path, metadata["sha256"])
 
     def _materialize_checkpoint(self):
         path = self.checkpoint_path
         if path is None and self.checkpoint_url:
             if not self.checkpoint_sha256:
                 raise ValueError("checkpoint_sha256 is required with checkpoint_url")
-            root = self.cache_dir or (Path.home() / ".cache" / "demucs-infer")
-            root.mkdir(parents=True, exist_ok=True)
+            root = self._cache_root()
             path = root / Path(self.checkpoint_url).name
-            if not path.exists():
-                with urlopen(self.checkpoint_url) as source, path.open("wb") as target:
-                    target.write(source.read())
+            self._download_checkpoint(self.checkpoint_url, path, self.checkpoint_sha256)
+            return path, path.stem.split("-", 1)[0]
         if path is None:
             return None
         if not path.is_file():
@@ -66,6 +125,32 @@ class DemucsSeparator:
         if expected:
             self._verify(path, expected)
         return path, signature
+
+    def _materialize_named_model_repo(self):
+        from .pretrained import REMOTE_ROOT
+        import yaml
+
+        root = self._cache_root()
+        catalog = checkpoint_catalog()
+        bag_path = REMOTE_ROOT / f"{self.model_name}.yaml"
+
+        if bag_path.is_file():
+            bag = yaml.safe_load(bag_path.read_text(encoding="utf-8"))
+            signatures = bag.get("models", [])
+            if signatures and all(signature in catalog for signature in signatures):
+                for signature in signatures:
+                    self._materialize_named_checkpoint(catalog[signature])
+                (root / bag_path.name).write_text(
+                    bag_path.read_text(encoding="utf-8"),
+                    encoding="utf-8",
+                )
+                return root, self.model_name
+
+        metadata = get_checkpoint_metadata(self.model_name)
+        if metadata is None:
+            return None
+        self._materialize_named_checkpoint(metadata)
+        return root, metadata["signature"]
 
     def _get_separator(self):
         if self._separator is None:
@@ -85,17 +170,11 @@ class DemucsSeparator:
                     separator.update_parameter(**self.separator_options)
                     self._separator = separator
                 else:
-                    # Resolve the package-owned release-pinned artifact for
-                    # the default path.  RemoteRepo delegates download and
-                    # ``check_hash=True`` verification to the existing
-                    # loader; explicit checkpoint overrides retain the
-                    # local materialization path above.
-                    metadata = get_checkpoint_metadata(self.model_name)
-                    if metadata is not None:
-                        from .repo import RemoteRepo
-                        repo = RemoteRepo({metadata["signature"]: metadata["url"]})
-                        self._separator = Separator(model=metadata["signature"],
-                                                    repo=repo,
+                    pinned = self._materialize_named_model_repo()
+                    if pinned is not None:
+                        repo_root, resolved_name = pinned
+                        self._separator = Separator(model=resolved_name,
+                                                    repo=repo_root,
                                                     **self.separator_options)
                     else:
                         self._separator = Separator(model=self.model_name,
@@ -173,7 +252,7 @@ class DemucsSeparator:
         ``Separator.separate_tensor``.
         """
         with self._call_lock:
-            separator = self._get_separator()
+            self._get_separator()
             return self._infer_loaded(audio, sample_rate=sample_rate)
 
     def separate(self, audio, *, sample_rate=None):

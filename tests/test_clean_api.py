@@ -1,18 +1,55 @@
 """Focused contract tests for the additive Demucs task facade."""
 
+from hashlib import sha256
 from pathlib import Path
 
 import pytest
+from torch import nn
 
 from demucs_infer.clean_api import DemucsSeparator, DemucsSession, separate
+from demucs_infer.apply import BagOfModels
 from demucs_infer.checkpoint_catalog import CHECKPOINT_CATALOG, get_checkpoint_metadata
+
+
+class _ChunkedResponse:
+    def __init__(self, payload):
+        self.payload = payload
+        self.offset = 0
+        self.read_sizes = []
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        return False
+
+    def read(self, size):
+        self.read_sizes.append(size)
+        chunk = self.payload[self.offset:self.offset + size]
+        self.offset += len(chunk)
+        return chunk
+
+
+class _FakeLoadedModel(nn.Module):
+    def __init__(self, signature="fake-signature"):
+        super().__init__()
+        self.signature = signature
+        self.audio_channels = 2
+        self.samplerate = 44100
+        self.sources = ["drums", "bass", "other", "vocals"]
+        self.segment = 4.0
+
+    def forward(self, wav):
+        return wav
 
 
 class _FakeSeparator:
     instances = []
 
     def __init__(self, model="htdemucs", **options):
-        self.model = model
+        self.model_name = model
+        self.model = _FakeLoadedModel(signature=model)
+        self.samplerate = self.model.samplerate
         self.options = options
         self.calls = []
         self.__class__.instances.append(self)
@@ -77,6 +114,8 @@ def test_session_lifecycle_and_context_manager(monkeypatch):
         session.infer("song.wav")
     assert session.load() is session
     assert session.status == "ready"
+    assert session.samplerate == 44100
+    assert session.sources == ("drums", "bass", "other", "vocals")
     assert session.infer("song.wav")[0] == "mixture"
     assert session.cache_info()["loaded"] is True
     session.release()
@@ -117,32 +156,156 @@ def test_checkpoint_url_requires_pinned_hash(tmp_path):
         DemucsSeparator(checkpoint_url="https://example.invalid/model.th").load()
 
 
-def test_default_session_uses_package_checkpoint_url_and_hash_loader(monkeypatch):
-    import demucs_infer.api as api
+def test_session_properties_require_loaded_session():
+    session = DemucsSession()
+    with pytest.raises(RuntimeError, match="session must be loaded"):
+        _ = session.samplerate
+    with pytest.raises(RuntimeError, match="session must be loaded"):
+        _ = session.sources
+
+
+def test_default_session_materializes_package_pinned_checkpoint(monkeypatch, tmp_path):
+    import demucs_infer.clean_api as clean_api
     import demucs_infer.repo as repo_module
 
-    calls = []
+    downloads = []
+    verified = []
+    checksums = []
 
-    def fake_download(url, *, map_location, check_hash):
-        calls.append((url, map_location, check_hash))
-        return {"fake": "weights"}
+    def fake_urlopen(url):
+        downloads.append(url)
+        return _ChunkedResponse(f"payload:{Path(url).name}".encode("ascii"))
 
-    class _FakeModel:
-        audio_channels = 2
-        samplerate = 44100
+    def fake_verify(self, path, expected):
+        verified.append((path.name, expected))
 
-    monkeypatch.setattr(repo_module.torch.hub, "load_state_dict_from_url", fake_download)
-    monkeypatch.setattr(repo_module, "load_model", lambda payload: _FakeModel())
+    def fake_check_checksum(path, checksum):
+        checksums.append((path.name, checksum))
 
-    class _LoaderProbe:
-        def __init__(self, model="htdemucs", repo=None, **options):
-            self.model = model
-            self.repo = repo
-            self.options = options
-            self.model_obj = repo.get_model(model)
+    monkeypatch.setattr(clean_api, "urlopen", fake_urlopen)
+    monkeypatch.setattr(DemucsSeparator, "_verify", fake_verify)
+    monkeypatch.setattr(repo_module, "check_checksum", fake_check_checksum)
+    monkeypatch.setattr(repo_module, "load_model",
+                        lambda path: _FakeLoadedModel(signature=Path(path).stem.split("-", 1)[0]))
 
-    monkeypatch.setattr(api, "Separator", _LoaderProbe)
-    session = DemucsSession(device="cpu").load()
+    session = DemucsSession(device="cpu", cache_dir=tmp_path).load()
     metadata = get_checkpoint_metadata("htdemucs")
-    assert session._separator.model == metadata["signature"]
-    assert calls == [(metadata["url"], "cpu", True)]
+    checkpoint = tmp_path / metadata["path"]
+    assert checkpoint.exists()
+    assert checkpoint.read_bytes() == f"payload:{checkpoint.name}".encode("ascii")
+    assert isinstance(session._separator.model, BagOfModels)
+    assert [model.signature for model in session._separator.model.models] == [metadata["signature"]]
+    assert downloads == [metadata["url"]]
+    assert [expected for _, expected in verified] == [metadata["sha256"]]
+    assert checksums == [(metadata["path"], metadata["sha256"][:8])]
+
+
+def test_htdemucs_ft_session_loads_pinned_four_model_bag(monkeypatch, tmp_path):
+    import demucs_infer.clean_api as clean_api
+    import demucs_infer.repo as repo_module
+
+    downloads = []
+    verified = []
+    checksums = []
+
+    def fake_urlopen(url):
+        downloads.append(url)
+        return _ChunkedResponse(f"payload:{Path(url).name}".encode("ascii"))
+
+    def fake_verify(self, path, expected):
+        verified.append((path.name, expected))
+
+    def fake_check_checksum(path, checksum):
+        checksums.append((path.name, checksum))
+
+    monkeypatch.setattr(clean_api, "urlopen", fake_urlopen)
+    monkeypatch.setattr(DemucsSeparator, "_verify", fake_verify)
+    monkeypatch.setattr(repo_module, "check_checksum", fake_check_checksum)
+    monkeypatch.setattr(repo_module, "load_model",
+                        lambda path: _FakeLoadedModel(signature=Path(path).stem.split("-", 1)[0]))
+
+    session = DemucsSession(model="htdemucs_ft", device="cpu", cache_dir=tmp_path).load()
+    signatures = ["f7e0c4bc", "d12395a8", "92cfc3b6", "04573f0d"]
+    expected = [get_checkpoint_metadata(signature) for signature in signatures]
+
+    assert isinstance(session._separator.model, BagOfModels)
+    assert len(session._separator.model.models) == 4
+    assert [model.signature for model in session._separator.model.models] == signatures
+    assert session.samplerate == 44100
+    assert session.sources == ("drums", "bass", "other", "vocals")
+    assert sorted(path.name for path in tmp_path.glob("*.th")) == sorted(item["path"] for item in expected)
+    assert (tmp_path / "htdemucs_ft.yaml").exists()
+    assert downloads == [item["url"] for item in expected]
+    assert [digest for _, digest in verified] == [item["sha256"] for item in expected]
+    assert checksums == [(item["path"], item["sha256"][:8]) for item in expected]
+
+
+def test_checkpoint_download_reads_fixed_size_chunks(monkeypatch, tmp_path):
+    import demucs_infer.clean_api as clean_api
+
+    payload = b"checkpoint-payload"
+    response = _ChunkedResponse(payload)
+    monkeypatch.setattr(clean_api, "_IO_CHUNK_SIZE", 4)
+    monkeypatch.setattr(clean_api, "urlopen", lambda url: response)
+
+    session = DemucsSeparator(
+        checkpoint_url="https://example.test/model.th",
+        checkpoint_sha256=sha256(payload).hexdigest(),
+        cache_dir=tmp_path,
+    )
+    path, _ = session._materialize_checkpoint()
+
+    assert path.read_bytes() == payload
+    assert response.read_sizes == [4, 4, 4, 4, 4, 4]
+    assert not list(tmp_path.glob(".model.th.*.tmp"))
+
+
+def test_failed_checkpoint_download_leaves_no_files(monkeypatch, tmp_path):
+    import demucs_infer.clean_api as clean_api
+
+    class FailingResponse(_ChunkedResponse):
+        def read(self, size):
+            if self.offset:
+                raise OSError("connection lost")
+            return super().read(size)
+
+    monkeypatch.setattr(clean_api, "_IO_CHUNK_SIZE", 4)
+    monkeypatch.setattr(clean_api, "urlopen", lambda url: FailingResponse(b"partial"))
+    session = DemucsSeparator(
+        checkpoint_url="https://example.test/model.th",
+        checkpoint_sha256=sha256(b"complete").hexdigest(),
+        cache_dir=tmp_path,
+    )
+
+    with pytest.raises(OSError, match="connection lost"):
+        session._materialize_checkpoint()
+
+    assert not (tmp_path / "model.th").exists()
+    assert not list(tmp_path.glob(".model.th.*.tmp"))
+
+
+def test_corrupted_cached_checkpoint_is_redownloaded_once(monkeypatch, tmp_path):
+    import demucs_infer.clean_api as clean_api
+
+    payload = b"valid-checkpoint"
+    cached = tmp_path / "model.th"
+    cached.write_bytes(b"corrupt")
+    responses = []
+
+    def fake_urlopen(url):
+        response = _ChunkedResponse(payload)
+        responses.append(response)
+        return response
+
+    monkeypatch.setattr(clean_api, "urlopen", fake_urlopen)
+    session = DemucsSeparator(
+        checkpoint_url="https://example.test/model.th",
+        checkpoint_sha256=sha256(payload).hexdigest(),
+        cache_dir=tmp_path,
+    )
+
+    path, _ = session._materialize_checkpoint()
+
+    assert path.read_bytes() == payload
+    assert len(responses) == 1
+    assert not list(tmp_path.glob(".model.th.*.tmp"))

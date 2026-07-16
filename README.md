@@ -191,7 +191,8 @@ leaving the existing `Separator` API unchanged:
 from demucs_infer import DemucsSession
 
 with DemucsSession(model="htdemucs", device="cpu") as session:
-    stems = session.infer("song.wav")
+    mixture, stems = session.infer("song.wav")
+    print(session.samplerate, session.sources)
     print(session.status, session.cache_info())
 ```
 

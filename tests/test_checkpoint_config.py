@@ -28,11 +28,16 @@ def test_custom_url_download_is_verified(tmp_path, monkeypatch):
     digest = hashlib.sha256(payload).hexdigest()
 
     class Response:
+        def __init__(self, content):
+            self.payload = content
+
         def __enter__(self): return self
         def __exit__(self, *args): return False
-        def read(self): return payload
+        def read(self, size):
+            chunk, self.payload = self.payload[:size], self.payload[size:]
+            return chunk
 
-    monkeypatch.setattr("demucs_infer.clean_api.urlopen", lambda *a, **k: Response())
+    monkeypatch.setattr("demucs_infer.clean_api.urlopen", lambda *a, **k: Response(payload))
     session = DemucsSeparator(checkpoint_url="https://example.test/model.th", checkpoint_sha256=digest, cache_dir=tmp_path)
     path, signature = session._materialize_checkpoint()
     assert path.read_bytes() == payload
