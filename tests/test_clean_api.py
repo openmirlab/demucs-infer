@@ -105,6 +105,28 @@ def test_advanced_separator_surface_remains_importable():
     assert callable(Separator.separate_tensor)
 
 
+def test_demucs_separator_auto_device_resolves_through_real_separator(monkeypatch):
+    """`device="auto"` reaches the real `Separator.update_parameter`
+    (unlike the `_FakeSeparator`-mocked tests above, which stub out
+    `api.Separator` entirely and would only prove pass-through, not
+    resolution). Only model loading is faked here -- via `api.get_model`,
+    the seam `Separator._load_model` already calls through -- so the real
+    device-resolution choke point runs unmodified."""
+    import torch as th
+    import demucs_infer.api as api
+
+    monkeypatch.setattr(api, "get_model", lambda name, repo: _FakeLoadedModel(signature=name))
+
+    helper = DemucsSeparator(model="mdx", device="auto")
+    helper.load()
+    expected = "cuda" if th.cuda.is_available() else "cpu"
+    assert helper._separator._device == expected
+
+    default_helper = DemucsSeparator(model="mdx")
+    default_helper.load()
+    assert default_helper._separator._device == helper._separator._device
+
+
 def test_session_lifecycle_and_context_manager(monkeypatch):
     import demucs_infer.api as api
     monkeypatch.setattr(api, "Separator", _FakeSeparator)

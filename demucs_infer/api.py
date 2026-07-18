@@ -98,6 +98,21 @@ class _NotProvided:
 NotProvided = _NotProvided()
 
 
+def _resolve_device(device):
+    """Resolve the `"auto"` device sentinel to a concrete device string.
+
+    `"auto"` is an explicit-string convenience for the same
+    cuda-if-available-else-cpu choice `Separator.__init__`'s default already
+    makes when `device` is left unset -- it lets a caller pass a literal
+    string (e.g. through a config file or CLI flag) instead of omitting the
+    argument. Any other value (an explicit "cpu", "cuda", "cuda:0", ...)
+    passes through unchanged.
+    """
+    if device == "auto":
+        return "cuda" if th.cuda.is_available() else "cpu"
+    return device
+
+
 class Separator:
     def __init__(
         self,
@@ -136,7 +151,9 @@ class Separator:
         device (torch.device, str, or None): If provided, device on which to execute the \
             computation, otherwise `wav.device` is assumed. When `device` is different from \
             `wav.device`, only local computations will be on `device`, while the entire tracks \
-            will be stored on `wav.device`. If not specified, will use the command line option.
+            will be stored on `wav.device`. If not specified, will use the command line option. \
+            The literal string `"auto"` is also accepted, and resolves to the same \
+            cuda-if-available-else-cpu choice as leaving `device` unset.
         jobs: Number of jobs. This can increase memory usage but will be much faster when \
             multiple cores are available. If not specified, will use the command line option.
         callback: A function will be called when the separation of a chunk starts or finished. \
@@ -203,7 +220,9 @@ class Separator:
         device (torch.device, str, or None): If provided, device on which to execute the \
             computation, otherwise `wav.device` is assumed. When `device` is different from \
             `wav.device`, only local computations will be on `device`, while the entire tracks \
-            will be stored on `wav.device`. If not specified, will use the command line option.
+            will be stored on `wav.device`. If not specified, will use the command line option. \
+            The literal string `"auto"` is also accepted, and resolves to the same \
+            cuda-if-available-else-cpu choice as leaving `device` unset.
         jobs: Number of jobs. This can increase memory usage but will be much faster when \
             multiple cores are available. If not specified, will use the command line option.
         callback: A function will be called when the separation of a chunk starts or finished. \
@@ -230,7 +249,7 @@ class Separator:
         - `models`: Count of submodels in the model.
         """
         if not isinstance(device, _NotProvided):
-            self._device = device
+            self._device = _resolve_device(device)
         if not isinstance(shifts, _NotProvided):
             self._shifts = shifts
         if not isinstance(overlap, _NotProvided):
