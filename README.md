@@ -199,9 +199,12 @@ with DemucsSession(model="htdemucs", device="cpu") as session:
 `load()` may be called explicitly; the session-level `infer()` requires the
 session to be `ready` after `load()` (or context-manager entry). The legacy
 callable form, `session(...)`, remains lazy for backward compatibility.
-`release()` (also available as `close()`) clears the in-memory model but keeps
-disk checkpoints cached, and `status` reports `new`, `loading`, `ready`,
-`failed`, or `released`. A custom checkpoint
+`release()` clears the in-memory model but keeps disk checkpoints cached and
+permits a later reload; `close()` is terminal and idempotent. Device requests
+preserve legacy `None`/`auto` selection and accept explicit `cpu`, `cuda`,
+`cuda:N`, or available `mps`, rejecting invalid/unavailable requests before
+loading. `status` reports `new`, `loading`, `ready`, `failed`, `released`, or
+`closed`. A custom checkpoint
 can be supplied with `checkpoint_path`, or downloaded with
 `checkpoint_url` plus its required full `checkpoint_sha256`. The package ships
 its release-pinned metadata in the package-local

@@ -11,6 +11,7 @@ unchanged.
 
 import inspect
 
+import pytest
 import torch as th
 
 from demucs_infer.api import Separator, _resolve_device
@@ -30,9 +31,37 @@ def test_resolve_device_auto_matches_cuda_availability():
     assert _resolve_device("auto") == expected
 
 
-def test_resolve_device_passes_through_non_auto_values():
-    for value in ("cpu", "cuda", "cuda:0", "cuda:1", "mps"):
-        assert _resolve_device(value) == value
+def test_resolve_device_validates_explicit_values_and_preserves_cuda_index(monkeypatch):
+    monkeypatch.setattr(th.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(th.cuda, "device_count", lambda: 2)
+    assert _resolve_device("cpu") == "cpu"
+    assert _resolve_device("cuda") == "cuda"
+    assert _resolve_device("cuda:1") == "cuda:1"
+
+
+def test_resolve_device_accepts_torch_cpu_device():
+    assert _resolve_device(th.device("cpu")) == "cpu"
+
+
+def test_resolve_device_rejects_invalid_or_unavailable_requests(monkeypatch):
+    monkeypatch.setattr(th.cuda, "is_available", lambda: False)
+    with pytest.raises(RuntimeError, match="CUDA"):
+        _resolve_device("cuda")
+    with pytest.raises(ValueError):
+        _resolve_device("cuda:-1")
+    with pytest.raises(ValueError):
+        _resolve_device("metal")
+
+    monkeypatch.setattr(th.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(th.cuda, "device_count", lambda: 1)
+    with pytest.raises(RuntimeError, match="index 1"):
+        _resolve_device("cuda:1")
+
+
+def test_resolve_device_rejects_unavailable_mps(monkeypatch):
+    monkeypatch.setattr(th.backends.mps, "is_available", lambda: False)
+    with pytest.raises(RuntimeError, match="MPS"):
+        _resolve_device("mps")
 
 
 def test_default_unset_device_matches_auto_resolution():
@@ -52,6 +81,9 @@ def test_update_parameter_resolves_auto_device():
 
 def test_update_parameter_explicit_device_strings_pass_through_unchanged():
     separator = _bare_separator()
-    for value in ("cpu", "cuda", "cuda:0", "cuda:1"):
-        separator.update_parameter(device=value)
-        assert separator._device == value
+    from unittest.mock import patch
+
+    with patch.object(th.cuda, "is_available", return_value=True), patch.object(th.cuda, "device_count", return_value=2):
+        for value in ("cpu", "cuda", "cuda:0", "cuda:1"):
+            separator.update_parameter(device=value)
+            assert separator._device == value

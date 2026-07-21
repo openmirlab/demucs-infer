@@ -99,17 +99,33 @@ NotProvided = _NotProvided()
 
 
 def _resolve_device(device):
-    """Resolve the `"auto"` device sentinel to a concrete device string.
-
-    `"auto"` is an explicit-string convenience for the same
-    cuda-if-available-else-cpu choice `Separator.__init__`'s default already
-    makes when `device` is left unset -- it lets a caller pass a literal
-    string (e.g. through a config file or CLI flag) instead of omitting the
-    argument. Any other value (an explicit "cpu", "cuda", "cuda:0", ...)
-    passes through unchanged.
-    """
-    if device == "auto":
+    """Resolve legacy automatic selection and validate explicit devices."""
+    if device is None or device == "auto":
         return "cuda" if th.cuda.is_available() else "cpu"
+    if isinstance(device, th.device):
+        device = str(device)
+    if device == "cpu":
+        return "cpu"
+    if not isinstance(device, str):
+        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', 'cuda:N', or 'mps'")
+    if device == "mps":
+        mps = getattr(th.backends, "mps", None)
+        if mps is None or not mps.is_available():
+            raise RuntimeError("MPS was explicitly requested but is not available")
+        return "mps"
+    if device == "cuda":
+        if not th.cuda.is_available():
+            raise RuntimeError("CUDA was explicitly requested but is not available")
+        return "cuda"
+    if not device.startswith("cuda:"):
+        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', 'cuda:N', or 'mps'")
+    index_text = device[5:]
+    if not index_text.isdigit():
+        raise ValueError("CUDA device index must be a non-negative integer")
+    if not th.cuda.is_available():
+        raise RuntimeError("CUDA was explicitly requested but is not available")
+    if int(index_text) >= th.cuda.device_count():
+        raise RuntimeError(f"CUDA device index {index_text} is not available")
     return device
 
 

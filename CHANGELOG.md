@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Validate explicit Demucs devices (`cpu`, `cuda`, `cuda:N`, and available
+  `mps`) before forwarding them to `Separator` and model application.
+- `DemucsSession.release()` is reloadable while `close()` is idempotent and
+  terminal. `cache_info()` now reports the same non-downloading default or
+  custom checkpoint path that loading resolves.
+- Add the conditional `tomli` dependency for package TOML metadata on Python
+  3.10 and earlier supported Python versions.
+
 ### Removed
 - Google Colab quickstart notebook (`notebooks/quickstart_colab.ipynb`) and
   the README's Colab badge/section — maintaining a separate notebook

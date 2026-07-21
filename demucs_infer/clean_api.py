@@ -67,9 +67,10 @@ class DemucsSeparator:
         if actual != expected:
             raise ValueError(f"checkpoint SHA-256 mismatch: expected {expected}, got {actual}")
 
-    def _cache_root(self):
+    def _cache_root(self, *, create=True):
         root = self.cache_dir or (Path.home() / ".cache" / "demucs-infer")
-        root.mkdir(parents=True, exist_ok=True)
+        if create:
+            root.mkdir(parents=True, exist_ok=True)
         return root
 
     def _download_checkpoint(self, url, path, expected):
@@ -152,7 +153,29 @@ class DemucsSeparator:
         self._materialize_named_checkpoint(metadata)
         return root, metadata["signature"]
 
+    def _resolved_named_checkpoints(self):
+        """Return the local artifacts the named-model loader would use.
+
+        This is deliberately the read-only counterpart of
+        :meth:`_materialize_named_model_repo`: it reads the packaged bag
+        recipe but never downloads a checkpoint or copies that recipe.
+        """
+        from .pretrained import REMOTE_ROOT
+        import yaml
+
+        catalog = checkpoint_catalog()
+        bag_path = REMOTE_ROOT / f"{self.model_name}.yaml"
+        if bag_path.is_file():
+            bag = yaml.safe_load(bag_path.read_text(encoding="utf-8"))
+            signatures = bag.get("models", [])
+            if signatures and all(signature in catalog for signature in signatures):
+                return [catalog[signature] for signature in signatures]
+        metadata = get_checkpoint_metadata(self.model_name)
+        return [metadata] if metadata is not None else []
+
     def _get_separator(self):
+        if self._status == "closed":
+            raise RuntimeError("cannot load a closed DemucsSession")
         if self._separator is None:
             self._status = "loading"
             try:
@@ -219,28 +242,46 @@ class DemucsSeparator:
 
     def release(self):
         with self._call_lock:
+            if self._status == "closed":
+                return self
             if self._separator is not None:
                 model = getattr(self._separator, "model", None)
                 if model is not None and hasattr(model, "cpu"):
                     model.cpu()
                 self._separator = None
             self._status = "released"
+        return self
 
-    close = release
+    def close(self):
+        with self._call_lock:
+            if self._status != "closed":
+                self.release()
+                self._status = "closed"
+        return self
 
     def cache_info(self):
         metadata = get_checkpoint_metadata(self.model_name)
+        if self.checkpoint_path is not None:
+            paths = [self.checkpoint_path]
+        elif self.checkpoint_url:
+            paths = [self._cache_root(create=False) / Path(self.checkpoint_url).name]
+        else:
+            entries = self._resolved_named_checkpoints()
+            paths = [self._cache_root(create=False) / entry["path"] for entry in entries]
+        path = paths[0] if paths else None
         return {"model": self.model_name,
-                "checkpoint_path": str(self.checkpoint_path) if self.checkpoint_path else None,
+                "checkpoint_path": str(path) if path is not None else None,
+                "checkpoint_paths": [str(item) for item in paths],
                 "checkpoint_url": self.checkpoint_url or (metadata or {}).get("url"),
                 "sha256": self.checkpoint_sha256 or (metadata or {}).get("sha256"),
+                "cached": bool(paths) and all(item.is_file() for item in paths),
                 "loaded": self._separator is not None, "status": self.status}
 
     def __enter__(self):
         return self.load()
 
     def __exit__(self, exc_type, exc, tb):
-        self.release()
+        self.close()
         return False
 
     def __call__(self, audio, *, sample_rate=None):

@@ -147,7 +147,7 @@ def test_session_lifecycle_and_context_manager(monkeypatch):
         session.infer("song.wav")
     with DemucsSeparator() as scoped:
         assert scoped.status == "ready"
-    assert scoped.status == "released"
+    assert scoped.status == "closed"
 
 
 def test_session_infer_rejects_failed_state(monkeypatch):

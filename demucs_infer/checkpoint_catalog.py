@@ -11,7 +11,7 @@ from types import MappingProxyType
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - Python 3.10 fallback
-    tomllib = None
+    import tomli as tomllib
 
 
 def _legacy_toml_load(path):
@@ -50,8 +50,6 @@ def checkpoint_config_path():
 
 
 def _load_toml(path):
-    if tomllib is None:
-        return _legacy_toml_load(path)
     try:
         with Path(path).open("rb") as fh:
             return tomllib.load(fh)
