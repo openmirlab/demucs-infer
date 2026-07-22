@@ -4,7 +4,8 @@
       "gdrive_id": "1-Dm666ScPkg8Gt2-lK3Ua0xOudWHZBGC",
       "name": "Drumsep",
       "origin": "https://github.com/inagoy/drumsep",
-      "sha256": "aefaa8543c9b9c75e22f5f32b53ab86dfe416457849af1383ff1aef83401423f"
+      "sha256": "aefaa8543c9b9c75e22f5f32b53ab86dfe416457849af1383ff1aef83401423f",
+      "verified_https_url": "https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.5/model_drumsep.th"
     }
   },
   "official": {
@@ -28,8 +29,8 @@
     },
     "1ef250f1": {
       "embedded_prefix": "592467ce",
-      "note": "not cached locally; not downloaded by this tool",
-      "sha256": null,
+      "prefix_matches_embedded": true,
+      "sha256": "592467cef0b0d878bc66fe38c8456353ff435334331baab08e1dc82beeefd596",
       "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/1ef250f1-592467ce.th"
     },
     "305bc58f": {
@@ -100,8 +101,8 @@
     },
     "902315c2": {
       "embedded_prefix": "b39ce9c9",
-      "note": "not cached locally; not downloaded by this tool",
-      "sha256": null,
+      "prefix_matches_embedded": true,
+      "sha256": "b39ce9c97b5603fbaee99ec59fe1d2db570c77a37356c9c85542d881517c3302",
       "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/902315c2-b39ce9c9.th"
     },
     "92cfc3b6": {
@@ -118,8 +119,8 @@
     },
     "9a6b4851": {
       "embedded_prefix": "03af0aa6",
-      "note": "not cached locally; not downloaded by this tool",
-      "sha256": null,
+      "prefix_matches_embedded": true,
+      "sha256": "03af0aa64af2c4f0795659c265fdead238fab31c064a8a4b5b051c1b22c8ad48",
       "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/9a6b4851-03af0aa6.th"
     },
     "a1d90b5c": {
@@ -166,9 +167,77 @@
     },
     "fa0cb7f9": {
       "embedded_prefix": "100d8bf4",
-      "note": "not cached locally; not downloaded by this tool",
-      "sha256": null,
+      "prefix_matches_embedded": true,
+      "sha256": "100d8bf4dc5e228edfd9bb7a2ec44ad9f44d8f0a845964d38ee8c11ea8ca1399",
       "url": "https://dl.fbaipublicfiles.com/demucs/mdx_final/fa0cb7f9-100d8bf4.th"
+    }
+  },
+  "third_party": {
+    "cdx23_dnr_a": {
+      "license": "not stated",
+      "path": "cdx23_dnr_a-a778de4a.th",
+      "provenance": "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing",
+      "sha256": "a778de4a72b90482a578bfb6ea6bf41462785d9136c11802c67a864a40f29434",
+      "source_revision": "v.1.0.0",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-a778de4a.th"
+      ]
+    },
+    "cdx23_dnr_b": {
+      "license": "not stated",
+      "path": "cdx23_dnr_b-dbb4db15.th",
+      "provenance": "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing",
+      "sha256": "dbb4db154df7e45a5cb72d1659c48937e757f6d6b0eef8ca4199e6e38f8d8f37",
+      "source_revision": "v.1.0.0",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-dbb4db15.th"
+      ]
+    },
+    "cdx23_dnr_c": {
+      "license": "not stated",
+      "path": "cdx23_dnr_c-e41a5468.th",
+      "provenance": "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing",
+      "sha256": "e41a54684d3cd6794ee2bb59183ffeb11a9a3d42db873a6a08a9829ac3ef4cfe",
+      "source_revision": "v.1.0.0",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-e41a5468.th"
+      ]
+    },
+    "ebf34a2d": {
+      "license": "not stated",
+      "path": "ebf34a2d.th",
+      "provenance": "TRvlvr/model_repo",
+      "sha256": "0556f2145e97e96d3c2a33c3879711e7559d7d261fd9773b20e2c580a3beffd0",
+      "source_revision": "all_public_uvr_models",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2d.th"
+      ]
+    },
+    "ebf34a2db": {
+      "license": "not stated",
+      "path": "ebf34a2db.th",
+      "provenance": "TRvlvr/model_repo",
+      "sha256": "dbdd521017d706829716055df8a86e7ee5d05a590508488c82ffb551c6edb918",
+      "source_revision": "all_public_uvr_models",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2db.th"
+      ]
+    },
+    "msst_htdemucs_vocals_state": {
+      "license": "MIT",
+      "path": "model_vocals_htdemucs_sdr_8.78.ckpt",
+      "provenance": "ZFTurbo/Music-Source-Separation-Training",
+      "sha256": "0ea6e9495685045e6b4e66174131be5d19808bb0d6d1a1ba717d238f9380e8d0",
+      "source_revision": "v1.0.0",
+      "updated_at": "2026-07-22",
+      "urls": [
+        "https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.0/model_vocals_htdemucs_sdr_8.78.ckpt"
+      ]
     }
   }
 }

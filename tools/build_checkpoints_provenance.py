@@ -1,36 +1,11 @@
 #!/usr/bin/env python3
-"""ADOPT P3 -- build a checkpoints provenance record.
+"""Build and locally verify the schema-v2 checkpoint provenance record.
 
-Every model demucs_infer can load already has *some* integrity check:
-  - Meta-hosted models (demucs_infer/remote/files.txt + *.yaml bag configs):
-    the URL is ``ROOT_URL + root + filename``, and the filename embeds an
-    8-hex-char sha256 prefix (e.g. ``955717e8-8726e21a.th`` -> prefix
-    ``8726e21a``). ``RemoteRepo.get_model`` downloads via
-    ``torch.hub.load_state_dict_from_url(url, check_hash=True)``, which
-    verifies the downloaded bytes' sha256 against that filename prefix.
-    ``LocalRepo`` separately verifies the same prefix via
-    ``repo.check_checksum`` when loading from a local folder.
-  - Community models (demucs_infer/community.py's GDriveRepo): until this
-    phase, there was NO integrity check at all on the gdown download --
-    a real gap, since ``states.load_model`` calls
-    ``torch.load(..., weights_only=False)`` (pickle deserialization) on
-    whatever bytes land in the cache.
+The package registry owns full hashes and ordered HTTPS sources. This tool
+projects those facts into the durable JSON audit record and verifies any
+matching local cache file against the configured hash. It never downloads.
 
-This tool does not duplicate either existing mechanism; it extends
-coverage by recording the FULL 64-char sha256 of every checkpoint this
-machine already has cached (no re-download), for two purposes:
-  1. A durable, auditable provenance record (docs/checkpoints_provenance.json)
-     going beyond the 8-char prefix torch.hub checks.
-  2. The source of the sha256 wired into community.py's COMMUNITY_MODELS
-     registry (see P3 commit), so GDriveRepo can finally verify its
-     downloads via the existing repo.check_checksum() helper.
-
-Only checkpoints already present in the local torch hub cache
-(~/.cache/torch/hub/checkpoints/) or the demucs-infer community cache
-(~/.cache/demucs-infer/) are hashed; nothing is downloaded by this tool.
-
-Reads: demucs_infer.pretrained (_parse_remote_files, REMOTE_ROOT, ROOT_URL),
-       demucs_infer.community (COMMUNITY_MODELS)
+Reads: checkpoint_catalog, community compatibility metadata.
 """
 import hashlib
 import json
@@ -40,7 +15,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from demucs_infer.pretrained import _parse_remote_files, REMOTE_ROOT, ROOT_URL  # noqa: E402
+from demucs_infer.checkpoint_catalog import checkpoint_config  # noqa: E402
 from demucs_infer.community import COMMUNITY_MODELS, DEFAULT_CACHE_DIR  # noqa: E402
 
 TORCH_HUB_CACHE = Path.home() / ".cache" / "torch" / "hub" / "checkpoints"
@@ -55,37 +30,60 @@ def sha256_of(path: Path) -> str:
 
 
 def main():
-    models = _parse_remote_files(REMOTE_ROOT / "files.txt")
-    out = {"official": {}, "community": {}}
+    registry = checkpoint_config()
+    out = {"official": {}, "community": {}, "third_party": {}}
+    cached_verified = {"official": 0, "community": 0, "third_party": 0}
 
-    for sig, url in sorted(models.items()):
-        filename = url.rsplit("/", 1)[-1]
-        embedded_prefix = filename.split("-", 1)[1].rsplit(".", 1)[0] if "-" in filename else None
-        cached = TORCH_HUB_CACHE / filename
-        entry = {"url": url, "embedded_prefix": embedded_prefix}
-        if cached.exists():
-            full = sha256_of(cached)
-            entry["sha256"] = full
-            entry["prefix_matches_embedded"] = (
-                embedded_prefix is not None and full.startswith(embedded_prefix)
-            )
-        else:
-            entry["sha256"] = None
-            entry["note"] = "not cached locally; not downloaded by this tool"
-        out["official"][sig] = entry
+    for artifact in sorted(registry.artifacts.values(), key=lambda item: item.signature):
+        if artifact.signature in COMMUNITY_MODELS:
+            continue
+        if artifact.provenance != "facebookresearch/demucs":
+            entry = {
+                "path": artifact.path,
+                "urls": list(artifact.urls),
+                "sha256": artifact.sha256,
+                "license": artifact.license,
+                "provenance": artifact.provenance,
+                "source_revision": artifact.source_revision,
+                "updated_at": artifact.updated_at,
+            }
+            for root in (TORCH_HUB_CACHE, DEFAULT_CACHE_DIR):
+                cached = root / artifact.path
+                if cached.exists():
+                    if sha256_of(cached) != artifact.sha256:
+                        raise ValueError(f"cached checkpoint hash mismatch: {cached}")
+                    cached_verified["third_party"] += 1
+            out["third_party"][artifact.id] = entry
+            continue
+        embedded_prefix = Path(artifact.path).stem.split("-", 1)[1]
+        entry = {
+            "url": artifact.urls[0],
+            "embedded_prefix": embedded_prefix,
+            "sha256": artifact.sha256,
+            "prefix_matches_embedded": artifact.sha256.startswith(embedded_prefix),
+        }
+        for root in (TORCH_HUB_CACHE, DEFAULT_CACHE_DIR):
+            cached = root / artifact.path
+            if cached.exists():
+                if sha256_of(cached) != artifact.sha256:
+                    raise ValueError(f"cached checkpoint hash mismatch: {cached}")
+                cached_verified["official"] += 1
+        out["official"][artifact.signature] = entry
 
     for sig, meta in COMMUNITY_MODELS.items():
         cached = DEFAULT_CACHE_DIR / f"{sig}.th"
+        artifact = registry.signatures[sig]
         entry = {
             "name": meta["name"],
             "origin": meta["origin"],
             "gdrive_id": meta["gdrive_id"],
+            "sha256": artifact.sha256,
+            "verified_https_url": artifact.urls[0],
         }
         if cached.exists():
-            entry["sha256"] = sha256_of(cached)
-        else:
-            entry["sha256"] = None
-            entry["note"] = "not cached locally; not downloaded by this tool"
+            if sha256_of(cached) != artifact.sha256:
+                raise ValueError(f"cached checkpoint hash mismatch: {cached}")
+            cached_verified["community"] += 1
         out["community"][sig] = entry
 
     out_path = REPO_ROOT / "docs" / "checkpoints_provenance.json"
@@ -94,15 +92,26 @@ def main():
         json.dump(out, f, indent=2, sort_keys=True)
 
     n_official = len(out["official"])
-    n_hashed = sum(1 for e in out["official"].values() if e["sha256"])
     n_mismatch = sum(
         1 for e in out["official"].values()
         if e["sha256"] and not e.get("prefix_matches_embedded", True)
     )
     print(f"wrote {out_path}")
-    print(f"official: {n_hashed}/{n_official} hashed locally, {n_mismatch} prefix mismatches")
-    print(f"community: {sum(1 for e in out['community'].values() if e['sha256'])}/"
-          f"{len(out['community'])} hashed locally")
+    print(
+        f"official: {n_official}/{n_official} full hashes recorded; "
+        f"{cached_verified['official']} cached files verified; "
+        f"{n_mismatch} prefix mismatches"
+    )
+    n_community = len(out["community"])
+    print(
+        f"community: {n_community}/{n_community} full hashes recorded; "
+        f"{cached_verified['community']} cached files verified"
+    )
+    n_third_party = len(out["third_party"])
+    print(
+        f"third-party: {n_third_party}/{n_third_party} full hashes recorded; "
+        f"{cached_verified['third_party']} cached files verified"
+    )
 
 
 if __name__ == "__main__":

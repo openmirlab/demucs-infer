@@ -12,7 +12,9 @@ to PyPI as `demucs-infer`; GitHub Actions gates every release on the test
 suite (`.github/workflows/publish.yml`) -- nothing publishes without it
 passing. Upstream `facebookresearch/demucs` is no longer actively
 maintained; this fork exists specifically to keep pretrained-model inference
-working on current PyTorch/torchaudio, not to extend the model family.
+working on current PyTorch/torchaudio. The package-owned schema-v2 registry
+also exposes verified compatible Demucs checkpoints without changing model
+architectures or the inference algorithms.
 
 ## Testing philosophy
 
@@ -25,9 +27,8 @@ Two tiers, both pytest-based:
    models."
 2. **Fast unit/regression suite** (`tests/`): runs by default, network tests
    deselected (`-m "not network"` in `pyproject.toml`'s `addopts`). A
-   separate `network` marker covers checkpoint URL liveness against Meta's
-   real CDN and is opt-in (`pytest -m network`) since it depends on
-   external infrastructure being reachable.
+   separate `network` marker covers every configured checkpoint source and is
+   opt-in (`pytest -m network`) since it depends on external infrastructure.
 
 ## Scope
 
@@ -48,6 +49,21 @@ Two tiers, both pytest-based:
 - `demucs_infer/wiener.py` is vendored from open-unmix-pytorch (MIT); see
   its header for attribution and which forward paths actually exercise it
   (htdemucs never does; some mdx/mdx_extra bag members do).
+- `demucs_infer/config/checkpoints.toml` is the release-pinned source of truth
+  for physical artifacts and named recipes. `checkpoint_runtime.py` alone owns
+  named-model resolution, cache paths, verified downloads, format dispatch,
+  and registry-backed bag assembly. Packaged `remote/*.yaml` files remain only
+  for explicit legacy-repository compatibility; new recipes must not add
+  copied YAML files. The default named-model cache is
+  `~/.cache/demucs-infer/`; public lifecycle helpers override it with
+  `cache_dir`, and README.md owns the exact manual-download table.
+- Public compatible model names and exact stems are:
+  `uvr_demucs_model_1` (`vocals`, `non_vocals`),
+  `uvr_demucs_model_2` (`vocals`, `non_vocals`),
+  `uvr_demucs_model_bag` (`vocals`, `non_vocals`), `cdx23_dnr` (`music`,
+  `sfx`, `speech`), and `msst_htdemucs_vocals` (`vocals`, `other`). DrumSep
+  retains its actual programmatic keys: `bombo`, `redoblante`, `platillos`,
+  `toms`.
 - `tools/` -- one-off/repeatable scripts (baseline capture, checkpoint
   provenance) that support verification, not part of the installed package.
 - `tests/` -- fast unit/regression tests run by default, plus a `network`
@@ -80,10 +96,16 @@ print('bit-identical')
 # fast suite (default: network tests deselected)
 uv run pytest tests/
 
+# frozen public API and legacy metadata contract
+uv run python tools/capture_public_contract.py --compare tests/fixtures/public_contract.json
+
+# verified real-file parity (requires the Phase 0 files in /tmp)
+DEMUCS_PHASE0_PROBE_CACHE=/tmp uv run pytest tests/test_phase0_contract.py tests/test_phase3_checkpoints.py -q
+
 # checkpoint URL liveness (hits real network endpoints)
 uv run pytest tests/test_checkpoints_liveness.py -m network
 
-# rebuild the checkpoints provenance record (hashes only what's cached locally)
+# rebuild registry provenance; separately reports recorded hashes and cached files verified
 uv run python tools/build_checkpoints_provenance.py
 
 # regenerate the wiener vendoring regression fixture (only after an

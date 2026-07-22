@@ -17,9 +17,9 @@ documented API and by separate.py/tests for `list_models`) keeps working
 unchanged. This module never imports from api.py, so the re-export is a
 one-directional (non-circular) dependency.
 
-Reads: apply (BagOfModels), community (GDriveRepo), log (fatal),
-pretrained (get_model, _parse_remote_files, REMOTE_ROOT), repo (RemoteRepo,
-LocalRepo, ModelOnlyRepo, BagOnlyRepo)
+Reads: apply (BagOfModels), checkpoint_catalog, community (GDriveRepo),
+log (fatal), pretrained (get_model, REMOTE_ROOT), repo (LocalRepo,
+ModelOnlyRepo, BagOnlyRepo)
 """
 
 from dataclasses import dataclass
@@ -27,10 +27,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from .apply import BagOfModels
+from .checkpoint_catalog import checkpoint_config, checkpoint_config_path
 from .community import GDriveRepo
 from .log import fatal
-from .pretrained import get_model, _parse_remote_files, REMOTE_ROOT
-from .repo import RemoteRepo, LocalRepo, ModelOnlyRepo, BagOnlyRepo
+from .pretrained import get_model, REMOTE_ROOT
+from .repo import LocalRepo, ModelOnlyRepo, BagOnlyRepo
 
 
 # =============================================================================
@@ -73,11 +74,6 @@ SEPARATION_TYPES: Dict[str, Dict] = {
         'name': 'Speech Separation',
         'description': 'Separates speech/vocals from other audio',
         'sources': {'speech', 'vocals', 'voice'},
-    },
-    'stereo_center': {
-        'name': 'Stereo Center/Sides Separation',
-        'description': 'Separates audio into center (mono/similar) and sides (stereo difference) components',
-        'sources': {'similarity', 'difference', 'center', 'sides'},
     },
     'vocal_instrumental': {
         'name': 'Vocal/Instrumental Separation',
@@ -128,27 +124,20 @@ KNOWN_MODELS: Dict[str, Dict] = {
         'description': 'Drum stem separation model - separates drum recordings into kit pieces',
         'use_case': 'Drum recording separation (kick, snare, cymbals, toms)',
     },
-    '97d170e1': {
-        'display_name': 'CDX23 Cinematic',
-        'description': 'Cinematic sound demixing model from CDX23 challenge',
-        'use_case': 'Film/video audio separation (dialog, music, sfx)',
-    },
     '04573f0d': {
         'display_name': 'HTDemucs (MDX23)',
         'description': 'HTDemucs variant used in MVSep-MDX23 ensemble',
         'use_case': 'Music separation',
     },
-    'phantom_center': {
-        'display_name': 'Phantom Center Extractor',
-        'description': 'HTDemucs model for extracting center (similarity) and sides (difference) from stereo audio',
-        'use_case': 'Stereo center/sides separation (phantom center extraction)',
-    },
-    'ebf34a2d': {
-        'display_name': 'UVR Demucs Model 1',
-        'description': 'HDemucs model optimized for vocal/non-vocal (instrumental) separation',
-        'use_case': 'Vocal/instrumental separation (2-stem)',
-    },
 }
+
+# Stable recipe names and display labels come from the packaged registry. Keep
+# richer descriptions above only where they add user guidance beyond the
+# registry-owned identity.
+for _recipe in checkpoint_config().recipes.values():
+    _metadata = KNOWN_MODELS.setdefault(_recipe.name, {})
+    if _recipe.display_name is not None:
+        _metadata['display_name'] = _recipe.display_name
 
 
 class LoadModelError(Exception):
@@ -250,16 +239,28 @@ def list_models(repo: Optional[Path] = None) -> Dict[str, Dict[str, Union[str, P
     """
     model_repo: ModelOnlyRepo
     if repo is None:
-        models = _parse_remote_files(REMOTE_ROOT / 'files.txt')
-        model_repo = RemoteRepo(models)
-        bag_repo = BagOnlyRepo(REMOTE_ROOT, model_repo)
+        registry = checkpoint_config()
+        community_signatures = set(GDriveRepo().list_model())
+        single = {
+            artifact.signature: artifact.urls[0]
+            for artifact in registry.artifacts.values()
+            if artifact.signature not in community_signatures
+        }
+        bag = {}
+        for recipe in registry.recipes.values():
+            if recipe.components[0] in community_signatures:
+                continue
+            legacy_yaml = REMOTE_ROOT / f"{recipe.name}.yaml"
+            bag[recipe.name] = (
+                legacy_yaml if legacy_yaml.is_file() else checkpoint_config_path()
+            )
+        result = {"single": single, "bag": bag}
     else:
         if not repo.is_dir():
             fatal(f"{repo} must exist and be a directory.")
         model_repo = LocalRepo(repo)
         bag_repo = BagOnlyRepo(repo, model_repo)
-
-    result = {"single": model_repo.list_model(), "bag": bag_repo.list_model()}
+        result = {"single": model_repo.list_model(), "bag": bag_repo.list_model()}
 
     # Include community models when listing from default repo
     if repo is None:

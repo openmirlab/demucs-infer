@@ -5,15 +5,13 @@
 # LICENSE file in the root directory of this source tree.
 """Loading pretrained models.
 
-`get_model(name)` is the top-level resolver: tries the official Meta-hosted
-registry first (remote/files.txt signatures + remote/*.yaml bag configs,
-via repo.RemoteRepo/BagOnlyRepo), then falls back to community.GDriveRepo
-for community-contributed signatures. `REMOTE_ROOT`/`_parse_remote_files`
-are also reused directly by tools/build_checkpoints_provenance.py and
-tests/test_checkpoints_liveness.py to enumerate every official checkpoint
-URL without re-implementing the files.txt parsing.
+`get_model(name)` is the top-level compatibility resolver. Package-owned
+schema-v2 recipes and signatures load through checkpoint_runtime; unknown
+names retain the historical Meta YAML/files.txt and community fallbacks.
+Explicit local repositories remain on the original Repo classes unchanged.
+`REMOTE_ROOT`/`_parse_remote_files` remain audit and fallback surfaces.
 
-Reads: community (GDriveRepo), hdemucs (HDemucs, for demucs_unittest),
+Reads: checkpoint_runtime, community (GDriveRepo), hdemucs (HDemucs, for demucs_unittest),
 repo (RemoteRepo, LocalRepo, BagOnlyRepo, AnyModelRepo, ModelLoadingError),
 states (_check_diffq)
 """
@@ -77,6 +75,13 @@ def get_model(name: str,
     """
     if name == 'demucs_unittest':
         return demucs_unittest()
+    if repo is None:
+        from .checkpoint_runtime import CheckpointRuntime, RegistryModelNotFound
+
+        try:
+            return CheckpointRuntime(name).load_registered_model()
+        except RegistryModelNotFound:
+            pass
     model_repo: ModelOnlyRepo
     explicit_model_repo = isinstance(repo, ModelOnlyRepo)
     if explicit_model_repo:

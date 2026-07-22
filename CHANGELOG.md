@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add schema-v2 registry recipes for `uvr_demucs_model_1`,
+  `uvr_demucs_model_2`, `uvr_demucs_model_bag`, `cdx23_dnr`, and
+  `msst_htdemucs_vocals`. The six source artifacts carry full SHA-256,
+  provenance, source revision, and weight-license metadata.
+- Add strict raw-state-dict loading through a closed `HTDemucs` constructor
+  recipe for the MSST vocals model. UVR and CDX23 continue to use the existing
+  Demucs package loader.
+- Document automatic and manual checkpoint acquisition, the
+  `~/.cache/demucs-infer/` default, and the `cache_dir` override.
+
 ### Changed
 - Validate explicit Demucs devices (`cpu`, `cuda`, `cuda:N`, and available
   `mps`) before forwarding them to `Separator` and model application.
@@ -15,8 +26,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   custom checkpoint path that loading resolves.
 - Add the conditional `tomli` dependency for package TOML metadata on Python
   3.10 and earlier supported Python versions.
+- Route default named-model loading, cache reporting, verified downloads, and
+  registry-backed bag construction through one checkpoint runtime. Explicit
+  legacy `repo=Path(...)` loading remains supported.
+- Correct UVR identity: Model 1 is artifact `ebf34a2db`, while Model 2 is
+  `ebf34a2d`. CDX23 is now represented as its real three-component bag with
+  programmatic stems `music`, `sfx`, and `speech`.
+- Report DrumSep's actual programmatic stems as `bombo`, `redoblante`,
+  `platillos`, and `toms`; English translations remain display-only guidance.
 
 ### Removed
+- Remove the unsupported `phantom_center` model and stereo-center separation
+  claims; no verified Demucs checkpoint/source backs that entry.
 - Google Colab quickstart notebook (`notebooks/quickstart_colab.ipynb`) and
   the README's Colab badge/section — maintaining a separate notebook
   environment alongside the PyPI package was more upkeep than the audience

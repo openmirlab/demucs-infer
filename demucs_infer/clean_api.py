@@ -1,23 +1,18 @@
-"""Task-level source-separation facade.
+"""Task-level source-separation facade and session lifecycle.
 
 This module is a small front door over :class:`demucs_infer.api.Separator`.
-It owns input-boundary validation and helper lifecycle, while the existing
-separator continues to own model loading, audio decoding, and separation.
-The module deliberately avoids importing torch (or the heavier API module)
-until a separation call is made.
+It owns input-boundary validation and helper lifecycle, while
+``checkpoint_runtime`` owns checkpoint resolution/loading and the existing
+separator owns audio decoding and separation. The module deliberately avoids
+importing torch (or the heavier API module) until a separation call is made.
+
+Reads: checkpoint_runtime, api.Separator through the internal runtime.
 """
 
-import os
-import tempfile
-from hashlib import sha256
 from pathlib import Path
 from threading import RLock
-from urllib.request import urlopen
 
-from .checkpoint_catalog import checkpoint_catalog, get_checkpoint_metadata
-
-
-_IO_CHUNK_SIZE = 1024 * 1024
+from .checkpoint_runtime import CheckpointRuntime
 
 
 class DemucsSeparator:
@@ -58,120 +53,17 @@ class DemucsSeparator:
             raise RuntimeError("session must be loaded before sources are available")
         return tuple(self._separator.model.sources)
 
-    def _verify(self, path, expected):
-        digest = sha256()
-        with path.open("rb") as checkpoint:
-            while chunk := checkpoint.read(_IO_CHUNK_SIZE):
-                digest.update(chunk)
-        actual = digest.hexdigest()
-        if actual != expected:
-            raise ValueError(f"checkpoint SHA-256 mismatch: expected {expected}, got {actual}")
-
-    def _cache_root(self, *, create=True):
-        root = self.cache_dir or (Path.home() / ".cache" / "demucs-infer")
-        if create:
-            root.mkdir(parents=True, exist_ok=True)
-        return root
-
-    def _download_checkpoint(self, url, path, expected):
-        if path.exists():
-            try:
-                self._verify(path, expected)
-                return path
-            except ValueError:
-                path.unlink()
-
-        temporary_path = None
-        try:
-            with urlopen(url) as source:
-                with tempfile.NamedTemporaryFile(
-                    mode="wb",
-                    dir=path.parent,
-                    prefix=f".{path.name}.",
-                    suffix=".tmp",
-                    delete=False,
-                ) as target:
-                    temporary_path = Path(target.name)
-                    while chunk := source.read(_IO_CHUNK_SIZE):
-                        target.write(chunk)
-                    target.flush()
-                    os.fsync(target.fileno())
-            self._verify(temporary_path, expected)
-            os.replace(temporary_path, path)
-        except BaseException:
-            if temporary_path is not None:
-                temporary_path.unlink(missing_ok=True)
-            raise
-        return path
-
-    def _materialize_named_checkpoint(self, metadata):
-        path = self._cache_root() / metadata["path"]
-        return self._download_checkpoint(metadata["url"], path, metadata["sha256"])
+    def _checkpoint_runtime(self):
+        return CheckpointRuntime(
+            self.model_name,
+            checkpoint_path=self.checkpoint_path,
+            checkpoint_url=self.checkpoint_url,
+            checkpoint_sha256=self.checkpoint_sha256,
+            cache_dir=self.cache_dir,
+        )
 
     def _materialize_checkpoint(self):
-        path = self.checkpoint_path
-        if path is None and self.checkpoint_url:
-            if not self.checkpoint_sha256:
-                raise ValueError("checkpoint_sha256 is required with checkpoint_url")
-            root = self._cache_root()
-            path = root / Path(self.checkpoint_url).name
-            self._download_checkpoint(self.checkpoint_url, path, self.checkpoint_sha256)
-            return path, path.stem.split("-", 1)[0]
-        if path is None:
-            return None
-        if not path.is_file():
-            raise FileNotFoundError(f"checkpoint does not exist: {path}")
-        signature = path.stem.split("-", 1)[0]
-        expected = self.checkpoint_sha256 or (get_checkpoint_metadata(signature) or {}).get("sha256")
-        if expected:
-            self._verify(path, expected)
-        return path, signature
-
-    def _materialize_named_model_repo(self):
-        from .pretrained import REMOTE_ROOT
-        import yaml
-
-        root = self._cache_root()
-        catalog = checkpoint_catalog()
-        bag_path = REMOTE_ROOT / f"{self.model_name}.yaml"
-
-        if bag_path.is_file():
-            bag = yaml.safe_load(bag_path.read_text(encoding="utf-8"))
-            signatures = bag.get("models", [])
-            if signatures and all(signature in catalog for signature in signatures):
-                for signature in signatures:
-                    self._materialize_named_checkpoint(catalog[signature])
-                (root / bag_path.name).write_text(
-                    bag_path.read_text(encoding="utf-8"),
-                    encoding="utf-8",
-                )
-                return root, self.model_name
-
-        metadata = get_checkpoint_metadata(self.model_name)
-        if metadata is None:
-            return None
-        self._materialize_named_checkpoint(metadata)
-        return root, metadata["signature"]
-
-    def _resolved_named_checkpoints(self):
-        """Return the local artifacts the named-model loader would use.
-
-        This is deliberately the read-only counterpart of
-        :meth:`_materialize_named_model_repo`: it reads the packaged bag
-        recipe but never downloads a checkpoint or copies that recipe.
-        """
-        from .pretrained import REMOTE_ROOT
-        import yaml
-
-        catalog = checkpoint_catalog()
-        bag_path = REMOTE_ROOT / f"{self.model_name}.yaml"
-        if bag_path.is_file():
-            bag = yaml.safe_load(bag_path.read_text(encoding="utf-8"))
-            signatures = bag.get("models", [])
-            if signatures and all(signature in catalog for signature in signatures):
-                return [catalog[signature] for signature in signatures]
-        metadata = get_checkpoint_metadata(self.model_name)
-        return [metadata] if metadata is not None else []
+        return self._checkpoint_runtime().materialize_override()
 
     def _get_separator(self):
         if self._status == "closed":
@@ -179,29 +71,7 @@ class DemucsSeparator:
         if self._separator is None:
             self._status = "loading"
             try:
-                from .api import Separator
-                override = self._materialize_checkpoint()
-                if override:
-                    path, signature = override
-                    from .states import load_model
-                    separator = Separator.__new__(Separator)
-                    separator._name = signature
-                    separator._repo = path.parent
-                    separator._model = load_model(path)
-                    separator._audio_channels = separator._model.audio_channels
-                    separator._samplerate = separator._model.samplerate
-                    separator.update_parameter(**self.separator_options)
-                    self._separator = separator
-                else:
-                    pinned = self._materialize_named_model_repo()
-                    if pinned is not None:
-                        repo_root, resolved_name = pinned
-                        self._separator = Separator(model=resolved_name,
-                                                    repo=repo_root,
-                                                    **self.separator_options)
-                    else:
-                        self._separator = Separator(model=self.model_name,
-                                                    **self.separator_options)
+                self._separator = self._checkpoint_runtime().load_separator(self.separator_options)
                 self._status = "ready"
             except Exception:
                 self._status = "failed"
@@ -260,22 +130,10 @@ class DemucsSeparator:
         return self
 
     def cache_info(self):
-        metadata = get_checkpoint_metadata(self.model_name)
-        if self.checkpoint_path is not None:
-            paths = [self.checkpoint_path]
-        elif self.checkpoint_url:
-            paths = [self._cache_root(create=False) / Path(self.checkpoint_url).name]
-        else:
-            entries = self._resolved_named_checkpoints()
-            paths = [self._cache_root(create=False) / entry["path"] for entry in entries]
-        path = paths[0] if paths else None
-        return {"model": self.model_name,
-                "checkpoint_path": str(path) if path is not None else None,
-                "checkpoint_paths": [str(item) for item in paths],
-                "checkpoint_url": self.checkpoint_url or (metadata or {}).get("url"),
-                "sha256": self.checkpoint_sha256 or (metadata or {}).get("sha256"),
-                "cached": bool(paths) and all(item.is_file() for item in paths),
-                "loaded": self._separator is not None, "status": self.status}
+        return self._checkpoint_runtime().cache_info(
+            loaded=self._separator is not None,
+            status=self.status,
+        )
 
     def __enter__(self):
         return self.load()

@@ -37,7 +37,10 @@ PROBE_FIXTURE = REPO_ROOT / "tests/fixtures/checkpoint_probe_baseline.json"
 
 def test_public_contract_matches_phase0_snapshot() -> None:
     expected = json.loads(CONTRACT_FIXTURE.read_text(encoding="utf-8"))
-    assert capture_public_contract.build_snapshot() == expected
+    capture_public_contract.assert_matches_baseline(
+        capture_public_contract.build_snapshot(),
+        expected,
+    )
 
 
 def test_probe_fixture_owns_pinned_urls_hashes_and_discrete_loading_facts() -> None:

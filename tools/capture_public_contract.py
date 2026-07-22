@@ -137,6 +137,19 @@ def build_snapshot() -> dict[str, object]:
     }
 
 
+def assert_matches_baseline(snapshot, baseline) -> None:
+    """Require the frozen contract while allowing additive catalog entries."""
+    actual = dict(snapshot)
+    expected = dict(baseline)
+    actual_catalog = actual.pop("checkpoint_catalog")
+    expected_catalog = expected.pop("checkpoint_catalog")
+    if actual != expected:
+        raise AssertionError("public exports, signatures, metadata, or CLI changed")
+    for signature, metadata in expected_catalog.items():
+        if actual_catalog.get(signature) != metadata:
+            raise AssertionError(f"baseline checkpoint metadata changed for {signature}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path)
@@ -147,8 +160,10 @@ def main() -> None:
     snapshot = build_snapshot()
     if args.compare:
         expected = json.loads(args.compare.read_text(encoding="utf-8"))
-        if snapshot != expected:
-            raise SystemExit("public contract differs from the Phase 0 snapshot")
+        try:
+            assert_matches_baseline(snapshot, expected)
+        except AssertionError as error:
+            raise SystemExit(f"public contract differs from the Phase 0 snapshot: {error}")
         print(f"public contract matches {args.compare}")
     if args.out:
         args.out.parent.mkdir(parents=True, exist_ok=True)

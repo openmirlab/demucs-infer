@@ -1,50 +1,75 @@
-"""ADOPT P3 -- checkpoint URL liveness (network test, deselected by default).
+"""Check every schema-v2 artifact's primary HTTPS source for liveness.
 
-HEADs every official checkpoint URL (built the same way
-demucs_infer.pretrained._parse_remote_files does, from
-demucs_infer/remote/files.txt + ROOT_URL) plus every community model's
-Google Drive download URL, to catch upstream hosting rot (Meta or a
-community author moving/deleting a file) before a user hits it.
+The package registry is the only URL authority. Each artifact's first ordered
+URL is probed with HEAD, then a one-byte ranged GET when the host rejects or
+mishandles HEAD; only a successful HTTP response counts as live.
 
 Deselected by default (see pyproject.toml's `addopts = -m "not network"` and
 the registered `network` marker). Run explicitly with:
 
     pytest -m network tests/test_checkpoints_liveness.py
-"""
-import pytest
-import urllib.request
-import urllib.error
 
-from demucs_infer.pretrained import _parse_remote_files, REMOTE_ROOT
-from demucs_infer.community import COMMUNITY_MODELS
+Reads: checkpoint_catalog.checkpoint_config.
+"""
+import urllib.error
+import urllib.request
+from urllib.parse import urlsplit
+
+import pytest
+
+from demucs_infer.checkpoint_catalog import checkpoint_config
 
 pytestmark = pytest.mark.network
 
 
-def _head_ok(url: str, timeout: float = 10.0) -> bool:
-    req = urllib.request.Request(url, method="HEAD")
+def _request_ok(request, timeout):
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return 200 <= resp.status < 400
-    except urllib.error.HTTPError as e:
-        # Some hosts (e.g. Drive) don't support HEAD cleanly; treat
-        # "method not allowed"/redirect-adjacent codes as reachable.
-        return e.code in (405, 302, 303)
-    except Exception:
-        return False
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            if request.get_method() == "GET":
+                response.read(1)
+            return 200 <= response.status < 400, f"HTTP {response.status}"
+    except urllib.error.HTTPError as error:
+        return False, f"HTTP {error.code}"
+    except urllib.error.URLError as error:
+        return False, f"URL error: {error.reason}"
+    except TimeoutError:
+        return False, "timeout"
 
 
-def _official_urls():
-    models = _parse_remote_files(REMOTE_ROOT / "files.txt")
-    return sorted(models.items())
+def _probe_primary_url(url, timeout=20.0):
+    headers = {"User-Agent": "demucs-infer-checkpoint-liveness/1"}
+    head_ok, head_detail = _request_ok(
+        urllib.request.Request(url, headers=headers, method="HEAD"),
+        timeout,
+    )
+    if head_ok:
+        return True, f"HEAD {head_detail}"
+    range_headers = dict(headers)
+    range_headers["Range"] = "bytes=0-0"
+    get_ok, get_detail = _request_ok(
+        urllib.request.Request(url, headers=range_headers, method="GET"),
+        timeout,
+    )
+    return get_ok, f"HEAD {head_detail}; ranged GET {get_detail}"
 
 
-@pytest.mark.parametrize("sig,url", _official_urls())
-def test_official_checkpoint_url_is_live(sig, url):
-    assert _head_ok(url), f"{sig}: {url} did not respond with a live status"
+def _primary_urls():
+    registry = checkpoint_config()
+    return tuple(
+        (artifact.id, artifact.urls[0])
+        for artifact in sorted(registry.artifacts.values(), key=lambda item: item.id)
+    )
 
 
-@pytest.mark.parametrize("sig,entry", sorted(COMMUNITY_MODELS.items()))
-def test_community_checkpoint_gdrive_is_live(sig, entry):
-    url = f"https://drive.google.com/uc?id={entry['gdrive_id']}"
-    assert _head_ok(url), f"{sig} ({entry['name']}): {url} did not respond with a live status"
+PRIMARY_URLS = _primary_urls()
+
+
+@pytest.mark.parametrize(
+    "artifact_id,url",
+    PRIMARY_URLS,
+    ids=[f"{urlsplit(url).netloc}-{artifact_id}" for artifact_id, url in PRIMARY_URLS],
+)
+def test_primary_checkpoint_url_is_live(artifact_id, url):
+    live, detail = _probe_primary_url(url)
+    host = urlsplit(url).netloc
+    assert live, f"{host}: {artifact_id}: {url} is not live ({detail})"

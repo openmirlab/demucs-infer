@@ -33,16 +33,16 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository by 
 | **Training code** | Included | Removed (inference-only) |
 | **Inference code / quality** | High | Identical (zero algorithm changes) |
 | **CLI / import name** | `demucs` / `demucs` | `demucs-infer` / `demucs_infer` (no conflicts) |
-| **Model weights** | Official Meta checkpoints | Same official checkpoints, same host |
+| **Model weights** | Official Meta checkpoints | Same Meta checkpoints plus verified, source-pinned compatible checkpoints |
 
 ## Acknowledgments
 
-**demucs-infer** is built entirely on the research and models of the original Demucs project. All algorithms, model architectures, and pretrained weights originate there — this package only maintains the packaging and PyTorch 2.x compatibility layer around them.
+**demucs-infer** is built on the research, architectures, and official models of the original Demucs project. This package maintains the packaging and PyTorch 2.x compatibility layer, and its checkpoint registry also exposes compatible third-party weights from their original public sources.
 
 - **Upstream organization:** [Meta AI Research (FAIR)](https://ai.meta.com/research/)
 - **Individual authors:** Alexandre Défossez (both papers below, see [Citation](#citation)); Simon Rouard and Francisco Massa (Hybrid Transformer Demucs, co-authors — see [arXiv:2211.08553](https://arxiv.org/abs/2211.08553))
 - **Source repository:** [github.com/facebookresearch/demucs](https://github.com/facebookresearch/demucs)
-- **Pretrained weights host:** [dl.fbaipublicfiles.com/demucs](https://dl.fbaipublicfiles.com/demucs/) — Meta's own public checkpoint CDN; demucs-infer downloads directly from it and hosts no mirror
+- **Official pretrained weights host:** [dl.fbaipublicfiles.com/demucs](https://dl.fbaipublicfiles.com/demucs/) — Meta's public checkpoint CDN. Compatible third-party sources are credited in [Registry-backed compatible models](#registry-backed-compatible-models); demucs-infer hosts no mirror.
 
 **What this package changed vs. upstream:** PyTorch 2.x compatibility, inference-only packaging, and modern dependency management. **What stayed identical:** every model architecture, every separation algorithm, and every pretrained weight — see [Scope](#scope) below for the full breakdown.
 
@@ -79,9 +79,9 @@ If you use demucs-infer in your research, please cite the original Demucs papers
 - **Minimal Dependencies**: 8 core packages (vs 15+ in original)
 - **API Compatible**: Drop-in replacement for inference workflows
 - **Same Quality**: Zero changes to separation algorithms
-- **All Models Supported**: HTDemucs, MDX, and all variants
+- **Schema-v2 Model Registry**: Official models plus verified UVR, CDX23, MSST, and DrumSep recipes
 - **Model Info API**: Query model capabilities, separation types, and source translations
-- **Third-Party Model Support**: Compatible with community models (drumsep, cinematic, etc.)
+- **Third-Party Model Support**: Stable public names, exact stems, source URLs, and full SHA-256 verification
 
 ## Scope
 
@@ -100,7 +100,7 @@ If you use demucs-infer in your research, please cite the original Demucs papers
 - All separation models: HTDemucs, MDX, and all variants
 - Model architectures: zero modifications to the neural networks
 - Separation algorithms: identical audio processing
-- Model weights: same pretrained checkpoints, same host
+- Model weights: unchanged official checkpoints plus source-pinned compatible checkpoints
 - Audio quality: 100% identical output (bit-for-bit gated — see [CLAUDE.md](CLAUDE.md))
 
 ### Out of scope, forever
@@ -213,6 +213,12 @@ provenance, and source revision). Runtime inference reads this local snapshot
 and does not depend on a remote catalog. Use `checkpoint_catalog()` or
 `checkpoint_config_path()` to inspect it.
 
+Named models download to `~/.cache/demucs-infer/` by default. Pass
+`cache_dir=Path("/your/checkpoint/cache")` to `DemucsSession` or
+`DemucsSeparator` to override that location. `checkpoint_path` remains the
+single-file override, while explicit legacy `get_model(name, repo=Path(...))`
+repositories remain supported for existing callers.
+
 The facade is additive: advanced users can continue composing
 `demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and
 `demucs_infer.apply.apply_model` directly. Optional backends remain lazy and
@@ -280,23 +286,32 @@ demucs-infer -n htdemucs_ft -o output/ "song.wav"   # pick a model + output dir
 |-------|---------|-------|-------------|
 | `htdemucs_6s` | ⭐⭐⭐⭐⭐ | Medium | 6-source separation |
 
-### Compatible Third-Party Models
+### Registry-backed compatible models
 
-demucs-infer supports loading community-trained Demucs models. Place `.th` model files in a local directory and use the `repo` parameter.
+These names use the same package-owned resolver as official models. Stems in
+the table are the exact programmatic dictionary keys returned by the API.
+`speech` is the dialogue stem in the CDX23 recipe. DrumSep's Spanish keys are
+preserved; their English meanings are bombo = kick, redoblante = snare, and
+platillos = cymbals.
 
-| Model Signature | Name | Separation Type | Sources |
-|-----------------|------|-----------------|---------|
-| `49469ca8` | [Drumsep](https://github.com/inagoy/drumsep) | Drum Kit | kick, snare, cymbals, toms |
-| `97d170e1` | CDX23 Cinematic | Film/Video | dialog, music, sfx |
-| `phantom_center` | Phantom Center Extractor | Stereo Center/Sides | similarity, difference |
-| `ebf34a2d` | UVR Demucs Model 1 | Vocal/Instrumental | vocals, non_vocals |
+| Public model name | Recipe | Programmatic stems | Weight license recorded by source |
+|-------------------|--------|--------------------|-----------------------------------|
+| `uvr_demucs_model_1` | UVR Model 1 (`ebf34a2db`) | vocals, non_vocals | not stated |
+| `uvr_demucs_model_2` | UVR Model 2 (`ebf34a2d`) | vocals, non_vocals | not stated |
+| `uvr_demucs_model_bag` | UVR ensemble, Model 2 then Model 1 | vocals, non_vocals | not stated |
+| `cdx23_dnr` | Three-component CDX23 DnR bag | music, sfx, speech | not stated |
+| `msst_htdemucs_vocals` | MSST HTDemucs vocals state dict | vocals, other | MIT |
+| `drumsep` | DrumSep (`49469ca8`) | bombo, redoblante, platillos, toms | MIT |
 
 ```python
-from pathlib import Path
 from demucs_infer.pretrained import get_model
 
-# Load third-party model from local directory
-model = get_model("49469ca8", repo=Path("/path/to/models"))
+# Registry-backed models download and verify automatically.
+model = get_model("cdx23_dnr")
+
+# Explicit local repositories remain available for legacy/custom layouts.
+from pathlib import Path
+local_model = get_model("my_signature", repo=Path("/path/to/models"))
 ```
 
 ## Use Cases
@@ -353,7 +368,6 @@ for key, info in types.items():
 # drum_kit: Drum Kit Separation
 # cinematic: Cinematic/Film Audio Separation
 # speech: Speech Separation
-# stereo_center: Stereo Center/Sides Separation
 # vocal_instrumental: Vocal/Instrumental Separation
 ```
 
@@ -546,29 +560,56 @@ will never, ship them inside the git repository or the published package.
 - **No weight files in the repo or the PyPI package.** `.th` checkpoints are
   never committed to git and never included in the sdist/wheel — the package
   is source code only.
-- **No re-hosted or mirrored weights.** Official models are always fetched
-  directly from Meta's own CDN, [dl.fbaipublicfiles.com/demucs](https://dl.fbaipublicfiles.com/demucs/)
-  — demucs-infer does not run its own mirror or CDN.
+- **No re-hosted or mirrored weights.** Official models are fetched from
+  Meta's CDN; compatible models are fetched from their registry-recorded
+  original public sources. demucs-infer does not run its own mirror or CDN.
 - **No silently altered or re-derived weights.** What you get from the
   official checkpoint URLs is bit-for-bit what upstream Demucs produced;
   this package does not quantize, prune, or fine-tune models and ship the
   result as a default.
-- **Community/third-party models stay opt-in and user-supplied.** Models
-  like Drumsep or UVR variants (see [Available Models](#available-models))
-  are loaded only from a local directory or Google Drive link you provide
-  via the optional `[community]` extra — never bundled or auto-downloaded
-  by default.
+- **Compatible models remain separate artifacts.** Selecting a registry-backed
+  DrumSep, UVR, CDX23, or MSST model downloads its exact source artifact on
+  first use and verifies the full SHA-256. The bytes are never bundled.
 
 Default cache location (where downloaded weights land on disk):
 
 ```
-# Linux:   ~/.cache/torch/hub/checkpoints/
-# macOS:   ~/Library/Caches/torch/hub/checkpoints/
-# Windows: %USERPROFILE%\.cache\torch\hub\checkpoints\
+~/.cache/demucs-infer/
 ```
 
-If a download fails, check your internet connection and firewall settings —
-these are live fetches from Meta's CDN, not files shipped with the package.
+Override it per session with `cache_dir`:
+
+```python
+from pathlib import Path
+from demucs_infer import DemucsSession
+
+session = DemucsSession(
+    model="uvr_demucs_model_1",
+    cache_dir=Path("/srv/demucs-checkpoints"),
+)
+```
+
+### Manual checkpoint download
+
+For offline or air-gapped use, download each required URL ahead of time and
+save it under the exact cache filename shown below. Use the default directory
+above or the directory passed as `cache_dir`. Multi-component bags require
+every row listed for that recipe.
+
+| Used by | Save as | Exact source URL |
+|---------|---------|------------------|
+| `uvr_demucs_model_1`, `uvr_demucs_model_bag` | `ebf34a2db.th` | https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2db.th |
+| `uvr_demucs_model_2`, `uvr_demucs_model_bag` | `ebf34a2d.th` | https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2d.th |
+| `cdx23_dnr` component A | `cdx23_dnr_a-a778de4a.th` | https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-a778de4a.th |
+| `cdx23_dnr` component B | `cdx23_dnr_b-dbb4db15.th` | https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-dbb4db15.th |
+| `cdx23_dnr` component C | `cdx23_dnr_c-e41a5468.th` | https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-e41a5468.th |
+| `msst_htdemucs_vocals` | `model_vocals_htdemucs_sdr_8.78.ckpt` | https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.0/model_vocals_htdemucs_sdr_8.78.ckpt |
+
+The registry verifies every file before loading. A wrong or incomplete file is
+rejected rather than used. Official Meta and DrumSep artifacts follow the same
+resolver; inspect `demucs_infer/config/checkpoints.toml` for their exact
+filenames, URLs, and hashes. If a live download fails, check the source host,
+internet connection, and firewall settings.
 
 ## Development
 

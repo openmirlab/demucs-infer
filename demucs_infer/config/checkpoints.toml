@@ -1,61 +1,507 @@
-# Release-pinned checkpoint metadata shipped with demucs-infer.
+# Release-pinned checkpoint artifacts and model recipes shipped with demucs-infer.
 [schema]
-version = 1
+version = 2
 
 [package]
 name = "demucs-infer"
-config_revision = "2026-07-15"
+config_revision = "2026-07-22"
 
-[metadata]
+[[artifacts]]
+id = "0d19c1c6"
+signature = "0d19c1c6"
+path = "0d19c1c6-0f06f20e.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/0d19c1c6-0f06f20e.th"]
+sha256 = "0f06f20ed6ddc8058fa72ccc4845f3a88916eff7d007b623924193de217bbcf4"
 license = "MIT"
 provenance = "facebookresearch/demucs"
 source_revision = "v4.1.0"
 updated_at = "2026-07-15"
 
-[models.htdemucs]
-model = "htdemucs"
+[[artifacts]]
+id = "5d2d6c55"
+signature = "5d2d6c55"
+path = "5d2d6c55-db83574e.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/5d2d6c55-db83574e.th"]
+sha256 = "db83574e05b2308f76e2764819da673f2d16d437b9e619f5fcb72f275fc0e24f"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "7d865c68"
+signature = "7d865c68"
+path = "7d865c68-3d5dd56b.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/7d865c68-3d5dd56b.th"]
+sha256 = "3d5dd56b5bc986f136dff98655ded22b2b033f465ccec7a28640a6b15fd71ed6"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "7ecf8ec1"
+signature = "7ecf8ec1"
+path = "7ecf8ec1-70f50cc9.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/7ecf8ec1-70f50cc9.th"]
+sha256 = "70f50cc947d08f32e6dd8e2b687d398fa5ef9e51d1bd7600e32205d1f44be6b9"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "a1d90b5c"
+signature = "a1d90b5c"
+path = "a1d90b5c-ae9d2452.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/a1d90b5c-ae9d2452.th"]
+sha256 = "ae9d245283bf24b552913ee233a1101dcd0aeaed59b1c0a2da0e1f6eda15101b"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "c511e2ab"
+signature = "c511e2ab"
+path = "c511e2ab-fe698775.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/c511e2ab-fe698775.th"]
+sha256 = "fe6987756a7087d339bf63b19bb481b12cea02d3bc0de7583df7597210209649"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "cfa93e08"
+signature = "cfa93e08"
+path = "cfa93e08-61801ae1.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/cfa93e08-61801ae1.th"]
+sha256 = "61801ae1567d606c97a9c3469e943ae306d0a873eeb60d623ae7cfc7042b3f68"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "e51eebcc"
+signature = "e51eebcc"
+path = "e51eebcc-c1b80bdd.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/e51eebcc-c1b80bdd.th"]
+sha256 = "c1b80bdd6de58274abf359e66822a76f49ce2b9f086fc5dc917ac14598e6bebf"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "6b9c2ca1"
+signature = "6b9c2ca1"
+path = "6b9c2ca1-3fd82607.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/6b9c2ca1-3fd82607.th"]
+sha256 = "3fd82607b051e9f8ed0e86a30791023a3b589a427fb994c8bbfdff8c1903eeff"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "b72baf4e"
+signature = "b72baf4e"
+path = "b72baf4e-8778635e.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/b72baf4e-8778635e.th"]
+sha256 = "8778635e98a9d4b34b3d132300597758f8f3f2978510eb20c202fd0d54a7bbf0"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "42e558d4"
+signature = "42e558d4"
+path = "42e558d4-196e0e1b.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/42e558d4-196e0e1b.th"]
+sha256 = "196e0e1bc5e83ea6ffbf0750b1abae1305b83de12ec98e5b50915a7139c52759"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "305bc58f"
+signature = "305bc58f"
+path = "305bc58f-18378783.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/305bc58f-18378783.th"]
+sha256 = "18378783cf76d44213f7a0c87da872a35b976c31ac11c4b367438b4674a2f0fe"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "14fc6a69"
+signature = "14fc6a69"
+path = "14fc6a69-a89dd0ee.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/14fc6a69-a89dd0ee.th"]
+sha256 = "a89dd0eeb547221dcfd6c0a47baa768ce0bce548eaf86b9a404d6b1088b5d22f"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "464b36d7"
+signature = "464b36d7"
+path = "464b36d7-e5a9386e.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/464b36d7-e5a9386e.th"]
+sha256 = "e5a9386ecbf6f30bb2bdc7ae162f471d87f3b5bffba1a8cb2cebe4403280967e"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "7fd6ef75"
+signature = "7fd6ef75"
+path = "7fd6ef75-a905dd85.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/7fd6ef75-a905dd85.th"]
+sha256 = "a905dd8548f7389f1a3686c24c09d7bee61b716e3372e778e2acec88333ecdf4"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "83fc094f"
+signature = "83fc094f"
+path = "83fc094f-4a16d450.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/83fc094f-4a16d450.th"]
+sha256 = "4a16d450fd8c9277494e23865cadaa4a3e64141c45411d84243b8c95ea4b7cae"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "1ef250f1"
+signature = "1ef250f1"
+path = "1ef250f1-592467ce.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/1ef250f1-592467ce.th"]
+sha256 = "592467cef0b0d878bc66fe38c8456353ff435334331baab08e1dc82beeefd596"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "902315c2"
+signature = "902315c2"
+path = "902315c2-b39ce9c9.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/902315c2-b39ce9c9.th"]
+sha256 = "b39ce9c97b5603fbaee99ec59fe1d2db570c77a37356c9c85542d881517c3302"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "9a6b4851"
+signature = "9a6b4851"
+path = "9a6b4851-03af0aa6.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/9a6b4851-03af0aa6.th"]
+sha256 = "03af0aa64af2c4f0795659c265fdead238fab31c064a8a4b5b051c1b22c8ad48"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "fa0cb7f9"
+signature = "fa0cb7f9"
+path = "fa0cb7f9-100d8bf4.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/mdx_final/fa0cb7f9-100d8bf4.th"]
+sha256 = "100d8bf4dc5e228edfd9bb7a2ec44ad9f44d8f0a845964d38ee8c11ea8ca1399"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "955717e8"
 signature = "955717e8"
-[[models.htdemucs.files]]
 path = "955717e8-8726e21a.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"]
 sha256 = "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
 
-[models.htdemucs_6s]
-model = "htdemucs_6s"
-signature = "5c90dfd2"
-[[models.htdemucs_6s.files]]
-path = "5c90dfd2-34c22ccb.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/5c90dfd2-34c22ccb.th"
-sha256 = "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd"
-
-[models.htdemucs_ft]
-model = "htdemucs_ft"
+[[artifacts]]
+id = "f7e0c4bc"
 signature = "f7e0c4bc"
-[[models.htdemucs_ft.files]]
 path = "f7e0c4bc-ba3fe64a.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th"]
 sha256 = "ba3fe64ae8ef66ac9a4857222ce48efbdc5eb3ad375cb79dd13debee5aaa4066"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
 
-[models.htdemucs_ft_2]
-model = "htdemucs_ft"
+[[artifacts]]
+id = "d12395a8"
 signature = "d12395a8"
-[[models.htdemucs_ft_2.files]]
 path = "d12395a8-e57c48e6.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th"]
 sha256 = "e57c48e6b0e38af4f7118d7bd08c49f0a0c0edf7d09143bdd902ea0d237303e6"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
 
-[models.htdemucs_ft_3]
-model = "htdemucs_ft"
+[[artifacts]]
+id = "92cfc3b6"
 signature = "92cfc3b6"
-[[models.htdemucs_ft_3.files]]
 path = "92cfc3b6-ef3bcb9c.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th"]
 sha256 = "ef3bcb9c8b40d14ae5d51b6db2587339cc12c6b77c0be151ce6d69002e087bf2"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
 
-[models.htdemucs_ft_4]
-model = "htdemucs_ft"
+[[artifacts]]
+id = "04573f0d"
 signature = "04573f0d"
-[[models.htdemucs_ft_4.files]]
 path = "04573f0d-f3cf25b2.th"
-url = "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"]
 sha256 = "f3cf25b222c4eed7cd49dd8b2c9597d50c18bd154090f7b919cfa5f93cf22c49"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "75fc33f5"
+signature = "75fc33f5"
+path = "75fc33f5-1941ce65.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/75fc33f5-1941ce65.th"]
+sha256 = "1941ce654b11df4132b9f4eae408556b4c83fad6fe26b4bc0dbcb36b975befb3"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "5c90dfd2"
+signature = "5c90dfd2"
+path = "5c90dfd2-34c22ccb.th"
+urls = ["https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/5c90dfd2-34c22ccb.th"]
+sha256 = "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd"
+license = "MIT"
+provenance = "facebookresearch/demucs"
+source_revision = "v4.1.0"
+updated_at = "2026-07-15"
+
+[[artifacts]]
+id = "49469ca8"
+signature = "49469ca8"
+path = "49469ca8.th"
+urls = ["https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.5/model_drumsep.th"]
+sha256 = "aefaa8543c9b9c75e22f5f32b53ab86dfe416457849af1383ff1aef83401423f"
+license = "MIT"
+provenance = "inagoy/drumsep"
+source_revision = "ZFTurbo/Music-Source-Separation-Training v1.0.5 byte-identical mirror"
+updated_at = "2026-07-22"
+
+[[models]]
+name = "hdemucs_mmi"
+aliases = []
+components = ["75fc33f5"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "htdemucs"
+aliases = []
+components = ["955717e8"]
+format = "demucs_package"
+
+[[models]]
+name = "htdemucs_6s"
+aliases = []
+components = ["5c90dfd2"]
+format = "demucs_package"
+
+[[models]]
+name = "htdemucs_ft"
+aliases = []
+components = ["f7e0c4bc", "d12395a8", "92cfc3b6", "04573f0d"]
+format = "demucs_package"
+weights = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+
+[[models]]
+name = "mdx"
+aliases = []
+components = ["0d19c1c6", "7ecf8ec1", "c511e2ab", "7d865c68"]
+format = "demucs_package"
+weights = [[1.0, 1.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [1.0, 0.0, 1.0, 1.0], [1.0, 0.0, 1.0, 1.0]]
+segment = 44
+
+[[models]]
+name = "mdx_extra"
+aliases = []
+components = ["e51eebcc", "a1d90b5c", "5d2d6c55", "cfa93e08"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "mdx_extra_q"
+aliases = []
+components = ["83fc094f", "464b36d7", "14fc6a69", "7fd6ef75"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "mdx_q"
+aliases = []
+components = ["6b9c2ca1", "b72baf4e", "42e558d4", "305bc58f"]
+format = "demucs_package"
+weights = [[1.0, 1.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [1.0, 0.0, 1.0, 1.0], [1.0, 0.0, 1.0, 1.0]]
+segment = 44
+
+[[models]]
+name = "repro_mdx_a"
+aliases = []
+components = ["9a6b4851", "1ef250f1", "fa0cb7f9", "902315c2"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "repro_mdx_a_hybrid_only"
+aliases = []
+components = ["fa0cb7f9", "902315c2", "fa0cb7f9", "902315c2"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "repro_mdx_a_time_only"
+aliases = []
+components = ["9a6b4851", "9a6b4851", "1ef250f1", "1ef250f1"]
+format = "demucs_package"
+segment = 44
+
+[[models]]
+name = "drumsep"
+aliases = ["Drumsep"]
+components = ["49469ca8"]
+format = "demucs_package"
+display_name = "Drumsep"
+stems = ["bombo", "redoblante", "platillos", "toms"]
+
+[[artifacts]]
+id = "ebf34a2db"
+signature = "ebf34a2db"
+path = "ebf34a2db.th"
+urls = ["https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2db.th"]
+sha256 = "dbdd521017d706829716055df8a86e7ee5d05a590508488c82ffb551c6edb918"
+license = "not stated"
+provenance = "TRvlvr/model_repo"
+source_revision = "all_public_uvr_models"
+updated_at = "2026-07-22"
+
+[[artifacts]]
+id = "ebf34a2d"
+signature = "ebf34a2d"
+path = "ebf34a2d.th"
+urls = ["https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2d.th"]
+sha256 = "0556f2145e97e96d3c2a33c3879711e7559d7d261fd9773b20e2c580a3beffd0"
+license = "not stated"
+provenance = "TRvlvr/model_repo"
+source_revision = "all_public_uvr_models"
+updated_at = "2026-07-22"
+
+[[artifacts]]
+id = "cdx23_dnr_a"
+signature = "cdx23_dnr_a"
+path = "cdx23_dnr_a-a778de4a.th"
+urls = ["https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-a778de4a.th"]
+sha256 = "a778de4a72b90482a578bfb6ea6bf41462785d9136c11802c67a864a40f29434"
+license = "not stated"
+provenance = "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing"
+source_revision = "v.1.0.0"
+updated_at = "2026-07-22"
+
+[[artifacts]]
+id = "cdx23_dnr_b"
+signature = "cdx23_dnr_b"
+path = "cdx23_dnr_b-dbb4db15.th"
+urls = ["https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-dbb4db15.th"]
+sha256 = "dbb4db154df7e45a5cb72d1659c48937e757f6d6b0eef8ca4199e6e38f8d8f37"
+license = "not stated"
+provenance = "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing"
+source_revision = "v.1.0.0"
+updated_at = "2026-07-22"
+
+[[artifacts]]
+id = "cdx23_dnr_c"
+signature = "cdx23_dnr_c"
+path = "cdx23_dnr_c-e41a5468.th"
+urls = ["https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-e41a5468.th"]
+sha256 = "e41a54684d3cd6794ee2bb59183ffeb11a9a3d42db873a6a08a9829ac3ef4cfe"
+license = "not stated"
+provenance = "ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing"
+source_revision = "v.1.0.0"
+updated_at = "2026-07-22"
+
+[[artifacts]]
+id = "msst_htdemucs_vocals_state"
+signature = "msst_htdemucs_vocals_state"
+path = "model_vocals_htdemucs_sdr_8.78.ckpt"
+urls = ["https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.0/model_vocals_htdemucs_sdr_8.78.ckpt"]
+sha256 = "0ea6e9495685045e6b4e66174131be5d19808bb0d6d1a1ba717d238f9380e8d0"
+license = "MIT"
+provenance = "ZFTurbo/Music-Source-Separation-Training"
+source_revision = "v1.0.0"
+updated_at = "2026-07-22"
+
+[[models]]
+name = "uvr_demucs_model_1"
+aliases = []
+components = ["ebf34a2db"]
+format = "demucs_package"
+stems = ["vocals", "non_vocals"]
+display_name = "UVR Demucs Model 1"
+
+[[models]]
+name = "uvr_demucs_model_2"
+aliases = []
+components = ["ebf34a2d"]
+format = "demucs_package"
+stems = ["vocals", "non_vocals"]
+display_name = "UVR Demucs Model 2"
+
+[[models]]
+name = "uvr_demucs_model_bag"
+aliases = []
+components = ["ebf34a2d", "ebf34a2db"]
+format = "demucs_package"
+stems = ["vocals", "non_vocals"]
+display_name = "UVR Demucs Model Bag"
+
+[[models]]
+name = "cdx23_dnr"
+aliases = []
+components = ["cdx23_dnr_a", "cdx23_dnr_b", "cdx23_dnr_c"]
+format = "demucs_package"
+stems = ["music", "sfx", "speech"]
+display_name = "CDX23 DnR"
+
+[[models]]
+name = "msst_htdemucs_vocals"
+aliases = []
+components = ["msst_htdemucs_vocals_state"]
+format = "state_dict"
+stems = ["vocals", "other"]
+display_name = "MSST HTDemucs Vocals"
+architecture = { name = "HTDemucs", kwargs = { channels = 48, growth = 2, nfft = 4096, wiener_iters = 0, end_iters = 0, wiener_residual = false, cac = true, depth = 4, rewrite = true, multi_freqs = [], multi_freqs_depth = 3, freq_emb = 0.2, emb_scale = 10, emb_smooth = true, kernel_size = 8, stride = 4, time_stride = 2, context = 1, context_enc = 0, norm_starts = 4, norm_groups = 4, dconv_mode = 3, dconv_depth = 2, dconv_comp = 8, dconv_init = 0.001, bottom_channels = 512, t_layers = 5, t_hidden_scale = 4.0, t_heads = 8, t_dropout = 0.0, t_layer_scale = true, t_gelu = true, t_emb = "sin", t_max_positions = 10000, t_max_period = 10000.0, t_weight_pos_embed = 1.0, t_cape_mean_normalize = true, t_cape_augment = true, t_cape_glob_loc_scale = [5000.0, 1.0, 1.4], t_sin_random_shift = 0, t_norm_in = true, t_norm_in_group = false, t_group_norm = false, t_norm_first = true, t_norm_out = true, t_weight_decay = 0.0, t_sparse_self_attn = false, t_sparse_cross_attn = false, t_mask_type = "diag", t_mask_random_seed = 42, t_sparse_attn_window = 400, t_global_window = 100, t_sparsity = 0.95, t_auto_sparsity = false, t_cross_first = false, rescale = 0.1, sources = ["vocals", "other"], samplerate = 44100, audio_channels = 2, segment = 11 } }
