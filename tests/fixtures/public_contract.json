@@ -1,0 +1,411 @@
+{
+  "checkpoint_catalog": {
+    "04573f0d": {
+      "license": "MIT",
+      "model": "htdemucs_ft",
+      "path": "04573f0d-f3cf25b2.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "f3cf25b222c4eed7cd49dd8b2c9597d50c18bd154090f7b919cfa5f93cf22c49",
+      "signature": "04573f0d",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/04573f0d-f3cf25b2.th"
+    },
+    "5c90dfd2": {
+      "license": "MIT",
+      "model": "htdemucs_6s",
+      "path": "5c90dfd2-34c22ccb.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd",
+      "signature": "5c90dfd2",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/5c90dfd2-34c22ccb.th"
+    },
+    "92cfc3b6": {
+      "license": "MIT",
+      "model": "htdemucs_ft",
+      "path": "92cfc3b6-ef3bcb9c.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "ef3bcb9c8b40d14ae5d51b6db2587339cc12c6b77c0be151ce6d69002e087bf2",
+      "signature": "92cfc3b6",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/92cfc3b6-ef3bcb9c.th"
+    },
+    "955717e8": {
+      "license": "MIT",
+      "model": "htdemucs",
+      "path": "955717e8-8726e21a.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4",
+      "signature": "955717e8",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"
+    },
+    "d12395a8": {
+      "license": "MIT",
+      "model": "htdemucs_ft",
+      "path": "d12395a8-e57c48e6.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "e57c48e6b0e38af4f7118d7bd08c49f0a0c0edf7d09143bdd902ea0d237303e6",
+      "signature": "d12395a8",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/d12395a8-e57c48e6.th"
+    },
+    "f7e0c4bc": {
+      "license": "MIT",
+      "model": "htdemucs_ft",
+      "path": "f7e0c4bc-ba3fe64a.th",
+      "provenance": "facebookresearch/demucs",
+      "sha256": "ba3fe64ae8ef66ac9a4857222ce48efbdc5eb3ad375cb79dd13debee5aaa4066",
+      "signature": "f7e0c4bc",
+      "source_revision": "v4.1.0",
+      "updated_at": "2026-07-15",
+      "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/f7e0c4bc-ba3fe64a.th"
+    }
+  },
+  "clean_api_all": [
+    "DemucsSeparator",
+    "DemucsSession",
+    "separate",
+    "separate_file",
+    "separate_tensor"
+  ],
+  "cli": {
+    "actions": [
+      {
+        "choices": null,
+        "default": "==SUPPRESS==",
+        "dest": "help",
+        "nargs": 0,
+        "option_strings": [
+          "-h",
+          "--help"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": "[]",
+        "dest": "tracks",
+        "nargs": "*",
+        "option_strings": [],
+        "required": false,
+        "type": "Path"
+      },
+      {
+        "choices": null,
+        "default": null,
+        "dest": "sig",
+        "nargs": null,
+        "option_strings": [
+          "-s",
+          "--sig"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": "htdemucs",
+        "dest": "name",
+        "nargs": null,
+        "option_strings": [
+          "-n",
+          "--name"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": null,
+        "dest": "repo",
+        "nargs": null,
+        "option_strings": [
+          "--repo"
+        ],
+        "required": false,
+        "type": "Path"
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "list_models",
+        "nargs": 0,
+        "option_strings": [
+          "--list-models"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "verbose",
+        "nargs": 0,
+        "option_strings": [
+          "-v",
+          "--verbose"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": "separated",
+        "dest": "out",
+        "nargs": null,
+        "option_strings": [
+          "-o",
+          "--out"
+        ],
+        "required": false,
+        "type": "Path"
+      },
+      {
+        "choices": null,
+        "default": "{track}/{stem}.{ext}",
+        "dest": "filename",
+        "nargs": null,
+        "option_strings": [
+          "--filename"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": "<cuda-if-available-else-cpu>",
+        "dest": "device",
+        "nargs": null,
+        "option_strings": [
+          "-d",
+          "--device"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": 1,
+        "dest": "shifts",
+        "nargs": null,
+        "option_strings": [
+          "--shifts"
+        ],
+        "required": false,
+        "type": "int"
+      },
+      {
+        "choices": null,
+        "default": 0.25,
+        "dest": "overlap",
+        "nargs": null,
+        "option_strings": [
+          "--overlap"
+        ],
+        "required": false,
+        "type": "float"
+      },
+      {
+        "choices": null,
+        "default": true,
+        "dest": "split",
+        "nargs": 0,
+        "option_strings": [
+          "--no-split"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": null,
+        "dest": "segment",
+        "nargs": null,
+        "option_strings": [
+          "--segment"
+        ],
+        "required": false,
+        "type": "int"
+      },
+      {
+        "choices": null,
+        "default": null,
+        "dest": "stem",
+        "nargs": null,
+        "option_strings": [
+          "--two-stems"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": [
+          "none",
+          "add",
+          "minus"
+        ],
+        "default": "add",
+        "dest": "other_method",
+        "nargs": null,
+        "option_strings": [
+          "--other-method"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "int24",
+        "nargs": 0,
+        "option_strings": [
+          "--int24"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "float32",
+        "nargs": 0,
+        "option_strings": [
+          "--float32"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": [
+          "rescale",
+          "clamp",
+          "none"
+        ],
+        "default": "rescale",
+        "dest": "clip_mode",
+        "nargs": null,
+        "option_strings": [
+          "--clip-mode"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "flac",
+        "nargs": 0,
+        "option_strings": [
+          "--flac"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": false,
+        "dest": "mp3",
+        "nargs": 0,
+        "option_strings": [
+          "--mp3"
+        ],
+        "required": false,
+        "type": null
+      },
+      {
+        "choices": null,
+        "default": 320,
+        "dest": "mp3_bitrate",
+        "nargs": null,
+        "option_strings": [
+          "--mp3-bitrate"
+        ],
+        "required": false,
+        "type": "int"
+      },
+      {
+        "choices": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "default": 2,
+        "dest": "mp3_preset",
+        "nargs": null,
+        "option_strings": [
+          "--mp3-preset"
+        ],
+        "required": false,
+        "type": "int"
+      },
+      {
+        "choices": null,
+        "default": 0,
+        "dest": "jobs",
+        "nargs": null,
+        "option_strings": [
+          "-j",
+          "--jobs"
+        ],
+        "required": false,
+        "type": "int"
+      }
+    ],
+    "no_tracks_exit": 1,
+    "no_tracks_stderr": "error: the following arguments are required: tracks\n",
+    "no_tracks_stdout": "",
+    "program": "demucs-infer"
+  },
+  "demucs_session_is_alias": true,
+  "htdemucs_metadata": {
+    "license": "MIT",
+    "model": "htdemucs",
+    "path": "955717e8-8726e21a.th",
+    "provenance": "facebookresearch/demucs",
+    "sha256": "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4",
+    "signature": "955717e8",
+    "source_revision": "v4.1.0",
+    "updated_at": "2026-07-15",
+    "url": "https://dl.fbaipublicfiles.com/demucs/hybrid_transformer/955717e8-8726e21a.th"
+  },
+  "package_exports": {
+    "CHECKPOINT_CATALOG": "mappingproxy",
+    "DemucsSeparator": "demucs_infer.clean_api.DemucsSeparator",
+    "DemucsSession": "demucs_infer.clean_api.DemucsSeparator",
+    "checkpoint_catalog": "demucs_infer.checkpoint_catalog.checkpoint_catalog",
+    "checkpoint_config_path": "demucs_infer.checkpoint_catalog.checkpoint_config_path",
+    "get_checkpoint_metadata": "demucs_infer.checkpoint_catalog.get_checkpoint_metadata",
+    "separate": "module",
+    "separate_file": "demucs_infer.clean_api.separate_file",
+    "separate_tensor": "demucs_infer.clean_api.separate_tensor",
+    "validate_checkpoint_config": "demucs_infer.checkpoint_catalog.validate_checkpoint_config"
+  },
+  "schema_version": 1,
+  "signatures": {
+    "api.Separator": "(model: str = 'htdemucs', repo: Optional[pathlib.Path] = None, device: str = '<cuda-if-available-else-cpu>', shifts: int = 1, overlap: float = 0.25, split: bool = True, segment: Optional[int] = None, jobs: int = 0, progress: bool = False, callback: Optional[Callable[[dict], NoneType]] = None, callback_arg: Optional[dict] = None)",
+    "api.Separator.separate_audio_file": "(self, file: pathlib.Path)",
+    "api.Separator.separate_tensor": "(self, wav: torch.Tensor, sr: Optional[int] = None) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]",
+    "api.Separator.update_parameter": "(self, device: Union[str, demucs_infer.api._NotProvided] = '<not-provided>', shifts: Union[int, demucs_infer.api._NotProvided] = '<not-provided>', overlap: Union[float, demucs_infer.api._NotProvided] = '<not-provided>', split: Union[bool, demucs_infer.api._NotProvided] = '<not-provided>', segment: Union[int, demucs_infer.api._NotProvided, NoneType] = '<not-provided>', jobs: Union[int, demucs_infer.api._NotProvided] = '<not-provided>', progress: Union[bool, demucs_infer.api._NotProvided] = '<not-provided>', callback: Union[Callable[[dict], NoneType], demucs_infer.api._NotProvided, NoneType] = '<not-provided>', callback_arg: Union[dict, demucs_infer.api._NotProvided, NoneType] = '<not-provided>')",
+    "checkpoint_catalog.get_checkpoint_metadata": "(key)",
+    "clean_api.DemucsSeparator": "(model='htdemucs', *, checkpoint_path=None, checkpoint_url=None, checkpoint_sha256=None, cache_dir=None, **separator_options)",
+    "clean_api.DemucsSeparator.__call__": "(self, audio, *, sample_rate=None)",
+    "clean_api.DemucsSeparator.cache_info": "(self)",
+    "clean_api.DemucsSeparator.infer": "(self, audio, *, sample_rate=None)",
+    "clean_api.DemucsSeparator.load": "(self)",
+    "clean_api.separate": "(audio, *, model='htdemucs', sample_rate=None, **separator_options)",
+    "clean_api.separate_file": "(path, *, model='htdemucs', **separator_options)",
+    "clean_api.separate_tensor": "(wav, *, sample_rate, model='htdemucs', **separator_options)",
+    "pretrained.get_model": "(name: str, repo: Union[pathlib.Path, demucs_infer.repo.ModelOnlyRepo, NoneType] = None)",
+    "states.load_model": "(path_or_package, strict=False)"
+  }
+}

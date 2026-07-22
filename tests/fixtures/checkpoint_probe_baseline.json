@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "torch_version": "2.8.0+cu128",
+    "device": "cuda",
+    "cuda_version": "12.8",
+    "cuda_device": "NVIDIA GeForce RTX 4090",
+    "matmul_allow_tf32": false,
+    "cudnn_allow_tf32": true,
+    "input_seed": 20260722,
+    "input_samples": 16384,
+    "demucs_infer_version": "4.2.2"
+  },
+  "probe_parameters": {
+    "shifts": 0,
+    "split": false,
+    "sample_rate": 44100
+  },
+  "artifacts": {
+    "uvr_model_2": {
+      "filename": "ebf34a2d.th",
+      "url": "https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2d.th",
+      "sha256": "0556f2145e97e96d3c2a33c3879711e7559d7d261fd9773b20e2c580a3beffd0"
+    },
+    "uvr_model_1": {
+      "filename": "ebf34a2db.th",
+      "url": "https://github.com/TRvlvr/model_repo/releases/download/all_public_uvr_models/ebf34a2db.th",
+      "sha256": "dbdd521017d706829716055df8a86e7ee5d05a590508488c82ffb551c6edb918"
+    },
+    "cdx23_a": {
+      "filename": "97d170e1-a778de4a.th",
+      "url": "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-a778de4a.th",
+      "sha256": "a778de4a72b90482a578bfb6ea6bf41462785d9136c11802c67a864a40f29434"
+    },
+    "cdx23_b": {
+      "filename": "97d170e1-dbb4db15.th",
+      "url": "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-dbb4db15.th",
+      "sha256": "dbb4db154df7e45a5cb72d1659c48937e757f6d6b0eef8ca4199e6e38f8d8f37"
+    },
+    "cdx23_c": {
+      "filename": "97d170e1-e41a5468.th",
+      "url": "https://github.com/ZFTurbo/MVSEP-CDX23-Cinematic-Sound-Demixing/releases/download/v.1.0.0/97d170e1-e41a5468.th",
+      "sha256": "e41a54684d3cd6794ee2bb59183ffeb11a9a3d42db873a6a08a9829ac3ef4cfe"
+    },
+    "msst_htdemucs_vocals": {
+      "filename": "model_vocals_htdemucs_sdr_8.78.ckpt",
+      "url": "https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.0/model_vocals_htdemucs_sdr_8.78.ckpt",
+      "sha256": "0ea6e9495685045e6b4e66174131be5d19808bb0d6d1a1ba717d238f9380e8d0"
+    },
+    "msst_htdemucs_config": {
+      "filename": "config_vocals_htdemucs.yaml",
+      "url": "https://github.com/ZFTurbo/Music-Source-Separation-Training/releases/download/v1.0.0/config_vocals_htdemucs.yaml",
+      "sha256": "3e74bc81f35f198297b82e1a16a7736375af4290db54afa048126591b220b29c"
+    }
+  },
+  "uvr": {
+    "loader": "demucs_infer.states.load_model",
+    "components": {
+      "uvr_model_2": {
+        "model": {
+          "class": "demucs_infer.hdemucs.HDemucs",
+          "sources": [
+            "vocals",
+            "non_vocals"
+          ],
+          "samplerate": 44100,
+          "audio_channels": 2,
+          "segment": "44"
+        },
+        "output": {
+          "shape": [
+            1,
+            2,
+            2,
+            16384
+          ],
+          "sha256": "fac1ac10b00b0d88cf83bcd4366f0a38ffb2718e2ccbe07c2534caf4ea73b8ef",
+          "mean": 3.3016996894730255e-05,
+          "std": 0.010232585482299328,
+          "max_abs": 0.04444698244333267,
+          "first_16": [
+            0.00021513961837626994,
+            0.0003930341626983136,
+            7.76637316448614e-05,
+            3.2128780731000006e-05,
+            0.00012133068958064541,
+            4.2488507460802794e-05,
+            1.3597284123534337e-05,
+            0.00010981650848407298,
+            5.615886766463518e-05,
+            2.2290518245426938e-05,
+            8.189996151486412e-05,
+            0.00011668602382997051,
+            0.00010072061559185386,
+            0.00011909809109056368,
+            7.141010428313166e-05,
+            6.767690501874313e-05
+          ]
+        }
+      },
+      "uvr_model_1": {
+        "model": {
+          "class": "demucs_infer.hdemucs.HDemucs",
+          "sources": [
+            "vocals",
+            "non_vocals"
+          ],
+          "samplerate": 44100,
+          "audio_channels": 2,
+          "segment": "44"
+        },
+        "output": {
+          "shape": [
+            1,
+            2,
+            2,
+            16384
+          ],
+          "sha256": "fac1ac10b00b0d88cf83bcd4366f0a38ffb2718e2ccbe07c2534caf4ea73b8ef",
+          "mean": 3.3016996894730255e-05,
+          "std": 0.010232585482299328,
+          "max_abs": 0.04444698244333267,
+          "first_16": [
+            0.00021513961837626994,
+            0.0003930341626983136,
+            7.76637316448614e-05,
+            3.2128780731000006e-05,
+            0.00012133068958064541,
+            4.2488507460802794e-05,
+            1.3597284123534337e-05,
+            0.00010981650848407298,
+            5.615886766463518e-05,
+            2.2290518245426938e-05,
+            8.189996151486412e-05,
+            0.00011668602382997051,
+            0.00010072061559185386,
+            0.00011909809109056368,
+            7.141010428313166e-05,
+            6.767690501874313e-05
+          ]
+        }
+      }
+    },
+    "bag": {
+      "model": {
+        "class": "demucs_infer.apply.BagOfModels",
+        "sources": [
+          "vocals",
+          "non_vocals"
+        ],
+        "samplerate": 44100,
+        "audio_channels": 2,
+        "segment": null,
+        "component_order": [
+          "uvr_model_2",
+          "uvr_model_1"
+        ],
+        "weights": [
+          [
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0
+          ]
+        ]
+      },
+      "output": {
+        "shape": [
+          1,
+          2,
+          2,
+          16384
+        ],
+        "sha256": "fac1ac10b00b0d88cf83bcd4366f0a38ffb2718e2ccbe07c2534caf4ea73b8ef",
+        "mean": 3.3016996894730255e-05,
+        "std": 0.010232585482299328,
+        "max_abs": 0.04444698244333267,
+        "first_16": [
+          0.00021513961837626994,
+          0.0003930341626983136,
+          7.76637316448614e-05,
+          3.2128780731000006e-05,
+          0.00012133068958064541,
+          4.2488507460802794e-05,
+          1.3597284123534337e-05,
+          0.00010981650848407298,
+          5.615886766463518e-05,
+          2.2290518245426938e-05,
+          8.189996151486412e-05,
+          0.00011668602382997051,
+          0.00010072061559185386,
+          0.00011909809109056368,
+          7.141010428313166e-05,
+          6.767690501874313e-05
+        ]
+      }
+    }
+  },
+  "cdx23": {
+    "loader": "demucs_infer.states.load_model",
+    "components": {
+      "cdx23_a": {
+        "model": {
+          "class": "demucs_infer.htdemucs.HTDemucs",
+          "sources": [
+            "music",
+            "sfx",
+            "speech"
+          ],
+          "samplerate": 44100,
+          "audio_channels": 2,
+          "segment": "217/25"
+        },
+        "output": {
+          "shape": [
+            1,
+            3,
+            2,
+            16384
+          ],
+          "sha256": "63dd38800473923a0d1df1f36184de3de3a510a3fa48468bdb43fb5f62352796",
+          "mean": -6.0901842516614124e-05,
+          "std": 0.007854062132537365,
+          "max_abs": 0.03471329063177109,
+          "first_16": [
+            -1.7178390407934785e-05,
+            0.00014824082609266043,
+            -4.812236875295639e-05,
+            0.0003784875734709203,
+            3.0411509214900434e-05,
+            0.000615118769928813,
+            0.000642774160951376,
+            -3.354356158524752e-05,
+            0.00035924557596445084,
+            0.00046087801456451416,
+            -0.0005539965350180864,
+            0.0002734924200922251,
+            0.000691492110490799,
+            0.0003203330561518669,
+            -0.00015348708257079124,
+            0.00026683229953050613
+          ]
+        }
+      },
+      "cdx23_b": {
+        "model": {
+          "class": "demucs_infer.htdemucs.HTDemucs",
+          "sources": [
+            "music",
+            "sfx",
+            "speech"
+          ],
+          "samplerate": 44100,
+          "audio_channels": 2,
+          "segment": "217/25"
+        },
+        "output": {
+          "shape": [
+            1,
+            3,
+            2,
+            16384
+          ],
+          "sha256": "bc76fb2d52bb9e45870cf22ff1e2a0edca8c1f3fc62f92ac7f05360c0e4731e1",
+          "mean": -9.136940207099542e-05,
+          "std": 0.007972700521349907,
+          "max_abs": 0.03662285953760147,
+          "first_16": [
+            -0.00018690184515435249,
+            2.037279773503542e-05,
+            -0.0002985154278576374,
+            -2.6697292923927307e-05,
+            -2.4916196707636118e-05,
+            0.00035547465085983276,
+            0.00023069512099027634,
+            -0.0006537631852552295,
+            0.0004256682004779577,
+            0.0005770386196672916,
+            -0.0008792688604444265,
+            5.7470984756946564e-05,
+            0.001247523119673133,
+            0.00034200260415673256,
+            -5.4638367146253586e-05,
+            0.0003364691510796547
+          ]
+        }
+      },
+      "cdx23_c": {
+        "model": {
+          "class": "demucs_infer.htdemucs.HTDemucs",
+          "sources": [
+            "music",
+            "sfx",
+            "speech"
+          ],
+          "samplerate": 44100,
+          "audio_channels": 2,
+          "segment": "217/25"
+        },
+        "output": {
+          "shape": [
+            1,
+            3,
+            2,
+            16384
+          ],
+          "sha256": "9332fd8ad4fd07e80a99bed522ea5e8f5a8cb767a2dac0edd170fac2548c70c8",
+          "mean": -0.00016412301920354366,
+          "std": 0.007440685294568539,
+          "max_abs": 0.03517558425664902,
+          "first_16": [
+            -0.00012771580077242106,
+            -0.00013983191456645727,
+            -0.00024921016301959753,
+            -0.00015154352877289057,
+            -0.00010782004392240196,
+            0.00012193783186376095,
+            0.0002799233188852668,
+            -0.0006212376756593585,
+            0.00025663175620138645,
+            0.00011436291970312595,
+            -0.0006318496307358146,
+            -3.4629832953214645e-05,
+            0.0008164194878190756,
+            0.00020481878891587257,
+            -0.00029267463833093643,
+            -0.00019338540732860565
+          ]
+        }
+      }
+    },
+    "bag": {
+      "model": {
+        "class": "demucs_infer.apply.BagOfModels",
+        "sources": [
+          "music",
+          "sfx",
+          "speech"
+        ],
+        "samplerate": 44100,
+        "audio_channels": 2,
+        "segment": null,
+        "component_order": [
+          "cdx23_a",
+          "cdx23_b",
+          "cdx23_c"
+        ],
+        "weights": [
+          [
+            1.0,
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0,
+            1.0
+          ],
+          [
+            1.0,
+            1.0,
+            1.0
+          ]
+        ]
+      },
+      "output": {
+        "shape": [
+          1,
+          3,
+          2,
+          16384
+        ],
+        "sha256": "c97865a14d78a380fb5a38194774224b18a4aed9b68aefa8b936d27f9c3bce45",
+        "mean": -0.00010546475095907226,
+        "std": 0.007631771732121706,
+        "max_abs": 0.035390034317970276,
+        "first_16": [
+          -0.00011059868120355532,
+          9.593903087079525e-06,
+          -0.00019861599139403552,
+          6.674892210867256e-05,
+          -3.4108245017705485e-05,
+          0.00036417710362002254,
+          0.00038446421967819333,
+          -0.00043618149356916547,
+          0.000347181863617152,
+          0.0003840932040475309,
+          -0.0006883717142045498,
+          9.877786214929074e-05,
+          0.0009184782393276691,
+          0.00028905150247737765,
+          -0.00016693337238393724,
+          0.00013663868594449013
+        ]
+      }
+    }
+  },
+  "msst": {
+    "loader": "HTDemucs constructor plus raw state_dict",
+    "model": {
+      "class": "demucs_infer.htdemucs.HTDemucs",
+      "sources": [
+        "vocals",
+        "other"
+      ],
+      "samplerate": 44100,
+      "audio_channels": 2,
+      "segment": "11"
+    },
+    "strict_load": true,
+    "ignored_non_constructor_config_keys": [
+      "num_subbands"
+    ],
+    "output": {
+      "shape": [
+        1,
+        2,
+        2,
+        16384
+      ],
+      "sha256": "1516b968e366809db2fadb30f2dd7d6d95d116667eed56098ddbb3e4b5069c8c",
+      "mean": 3.9099977584555745e-06,
+      "std": 0.010150074027478695,
+      "max_abs": 0.042494457215070724,
+      "first_16": [
+        -4.362779145594686e-05,
+        8.738400356378406e-05,
+        2.093485090881586e-05,
+        -2.3686661734245718e-05,
+        -5.69617077417206e-06,
+        5.441497705760412e-05,
+        -1.709481693978887e-05,
+        -2.5435598217882216e-05,
+        -5.935223452979699e-05,
+        -2.824499097187072e-05,
+        6.555704749189317e-05,
+        9.445861360291019e-05,
+        -0.00017144775483757257,
+        -0.00011045501014450565,
+        -0.00020488124573603272,
+        -0.0001412922574672848
+      ]
+    }
+  }
+}
