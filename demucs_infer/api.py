@@ -51,7 +51,7 @@ import torchaudio as ta
 from pathlib import Path
 from typing import Optional, Callable, Dict, Tuple, Union
 
-from .apply import apply_model, _replace_dict, BagOfModels
+from .apply import apply_model, _replace_dict
 from .audio import AudioFile, convert_audio, save_audio
 from .pretrained import get_model
 

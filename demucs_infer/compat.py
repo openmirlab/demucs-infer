@@ -35,7 +35,7 @@ sys.modules['demucs'] = sys.modules['demucs_infer']
 
 # Import and alias submodules for models that reference specific demucs submodules
 # (e.g., drumsep uses demucs.hdemucs.HDemucs)
-from . import hdemucs, htdemucs, demucs, states, spec, apply, repo, pretrained, audio, utils
+from . import hdemucs, htdemucs, demucs, states, spec, apply, repo, pretrained, audio, utils  # noqa: E402
 
 sys.modules['demucs.hdemucs'] = hdemucs
 sys.modules['demucs.htdemucs'] = htdemucs

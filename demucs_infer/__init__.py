@@ -15,10 +15,10 @@
 # as a literal, which drifted from pyproject.toml.
 # Original Demucs version: 4.1.0
 
-from .__about__ import __version__  # noqa: F401
+from .__about__ import __version__
 
 # Import compatibility module to ensure demucs module is available
-from . import compat
+from . import compat as compat
 
 # Clean task-level facade. Imports remain lightweight; model/audio dependencies
 # are loaded only when a facade call initializes ``DemucsSeparator``.
@@ -30,6 +30,21 @@ from .checkpoint_catalog import (
     get_checkpoint_metadata,
     validate_checkpoint_config,
 )
+
+__all__ = [
+    "__version__",
+    "compat",
+    "DemucsSeparator",
+    "DemucsSession",
+    "separate",
+    "separate_file",
+    "separate_tensor",
+    "CHECKPOINT_CATALOG",
+    "checkpoint_catalog",
+    "checkpoint_config_path",
+    "get_checkpoint_metadata",
+    "validate_checkpoint_config",
+]
 
 # Reads: __about__ (__version__), compat (import side effect only, see
 # compat.py's header)

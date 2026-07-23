@@ -15,7 +15,7 @@ htdemucs (HTDemucs), pretrained (add_model_flags, ModelLoadingError)
 """
 
 # Import compatibility module to ensure demucs module is available
-from . import compat
+from . import compat as compat
 
 import argparse
 import sys
