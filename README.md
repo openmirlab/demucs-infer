@@ -226,16 +226,17 @@ The facade is additive: advanced users can continue composing
 `demucs_infer.apply.apply_model` directly. Optional backends remain lazy and
 retain their existing installation requirements.
 
-### Backends (Torch / MLX)
+## Backends and devices
 
 `Separator` and `DemucsSeparator`/`DemucsSession` accept an additive
 `backend=` keyword, independent of `device=`: `None`/`"torch"` (default,
 unchanged behaviour), `"mlx"` (native Apple Silicon via `mlx`/`mlx-spectro`,
 needs the `[mlx]` extra), or `"auto"` (prefers `"mlx"` when it can actually
 run the given model, otherwise `"torch"`). `device` keeps its existing Torch
-meaning either way -- it is not overloaded to mean "Apple Silicon" -- so
-`backend="mlx"` only accepts `None`/`"auto"`/`"mps"` for `device` and raises
-for anything else, rather than silently reinterpreting it:
+meaning either way -- it is not overloaded to mean "Apple Silicon" --
+`backend="mlx"` owns its own Apple Silicon execution and accepts only
+`None`/`"auto"`/`"mps"` for `device`, refusing anything else rather than
+silently reinterpreting it:
 
 ```python
 from demucs_infer.api import Separator
@@ -243,6 +244,18 @@ from demucs_infer.api import Separator
 separator = Separator(model="htdemucs", backend="mlx")          # Apple Silicon
 separator = Separator(model="htdemucs", backend="auto")         # mlx if it can run this model, else torch
 wav, stems = separator.separate_audio_file("song.wav")
+```
+
+There is no `--backend` CLI flag yet (`demucs_infer/separate.py`'s argparse
+surface has no such option) -- the compute-framework switch is Python-API-only
+for now; the CLI examples below always run the default Torch backend.
+
+### The MLX backend
+
+Install it with the extra, which is never part of the core install:
+
+```bash
+pip install "demucs-infer[mlx]"
 ```
 
 `backend="mlx"` is **refused explicitly**, not silently downgraded or
@@ -265,6 +278,16 @@ Measured Torch-vs-MLX parity on the real `htdemucs` checkpoint through the
 public `separate_audio_file()` API, worst-case max-abs divergence across a
 clean-signal / zero-padded-tail / near-silent-tail fixture (Apple M-series,
 torch 2.13.0, mlx 0.31.2): 5.4e-07 / 1.9e-07 / 1.9e-07.
+
+MPS and MLX both need an **arm64 Python interpreter**. Under Rosetta/x86_64
+they report as unavailable rather than failing loudly -- an x86_64
+interpreter makes `torch.backends.mps.is_available()` return `False`, and
+MLX fails to run correctly, so an accelerated path just looks absent rather
+than misconfigured. This is easy to hit without noticing: an x86_64 `uv`
+resolves x86_64 interpreters, so `uv sync` can silently produce an
+environment where the accelerated paths structurally cannot exist. Check
+with `python -c "import platform; print(platform.machine())"` -- it must
+print `arm64`.
 
 ```python
 from demucs_infer.pretrained import get_model
