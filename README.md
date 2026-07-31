@@ -144,6 +144,7 @@ uv add "demucs-infer[mp3]"         # MP3 output support
 uv add "demucs-infer[quantized]"   # Quantized models
 uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
 uv add "demucs-infer[torchcodec]"  # Restore torchaudio's own decoders on torchaudio>=2.11
+uv add "demucs-infer[mlx]"         # Apple Silicon MLX backend (see "Backends" below)
 uv add "demucs-infer[mp3,quantized,community,torchcodec]"  # all of the above
 ```
 
@@ -153,6 +154,7 @@ pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
 pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
 pip install demucs-infer[community]   # Adds: gdown>=5.0.0
 pip install demucs-infer[torchcodec]  # Adds: torchcodec
+pip install demucs-infer[mlx]         # Adds: mlx>=0.31, mlx-spectro>=0.7 (Apple Silicon)
 pip install "demucs-infer[mp3,quantized,community,torchcodec]"
 ```
 
@@ -223,6 +225,46 @@ The facade is additive: advanced users can continue composing
 `demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and
 `demucs_infer.apply.apply_model` directly. Optional backends remain lazy and
 retain their existing installation requirements.
+
+### Backends (Torch / MLX)
+
+`Separator` and `DemucsSeparator`/`DemucsSession` accept an additive
+`backend=` keyword, independent of `device=`: `None`/`"torch"` (default,
+unchanged behaviour), `"mlx"` (native Apple Silicon via `mlx`/`mlx-spectro`,
+needs the `[mlx]` extra), or `"auto"` (prefers `"mlx"` when it can actually
+run the given model, otherwise `"torch"`). `device` keeps its existing Torch
+meaning either way -- it is not overloaded to mean "Apple Silicon" -- so
+`backend="mlx"` only accepts `None`/`"auto"`/`"mps"` for `device` and raises
+for anything else, rather than silently reinterpreting it:
+
+```python
+from demucs_infer.api import Separator
+
+separator = Separator(model="htdemucs", backend="mlx")          # Apple Silicon
+separator = Separator(model="htdemucs", backend="auto")         # mlx if it can run this model, else torch
+wav, stems = separator.separate_audio_file("song.wav")
+```
+
+`backend="mlx"` is **refused explicitly**, not silently downgraded or
+mis-run, for:
+
+- **A `BagOfModels` of two or more sub-models** -- the fine-tuned and
+  MDX-challenge ensemble entries in "Available Models" below (their model
+  cards note the ensemble). A length-1 bag (which is what most single-
+  checkpoint registry entries actually resolve to internally) is unwrapped
+  and runs normally, since it is mathematically identical to its one
+  submodel.
+- **Any architecture other than `HDemucs`/`HTDemucs`** -- covers every
+  currently supported registry entry; a future architecture without an MLX
+  port raises rather than running incorrectly.
+- **A checkpoint whose configuration would exercise Wiener filtering**
+  (`cac=False` or `wiener_iters != 0`) -- not ported; `htdemucs` and
+  `hdemucs_mmi` both ship `cac=True, wiener_iters=0` and are unaffected.
+
+Measured Torch-vs-MLX parity on the real `htdemucs` checkpoint through the
+public `separate_audio_file()` API, worst-case max-abs divergence across a
+clean-signal / zero-padded-tail / near-silent-tail fixture (Apple M-series,
+torch 2.13.0, mlx 0.31.2): 5.4e-07 / 1.9e-07 / 1.9e-07.
 
 ```python
 from demucs_infer.pretrained import get_model

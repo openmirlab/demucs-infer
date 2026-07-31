@@ -8,6 +8,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Add an optional MLX backend (`backend="mlx"`/`"auto"` on `Separator`,
+  `DemucsSeparator`, `DemucsSession`) for native Apple Silicon inference,
+  behind a new `[mlx]` extra (`mlx>=0.31`, `mlx-spectro>=0.7` -- floors only,
+  no dependency on `mlx-audio-separator` itself, which pins `mlx` exactly and
+  ships a compiled `mlx-audio-io` backend). `device` keeps its existing Torch
+  meaning regardless of backend and is not overloaded to mean "Apple
+  Silicon" -- `backend="mlx"` accepts only `None`/`"auto"`/`"mps"` for
+  `device` and raises for anything else.
+  - Vendors `demucs_infer/mlx/` (MIT, from `ssmall256/mlx-audio-separator`
+    revision `0ddc8cf5507906b52ac45a9cd9e6d26e881a93f8`, verified against
+    `git rev-parse HEAD` rather than assumed unchanged from the sibling
+    packages' recorded revision): MLX ports of `HDemucs` and `HTDemucs`
+    only -- the two architectures this package's registry actually uses as
+    single-component checkpoints. The original time-domain-only `Demucs`
+    class (used inside some multi-model bags' components, never as a
+    single-component registry entry) has no MLX port.
+  - `demucs_infer/backends/` is the new compute seam
+    (`SeparationBackend` protocol); `torch_backend.py` moves
+    `Separator.separate_tensor()`'s existing body behind it unchanged, and
+    `mlx_backend.py` reimplements `apply.apply_model()`'s exact
+    shift/split/segment chunking arithmetic in MLX, including
+    `apply.TensorChunk`'s centered-padding-with-real-neighbouring-context
+    semantics for a track's final (short) chunk.
+  - `mlx/convert.py`'s `load_converted_weights()` raises rather than
+    loading a checkpoint partially -- caught three real conversion bugs
+    during development: (1) `HTDemucs`'s `channel_up/downsampler[_t]` and
+    every `HEncLayer`/`HDecLayer`/`DConv`/`LocalState` convolution needed a
+    `.conv` key-path insertion this port's transpose-wrapper layers add but
+    Torch's flat naming doesn't; (2) a custom `nn.Sequential`-alike wrapper
+    around `DConv`'s per-depth block list added its own extra path segment
+    (fixed by using a plain nested Python list, which MLX flattens by index
+    the same way Torch's `nn.Sequential` does); (3) `HTDemucs`'s `t_norm_out`
+    output GroupNorm (on by default in every shipped config) was initially
+    assumed inert and skipped, until real-checkpoint conversion caught it.
+  - **Bags of 2+ sub-models are refused explicitly**, not silently run as
+    one sub-model or downgraded to `backend="torch"`. A length-1
+    `BagOfModels` -- what `checkpoint_runtime.load_registered_model()`
+    actually returns for most single-checkpoint registry entries, including
+    `htdemucs` itself -- is unwrapped and runs normally, since it is
+    mathematically identical to its one submodel (`BagOfModels`'
+    per-source division by its own weight is an identity for any nonzero
+    weight).
+  - **Wiener filtering is not ported.** A checkpoint whose `cac=False` or
+    `wiener_iters != 0` would exercise it is refused. Measured on the two
+    single-model checkpoints this backend was verified against: `htdemucs`
+    and `hdemucs_mmi` both ship `cac=True, wiener_iters=0`.
+  - `exact_zero_safe_rfft` (routes `mx.fft.rfft` through the CPU stream to
+    avoid MLX 0.31.2's Metal rfft kernel returning ~4.5e-07 instead of exact
+    zero for an all-zero frame) is applied unconditionally per the org's
+    policy, but measured **inert** for `htdemucs` through the public API on
+    a zero-padded-tail fixture: 1.937e-07 with the guard vs. 2.533e-07
+    without -- both in the clean-signal noise floor (5.411e-07). This
+    matches the `mdxnet-infer` finding, not `bs-roformer-infer`'s
+    (1.455e-02 divergence with the guard removed there), and was measured
+    rather than assumed from either.
+  - Also fixed a real numerical bug found while porting `LocalState`
+    (the local-attention branch some `HDemucs` `DConv` layers use): the
+    content-aggregation matmul had `weights`/`content` transposed relative
+    to Torch's `einsum("bhts,bhct->bhcs", ...)`, and a scatter-add pattern
+    (`mx.array.at[...].add(...)`) that silently mis-accumulated large 4-D
+    updates on MLX 0.31.2, reproduced in isolation and replaced with a
+    `mx.pad` + elementwise-add accumulator.
+  - Measured Torch-vs-MLX parity through the public
+    `Separator.separate_audio_file()` API, worst-case max-abs divergence
+    across signal/zero-padded-tail/near-silent-tail fixtures: `htdemucs`
+    5.4e-07 / 1.9e-07 / 1.9e-07; `hdemucs_mmi` (manually verified, exercises
+    the BLSTM/`LocalState` `DConv` branches `htdemucs` does not) 2.4e-07 on
+    a zero-padded-tail fixture.
 - Add schema-v2 registry recipes for `uvr_demucs_model_1`,
   `uvr_demucs_model_2`, `uvr_demucs_model_bag`, `cdx23_dnr`, and
   `msst_htdemucs_vocals`. The six source artifacts carry full SHA-256,
@@ -19,6 +87,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `~/.cache/demucs-infer/` default, and the `cache_dir` override.
 
 ### Changed
+- `Separator.__init__`'s `device` parameter now defaults to `None`
+  (resolved lazily) instead of an eagerly-evaluated `"cuda"`/`"cpu"`
+  literal, so it no longer bakes in a Torch-flavoured default that
+  `backend="mlx"` would then reject; behaviour for existing callers
+  (`backend="torch"`, the default) is unchanged -- `None` still resolves
+  identically to the previous eager default and to explicit `"auto"`.
+  `Separator.separate_tensor()`'s resample/normalize/chunked-apply body now
+  runs through the new backend seam; for `backend="torch"` (the default)
+  it is the same code, moved, not changed.
 - Validate explicit Demucs devices (`cpu`, `cuda`, `cuda:N`, and available
   `mps`) before forwarding them to `Separator` and model application.
 - `DemucsSession.release()` is reloadable while `close()` is idempotent and

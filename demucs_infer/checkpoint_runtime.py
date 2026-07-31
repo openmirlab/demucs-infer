@@ -6,17 +6,17 @@ clean facade and legacy default resolver enter through this module; unknown
 names alone fall back to the historical repository chain.
 
 Reads: checkpoint_catalog, states, htdemucs.HTDemucs, apply.BagOfModels,
-api.Separator.
+api.Separator, backends.resolve_backend_name.
 """
 
 from __future__ import annotations
 
 import os
 import tempfile
+import typing as tp
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
-import typing as tp
 from urllib.request import urlopen
 
 from .checkpoint_catalog import (
@@ -27,7 +27,6 @@ from .checkpoint_catalog import (
     get_checkpoint_metadata,
     get_model_recipe,
 )
-
 
 _IO_CHUNK_SIZE = 1024 * 1024
 
@@ -287,12 +286,19 @@ class CheckpointRuntime:
         separator._model = model
         separator._audio_channels = model.audio_channels
         separator._samplerate = model.samplerate
+        separator_options = dict(separator_options)
+        requested_backend = separator_options.pop("backend", None)
+        from .backends import resolve_backend_name
+
+        separator._backend_name = resolve_backend_name(requested_backend, model=model)
+        separator._compute = None
         import inspect
 
         defaults = {
             name: parameter.default
             for name, parameter in inspect.signature(Separator).parameters.items()
-            if name not in {"model", "repo"} and parameter.default is not inspect.Parameter.empty
+            if name not in {"model", "repo", "backend"}
+            and parameter.default is not inspect.Parameter.empty
         }
         defaults.update(separator_options)
         separator.update_parameter(**defaults)

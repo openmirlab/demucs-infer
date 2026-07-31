@@ -67,7 +67,57 @@ Two tiers, both pytest-based:
 - `tools/` -- one-off/repeatable scripts (baseline capture, checkpoint
   provenance) that support verification, not part of the installed package.
 - `tests/` -- fast unit/regression tests run by default, plus a `network`
-  marker for tests that hit real URLs (deselected by default).
+  marker for tests that hit real URLs and a `realweights` marker for tests
+  needing a real downloaded checkpoint (both deselected by default).
+
+## Backends (Torch / MLX)
+
+Optional, additive `backend=` axis on `Separator`/`DemucsSeparator`/
+`DemucsSession`: `None`/`"torch"` (default, unchanged), `"mlx"` (Apple
+Silicon, needs the `[mlx]` extra), or `"auto"`. `device` keeps its existing
+Torch meaning regardless of `backend` -- it is not overloaded to mean "Apple
+Silicon"; `backend="mlx"` only accepts `None`/`"auto"`/`"mps"` for `device`.
+See README's "Backends (Torch / MLX)" for the public contract.
+
+- `demucs_infer/backends/` -- the compute seam. `base.py` holds the
+  `SeparationBackend` protocol and `BackendUnavailable`; `torch_backend.py`
+  is `Separator.separate_tensor()`'s pre-existing body (resample, reference-
+  normalize, `apply.apply_model()`, denormalize) moved behind the seam
+  verbatim -- a wrapper, never a second implementation. `mlx_backend.py` is
+  the new MLX path; its `_apply_chunk` mirrors `apply_model()`'s own
+  shift/split/segment recursion (including `apply.TensorChunk`'s exact
+  centered-padding-with-real-neighbouring-context semantics for the last,
+  short chunk -- a naive "zero-pad this chunk's own edges" implementation
+  would silently disagree with Torch on every track's final chunk). Both
+  backends are built from an *already-loaded* Torch model
+  (`Separator._load_model()` keeps sole ownership of checkpoint resolution,
+  sha256 verification, and `BagOfModels` assembly); `mlx_backend.py` never
+  touches a checkpoint path or `checkpoint_runtime.py`'s resolver directly.
+  `__init__.py` resolves a backend by name. Backend modules import lazily,
+  so `import demucs_infer` never pulls in `mlx` -- `tests/test_backends.py`
+  asserts that via a subprocess.
+- `demucs_infer/mlx/` -- the vendored MLX `HDemucs`/`HTDemucs` (MIT, from
+  `ssmall256/mlx-audio-separator`, source revision recorded in file
+  headers), imported only by `backends/mlx_backend.py`. Only `HDemucs`/
+  `HTDemucs` are ported (not the original time-domain-only `Demucs`, which
+  never appears as a single-component registry entry); the Wiener-filtering
+  path is not ported (measured unreachable for every checkpoint this
+  backend supports -- see `mlx/hdemucs.py`'s module docstring).
+  `convert.py`'s `load_converted_weights()` raises rather than loading
+  partially -- the naive `model.load_weights(strict=False)` it replaces
+  silently drops unmatched keys. `rfft_guard.py`'s `exact_zero_safe_rfft()`
+  is applied unconditionally (org policy) but was measured **inert** for
+  `htdemucs` (1.937e-07 with the guard vs. 2.533e-07 without, on a
+  zero-padded-tail fixture -- see its docstring); this is *not* assumed from
+  either sibling package's own finding.
+  MLX support is **refused explicitly**, never silently downgraded, for a
+  `BagOfModels` of 2+ sub-models (a length-1 bag -- what most single-
+  checkpoint registry entries actually resolve to via
+  `checkpoint_runtime.load_registered_model()` -- is unwrapped and runs
+  normally, since it is mathematically identical to its one submodel), an
+  unported architecture, or a Wiener-filtering configuration.
+- `.refs/` -- gitignored scratch checkout of `mlx-audio-separator` used only
+  to derive/verify the vendored files above; never imported, never shipped.
 
 ## Overriding rule: accuracy cannot drop
 

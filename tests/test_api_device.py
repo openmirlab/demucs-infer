@@ -21,9 +21,19 @@ def _bare_separator():
     """A `Separator` with none of `__init__`'s side effects (no model load).
 
     Mirrors the pattern `clean_api.py`'s `_get_separator` already uses for
-    checkpoint-override construction (`Separator.__new__(Separator)`).
+    checkpoint-override construction (`Separator.__new__(Separator)`), which
+    -- like `__init__` -- sets `_backend_name`/`_compute` before ever calling
+    `update_parameter` (see `checkpoint_runtime.load_separator`).
     """
-    return Separator.__new__(Separator)
+    separator = Separator.__new__(Separator)
+    separator._backend_name = "torch"
+    separator._compute = None
+    # A device update also (re)points the compute backend at `self._model`
+    # (`_sync_compute_backend`); for the torch backend that's a cheap,
+    # non-validating wrap, so `None` is a safe stand-in for these
+    # device-resolution-only tests.
+    separator._model = None
+    return separator
 
 
 def test_resolve_device_auto_matches_cuda_availability():
@@ -65,10 +75,15 @@ def test_resolve_device_rejects_unavailable_mps(monkeypatch):
 
 
 def test_default_unset_device_matches_auto_resolution():
-    """The unset-device default (baked in at class-definition time) must
-    resolve identically to the explicit `"auto"` sentinel."""
+    """The unset-device default is `None`, resolved lazily (not a literal
+    baked in at class-definition time as it used to be) -- required so
+    `backend="mlx"` doesn't inherit a Torch-flavoured `"cuda"`/`"cpu"`
+    default it would then reject (see `backends/mlx_backend.py`'s
+    `_select_device`). For `backend="torch"` (the default), `None` must
+    still resolve identically to the explicit `"auto"` sentinel."""
     default_device = inspect.signature(Separator.__init__).parameters["device"].default
-    assert default_device == _resolve_device("auto")
+    assert default_device is None
+    assert _resolve_device(default_device) == _resolve_device("auto")
 
 
 def test_update_parameter_resolves_auto_device():
