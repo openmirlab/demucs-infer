@@ -161,7 +161,17 @@ uv run python tools/build_checkpoints_provenance.py
 # regenerate the wiener vendoring regression fixture (only after an
 # intentional, verified change to demucs_infer/wiener.py)
 uv run python tools/capture_wiener_fixture.py
+
+# Torch-vs-MLX parity on the real htdemucs checkpoint, on an Apple Silicon
+# Mac with the [mlx] extra installed:
+uv pip install -e ".[dev,mlx]"
+uv run pytest -m realweights tests/test_mlx_parity.py -v
 ```
+
+The MLX parity test needs network on its *first* run only (to download the
+default checkpoint; cached under `~/.cache/demucs-infer/` after that) and an
+arm64 interpreter -- it skips silently under x86_64 (including Rosetta), so
+a green run on the wrong arch exercises no MLX code.
 
 ## File-top header convention
 
