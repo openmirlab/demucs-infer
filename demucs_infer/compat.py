@@ -7,22 +7,27 @@
 """Checkpoint-unpickling compatibility shim -- import this before loading any
 pretrained model.
 
-PyTorch 2.x compatibility utilities.
-Provides helper functions for torch operations that work across different PyTorch versions.
-Also provides module aliasing for backward compatibility with pretrained models.
-
-Old checkpoints (including community ones like drumsep) were pickled with
-class references under the `demucs.*` module path. This module registers
-`demucs` and `demucs.{hdemucs,htdemucs,demucs,states,spec,apply,repo,
-pretrained,audio,utils}` as aliases into `sys.modules` at IMPORT TIME (a
-side effect, not a function call) so `torch.load(..., weights_only=False)`
-can still resolve those classes under this renamed, inference-only package.
-Both __init__.py and separate.py import this module first for exactly that
-ordering reason -- removing or reordering the import breaks old-checkpoint
-loading silently (it only surfaces as an unpickling error).
-
 Reads: hdemucs, htdemucs, demucs, states, spec, apply, repo, pretrained,
-audio, utils (imported solely to populate the sys.modules aliases above)
+audio, utils (imported solely to populate the sys.modules aliases below)
+
+This module's real, load-bearing job is the `sys.modules` aliasing below, not
+the small `get_torch_arange` helper that follows it. Old checkpoints
+(including community ones like drumsep) were pickled with class references
+under the `demucs.*` module path. This module registers `demucs` and
+`demucs.{hdemucs,htdemucs,demucs,states,spec,apply,repo,pretrained,audio,
+utils}` as aliases into `sys.modules` at IMPORT TIME (a side effect, not a
+function call) so `torch.load(..., weights_only=False)` can still resolve
+those classes under this renamed, inference-only package. Both __init__.py
+and separate.py import this module first for exactly that ordering reason --
+removing or reordering the import breaks old-checkpoint loading silently (it
+only surfaces as an unpickling error).
+
+The explicit 10-module alias list below is an eagerness/convenience list, not
+the sole resolution mechanism: because `sys.modules['demucs']` is aliased to
+`demucs_infer` itself, `import demucs.<anything>` also resolves via the
+parent package's `__path__` even for submodules not listed here (empirically
+verified). Listing the common ones up front just avoids the extra import
+step at unpickling time for the modules old checkpoints actually reference.
 """
 
 import sys
@@ -54,33 +59,3 @@ def get_torch_arange(*args, **kwargs):
     Wrapper for torch.arange that handles device parameter correctly across PyTorch versions.
     """
     return torch.arange(*args, **kwargs)
-
-
-def get_torch_empty(*args, **kwargs):
-    """
-    Wrapper for torch.empty that handles device parameter correctly across PyTorch versions.
-    """
-    return torch.empty(*args, **kwargs)
-
-
-def get_torch_tensor(*args, **kwargs):
-    """
-    Wrapper for torch.tensor that handles device parameter correctly across PyTorch versions.
-    """
-    return torch.tensor(*args, **kwargs)
-
-
-def get_device_tensor(device):
-    """
-    Get a small tensor on the specified device for compatibility checks.
-    """
-    return torch.zeros(1, device=device)
-
-
-def get_cuda_current_device():
-    """
-    Get current CUDA device, compatible across PyTorch versions.
-    """
-    if torch.cuda.is_available():
-        return torch.cuda.current_device()
-    return None

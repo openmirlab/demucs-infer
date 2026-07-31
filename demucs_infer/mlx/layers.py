@@ -1,5 +1,7 @@
 """Vendored MLX layer primitives -- Conv/GroupNorm/BLSTM/LocalState/DConv/LayerScale.
 
+Reads: mlx.core, mlx.nn
+
 Adapted from mlx-audio-separator's `demucs_mlx/mlx_layers.py` and
 `demucs_mlx/mlx_demucs.py`, which implement the same layer stack hdemucs.py's
 `HEncLayer`/`HDecLayer`/`DConv` and demucs.py's `BLSTM`/`LocalState`/`DConv`
@@ -30,8 +32,6 @@ Vendored from:
     charge, to any person obtaining a copy of this software and associated
     documentation files (the "Software"), to deal in the Software without
     restriction, subject to the MIT License terms in upstream's LICENSE file.
-
-Reads: mlx.core, mlx.nn
 """
 
 from __future__ import annotations

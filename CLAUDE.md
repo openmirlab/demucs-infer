@@ -38,7 +38,7 @@ Two tiers, both pytest-based:
   because forward-pass code layout is tied to how each pretrained
   checkpoint's `args`/`kwargs` were pickled (`states.capture_init`).
   Restructuring them risks breaking old-checkpoint loading silently.
-- `wdemucs.py` is a deliberate 9-line alias (`WDemucs = HDemucs`) kept for
+- `wdemucs.py` is a deliberate tiny alias (`WDemucs = HDemucs`) kept for
   unpickling old checkpoints that reference `demucs.wdemucs.WDemucs` by
   class path. Do not remove or merge it into hdemucs.py.
 - `compat.py` registers `sys.modules['demucs'] = sys.modules['demucs_infer']`

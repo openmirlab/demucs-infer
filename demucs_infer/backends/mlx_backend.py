@@ -1,5 +1,12 @@
 """MLX backend -- native Apple Silicon execution behind the same seam.
 
+Reads: numpy, torch (boundary tensor conversion only -- see
+`_apply_mlx`'s `th.from_numpy` at the end of the MLX call), .base
+(BackendUnavailable), ..apply (BagOfModels, for isinstance/shape checks only
+-- never calls into Torch model code; imported lazily, like ..audio's
+`convert_audio` and every `mlx`/`mlx_spectro` import below, per this
+module's own lazy-import policy)
+
 Builds the vendored MLX `HDemucsMLX`/`HTDemucsMLX` from a Torch model this
 package's own `Separator._load_model()` already resolved, downloaded,
 sha256-verified, and constructed -- so the package-owned checkpoint contract
@@ -56,10 +63,6 @@ this package's own registry:
 `separate()` mirrors `apply.apply_model()`'s own shift/split/segment
 arithmetic (see this module's `_apply_mlx`) rather than the sibling packages'
 seam signature -- see `backends/base.py`'s module docstring for why.
-
-Reads: .base (BackendUnavailable), ..apply (BagOfModels, TensorChunk, for
-isinstance/shape checks only -- never calls into Torch model code), ..audio
-(convert_audio), numpy
 """
 
 from __future__ import annotations

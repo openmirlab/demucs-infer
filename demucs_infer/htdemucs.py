@@ -6,6 +6,11 @@
 # First author is Simon Rouard.
 """Hybrid Transformer Demucs (`HTDemucs`): the default `htdemucs` model.
 
+Reads: wiener (wiener, vendored from openunmix), transformer
+(CrossTransformerEncoder), demucs (rescale_module), states (capture_init),
+spec (spectro, ispectro), hdemucs (pad1d, ScaledEmbedding, HEncLayer,
+MultiWrap, HDecLayer)
+
 This code contains the spectrogram and Hybrid version of Demucs.
 
 Reuses hdemucs.py's encoder/decoder layers (HEncLayer, HDecLayer, ...) but
@@ -16,11 +21,6 @@ never exercises the vendored wiener path (see wiener.py's header; verified
 during the ADOPT campaign's P1). Deep-module file: internals intentionally
 untouched by this campaign (forward-pass layout is tied to pickled
 checkpoint args/kwargs; see demucs.py's header for the same constraint).
-
-Reads: wiener (wiener, vendored from openunmix), transformer
-(CrossTransformerEncoder), demucs (rescale_module), states (capture_init),
-spec (spectro, ispectro), hdemucs (pad1d, ScaledEmbedding, HEncLayer,
-MultiWrap, HDecLayer)
 """
 import math
 

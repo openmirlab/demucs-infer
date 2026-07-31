@@ -7,6 +7,12 @@
 """High-level Separator API -- the primary entry point for using demucs-infer
 programmatically.
 
+Reads: apply (_replace_dict), audio (AudioFile, convert_audio, save_audio),
+backends (get_backend, resolve_backend_name), model_info (ModelInfo,
+LoadModelError, list_models, get_model_info, list_supported_separation_types,
+KNOWN_MODELS, SEPARATION_TYPES, SOURCE_TRANSLATIONS -- re-exported for
+backward compat), pretrained (get_model)
+
 Wraps model loading (pretrained.get_model / repo.*Repo) behind a single
 Separator class, plus audio I/O convenience (load, save, format conversion).
 The chunking/shifting loop itself lives behind `backends/` (`SeparationBackend`
@@ -40,12 +46,6 @@ Functions
 Examples
 --------
 See the end of this module (if __name__ == "__main__")
-
-Reads: apply (_replace_dict), audio (AudioFile, convert_audio, save_audio),
-backends (get_backend, resolve_backend_name), model_info (ModelInfo,
-LoadModelError, list_models, get_model_info, list_supported_separation_types,
-KNOWN_MODELS, SEPARATION_TYPES, SOURCE_TRANSLATIONS -- re-exported for
-backward compat), pretrained (get_model)
 """
 
 import subprocess

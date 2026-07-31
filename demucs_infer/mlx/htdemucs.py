@@ -2,6 +2,10 @@
 `htdemucs_ft`/`msst_htdemucs_vocals` architecture (the default `htdemucs`
 registry model).
 
+Reads: mlx.core, mlx.nn, .hdemucs (HEncLayer, HDecLayer, MultiWrap,
+ScaledEmbedding, pad1d), .transformer (CrossTransformerEncoder), .layers
+(Conv1dNCL), .spec (spectro, ispectro)
+
 Ports `htdemucs.py`'s forward pass (encoder/decoder from `hdemucs.py`,
 transformer bottleneck from `transformer.py`) to MLX. Structure and
 arithmetic are carried field-for-field from `htdemucs.py`; only tensor
@@ -44,10 +48,6 @@ Vendored from:
     Adapted: fused Metal-kernel norm/activation and the Wiener path dropped
     (see hdemucs.py); sparse-attention configurations refused rather than
     silently built (see transformer.py).
-
-Reads: mlx.core, mlx.nn, .hdemucs (HEncLayer, HDecLayer, MultiWrap,
-ScaledEmbedding, pad1d), .transformer (CrossTransformerEncoder), .layers
-(Conv1dNCL), .spec (spectro, ispectro)
 """
 
 from __future__ import annotations

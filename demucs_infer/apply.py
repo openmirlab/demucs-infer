@@ -5,6 +5,9 @@
 # LICENSE file in the root directory of this source tree.
 """Inference-time driver: chunking, overlap-add, and the random-shift trick.
 
+Reads: demucs (Demucs), hdemucs (HDemucs), htdemucs (HTDemucs), utils
+(center_trim, DummyPoolExecutor)
+
 Code to apply a model to a mix. It will handle chunking with overlaps and
 inteprolation between chunks, as well as the "shift trick".
 
@@ -18,9 +21,6 @@ apply_model (see tools/capture_baseline.py). KNOWN BUG -- passing an
 explicit `segment=` here crashes HTDemucs models whose
 `use_train_segment=True` (ValueError in htdemucs.py's valid_length); out of
 scope for this campaign, not fixed here.
-
-Reads: demucs (Demucs), hdemucs (HDemucs), htdemucs (HTDemucs), utils
-(center_trim, DummyPoolExecutor)
 """
 from concurrent.futures import ThreadPoolExecutor
 import copy

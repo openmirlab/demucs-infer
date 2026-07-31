@@ -1,5 +1,7 @@
 """Vendored+adapted MLX `CrossTransformerEncoder` -- htdemucs.py's bottleneck.
 
+Reads: mlx.core, mlx.nn, .layers (LayerScale)
+
 Ports `transformer.py`'s `CrossTransformerEncoder` (the transformer bottleneck
 `HTDemucs` uses in place of `HDemucs`'s LSTM/local-attention branch) for the
 standard configuration every shipped htdemucs checkpoint in this package's
@@ -48,8 +50,6 @@ Vendored from:
     (this package's chunked seam calls the model once per chunk with a stable
     shape, so the cache upstream added for repeated-shape workloads buys
     nothing here and is one fewer piece of hidden state to keep correct).
-
-Reads: mlx.core, mlx.nn, .layers (LayerScale)
 """
 
 from __future__ import annotations

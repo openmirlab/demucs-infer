@@ -1,5 +1,7 @@
 """`exact_zero_safe_rfft` -- routes `mx.fft.rfft` through the CPU stream.
 
+Reads: mlx.core
+
 MLX 0.31.2's Metal rfft kernel packs two real FFTs into one complex FFT; in
 float32 that cancellation is not bit-exact, so a frame whose true value is
 exactly zero comes back as roughly 4.5e-07 instead of 0. In the sibling
@@ -29,8 +31,6 @@ Caveat, stated rather than hidden: this swaps a module-level attribute, so it
 is not thread-safe. Inference here is single-threaded per session.
 
 Delete this once MLX's rfft kernel is fixed upstream.
-
-Reads: mlx.core
 """
 
 from __future__ import annotations

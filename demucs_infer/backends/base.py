@@ -1,5 +1,7 @@
 """The backend seam -- one narrow protocol every compute backend implements.
 
+Reads: torch (boundary tensor type only)
+
 A backend owns everything framework-specific: model construction, checkpoint
 weights, tensor layout, device placement, and the whole conflated
 resample + reference-normalize + chunked-apply that ``Separator.separate_tensor()``
@@ -23,8 +25,6 @@ accumulator back to the host.
 Above the seam nothing knows a tensor layout, a dtype, or which chip is busy:
 folder iteration, stem naming, file writing, and the CLI stay in
 separate.py/api.py exactly as today.
-
-Reads: torch (boundary tensor type only)
 """
 
 from __future__ import annotations

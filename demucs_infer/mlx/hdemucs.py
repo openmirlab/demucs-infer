@@ -1,5 +1,7 @@
 """Vendored+adapted MLX `HDemucs` -- the `hdemucs_mmi`/mdx-family architecture.
 
+Reads: mlx.core, mlx.nn, .layers, .spec (spectro, ispectro)
+
 Ports `hdemucs.py`'s `HEncLayer`/`HDecLayer`/`MultiWrap`/`ScaledEmbedding`/
 `HDemucs` forward pass to MLX, verified by `convert.load_converted_weights`
 raising on any unconverted parameter and by `tests/test_mlx_parity.py`
@@ -33,8 +35,6 @@ Vendored from:
     `.layers` primitives (see layers.py's module docstring); Wiener path
     dropped (measured unreachable for every checkpoint this backend supports,
     see above); state-dict plumbing replaced by convert.py's auditing loader.
-
-Reads: mlx.core, mlx.nn, .layers, .spec (spectro, ispectro)
 """
 
 from __future__ import annotations

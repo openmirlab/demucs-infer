@@ -5,6 +5,13 @@ names, aliases, physical signatures, cache paths, and bag assembly. Both the
 clean facade and legacy default resolver enter through this module; unknown
 names alone fall back to the historical repository chain.
 
+Note: `repo.py` also computes sha256 digests, but compares only an 8-hex-char
+PREFIX because upstream demucs embeds truncated signatures in remote
+filenames (see `repo.py`'s module docstring). That is a different contract
+over different data (remote-filename-derived prefix matching vs. this
+module's full-digest verification against the registry), not the same
+decision duplicated in two places.
+
 Reads: checkpoint_catalog, states, htdemucs.HTDemucs, apply.BagOfModels,
 api.Separator, backends.resolve_backend_name.
 """

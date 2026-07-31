@@ -4,7 +4,13 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 """Model discovery/metadata layer: what models exist, what they're called,
-and how their stems categorize -- split out of api.py (ADOPT campaign P4;
+and how their stems categorize.
+
+Reads: apply (BagOfModels), checkpoint_catalog, community (GDriveRepo),
+log (fatal), pretrained (get_model, REMOTE_ROOT), repo (LocalRepo,
+ModelOnlyRepo, BagOnlyRepo)
+
+Split out of api.py (ADOPT campaign P4;
 api.py was the 3rd-largest file at 783 lines and this was its cleanest
 seam: describing/cataloging models is a distinct concern from actually
 running separation, which stays in api.py's `Separator`).
@@ -16,10 +22,6 @@ running separation, which stays in api.py's `Separator`).
 documented API and by separate.py/tests for `list_models`) keeps working
 unchanged. This module never imports from api.py, so the re-export is a
 one-directional (non-circular) dependency.
-
-Reads: apply (BagOfModels), checkpoint_catalog, community (GDriveRepo),
-log (fatal), pretrained (get_model, REMOTE_ROOT), repo (LocalRepo,
-ModelOnlyRepo, BagOnlyRepo)
 """
 
 from dataclasses import dataclass

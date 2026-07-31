@@ -1,6 +1,11 @@
 """PyTorch -> MLX weight conversion for `HDemucsMLX`/`HTDemucsMLX`, plus a
 strict load gate.
 
+Reads: mlx.core, mlx.utils (tree_flatten), numpy (torch itself is not
+imported -- the live Torch model is walked duck-typed, via
+`named_modules()`/`state_dict()` and `type(module).__name__` string
+comparisons, never `isinstance` against an imported torch class)
+
 `convert_state_dict` walks the *live* Torch model's `named_modules()` to
 learn each parameter's true layout (`Conv1d` vs `Conv2d` vs their transposed
 counterparts) rather than guessing from the parameter name -- the same
@@ -33,9 +38,6 @@ docstring for the full vendoring/attribution note; this file's
 `load_converted_weights` is new, not upstream (upstream's own loader calls
 `load_weights(..., strict=False)` directly, which is exactly the failure
 mode this function exists to prevent).
-
-Reads: mlx.core, mlx.utils (tree_flatten), numpy, torch (typing-only, for
-isinstance checks against the live Torch module tree)
 """
 
 from __future__ import annotations
