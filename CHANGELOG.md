@@ -120,6 +120,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   environment alongside the PyPI package was more upkeep than the audience
   justified.
 
+### Fixed
+- Mark the `[mlx]` extra's `mlx`/`mlx-spectro` dependencies
+  `python_version >= '3.10'`, matching MLX's own floor. Without the marker a
+  universal resolve (`uv sync`/`uv lock`, which solves every declared extra
+  across the whole `requires-python` range at once) had no solution on the
+  3.8/3.9 split, and the repo could not be synced at all -- with or without
+  extras, on any interpreter. The core `requires-python` stays `>=3.8`; below
+  3.10 the extra now installs nothing and `backend="mlx"` refuses loudly via
+  `BackendUnavailable`, never a silent fallback to torch.
+- Header truth sweep: deleted four dead passthrough helpers from `compat.py`
+  (only `get_torch_arange` had a caller), corrected two `Reads:` lines that
+  claimed imports the code didn't have, dropped a stale self-reported line
+  count from `wdemucs.py`/`CLAUDE.md`, and clarified `checkpoint_runtime.py`'s
+  header on how its full-digest check relates to `repo.py`'s truncated
+  signature comparison. No runtime logic changed.
+
 ## [4.2.2] - 2026-07-12
 
 ### Fixed

@@ -17,7 +17,7 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository by 
 
 **demucs-infer** re-provides the same models and separation quality as an inference-only, PyPI-installable package:
 
-1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+.
+1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+ (the optional `[mlx]` extra needs Python 3.10+; see "Requirements" below).
 2. **Continue development** — addresses issues and papers over gaps (e.g. torchaudio 2.11+ dropping its bundled decoders) that the unmaintained upstream never will.
 3. **Focus on inference** — training code, evaluation scripts, and dataset utilities are removed for a leaner package.
 4. **Serve the community** — lets researchers and developers keep using these models without maintaining a fork themselves.
@@ -131,7 +131,9 @@ pip install demucs-infer
 
 ### Requirements
 
-- **Python**: 3.8+
+- **Python**: 3.8+ (the optional `[mlx]` extra needs Python 3.10+, MLX's own
+  floor; below 3.10 the extra installs nothing and `backend="mlx"` refuses
+  loudly rather than silently falling back to Torch)
 - **PyTorch**: 2.0 or later
 - **OS**: Linux, macOS, Windows
 - **GPU**: Optional (CUDA-capable GPU recommended for speed)
@@ -144,7 +146,7 @@ uv add "demucs-infer[mp3]"         # MP3 output support
 uv add "demucs-infer[quantized]"   # Quantized models
 uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
 uv add "demucs-infer[torchcodec]"  # Restore torchaudio's own decoders on torchaudio>=2.11
-uv add "demucs-infer[mlx]"         # Apple Silicon MLX backend (see "Backends" below)
+uv add "demucs-infer[mlx]"         # Apple Silicon MLX backend, needs Python 3.10+ (see "Backends" below)
 uv add "demucs-infer[mp3,quantized,community,torchcodec]"  # all of the above
 ```
 
@@ -154,7 +156,7 @@ pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
 pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
 pip install demucs-infer[community]   # Adds: gdown>=5.0.0
 pip install demucs-infer[torchcodec]  # Adds: torchcodec
-pip install demucs-infer[mlx]         # Adds: mlx>=0.31, mlx-spectro>=0.7 (Apple Silicon)
+pip install demucs-infer[mlx]         # Adds: mlx>=0.31, mlx-spectro>=0.7 (Apple Silicon, Python 3.10+)
 pip install "demucs-infer[mp3,quantized,community,torchcodec]"
 ```
 
@@ -281,13 +283,15 @@ torch 2.13.0, mlx 0.31.2): 5.4e-07 / 1.9e-07 / 1.9e-07.
 
 MPS and MLX both need an **arm64 Python interpreter**. Under Rosetta/x86_64
 they report as unavailable rather than failing loudly -- an x86_64
-interpreter makes `torch.backends.mps.is_available()` return `False`, and
-MLX fails to run correctly, so an accelerated path just looks absent rather
-than misconfigured. This is easy to hit without noticing: an x86_64 `uv`
-resolves x86_64 interpreters, so `uv sync` can silently produce an
-environment where the accelerated paths structurally cannot exist. Check
-with `python -c "import platform; print(platform.machine())"` -- it must
-print `arm64`.
+interpreter makes `torch.backends.mps.is_available()` return `False`, and MLX
+ships no macOS x86_64 wheel at all, so it cannot even be installed there
+(published wheels are macosx arm64, manylinux aarch64/x86_64, and win); an
+accelerated path just looks absent rather than misconfigured. This is easy to
+hit without noticing: an x86_64 `uv` resolves x86_64 interpreters, so
+`uv sync` can silently produce an environment where the accelerated paths
+structurally cannot exist. Check with
+`python -c "import platform; print(platform.machine())"` -- it must print
+`arm64`.
 
 ```python
 from demucs_infer.pretrained import get_model
