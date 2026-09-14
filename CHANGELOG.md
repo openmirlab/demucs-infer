@@ -135,6 +135,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   count from `wdemucs.py`/`CLAUDE.md`, and clarified `checkpoint_runtime.py`'s
   header on how its full-digest check relates to `repo.py`'s truncated
   signature comparison. No runtime logic changed.
+- **`tests/test_baseline_regression.py::test_baseline_matches_fixture` ran a
+  real, unmocked checkpoint download on a cache miss with no test marker at
+  all**, found by a Phonon-hosting readiness audit: the default (`pytest
+  tests/`) suite silently required network access on any machine without
+  `htdemucs` already cached. Marked it `@pytest.mark.realweights` (it needs
+  a real downloaded checkpoint and does real inference against it, the same
+  class as `test_mlx_parity.py`'s tests, not the pure URL-liveness checks
+  `network` covers) so it is deselected by default, matching org convention.
+  Added `tests/conftest.py`'s autouse `_block_real_network` fixture as a
+  regression guard: it blocks real (non-loopback) socket connections for
+  any test not marked `network` or `realweights`, so a future unmarked
+  network-touching test fails loudly with a clear error instead of silently
+  reaching the network.
 
 ## [4.2.2] - 2026-07-12
 

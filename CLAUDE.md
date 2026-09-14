@@ -25,10 +25,17 @@ Two tiers, both pytest-based:
    overriding constraint -- it exists because this package's entire value
    proposition is "same models, same weights, same output," not "improved
    models."
-2. **Fast unit/regression suite** (`tests/`): runs by default, network tests
-   deselected (`-m "not network"` in `pyproject.toml`'s `addopts`). A
-   separate `network` marker covers every configured checkpoint source and is
-   opt-in (`pytest -m network`) since it depends on external infrastructure.
+2. **Fast unit/regression suite** (`tests/`): runs by default, network- and
+   real-checkpoint tests deselected (`-m "not network and not realweights"`
+   in `pyproject.toml`'s `addopts`). The `network` marker covers pure
+   checkpoint URL-liveness probes (`test_checkpoints_liveness.py`) and is
+   opt-in (`pytest -m network`); the `realweights` marker covers tests that
+   need a real downloaded checkpoint and run real inference against it
+   (`test_mlx_parity.py`, `test_baseline_regression.py`) and is opt-in
+   (`pytest -m realweights`). `tests/conftest.py`'s autouse
+   `_block_real_network` fixture blocks real network sockets for any test
+   carrying neither marker, so a future unmarked network-touching test fails
+   loudly instead of silently requiring network in the default suite.
 
 ## Scope
 
@@ -143,7 +150,7 @@ print('bit-identical')
 ## Verification commands
 
 ```bash
-# fast suite (default: network tests deselected)
+# fast suite (default: network and realweights tests deselected)
 uv run pytest tests/
 
 # frozen public API and legacy metadata contract
@@ -154,6 +161,10 @@ DEMUCS_PHASE0_PROBE_CACHE=/tmp uv run pytest tests/test_phase0_contract.py tests
 
 # checkpoint URL liveness (hits real network endpoints)
 uv run pytest tests/test_checkpoints_liveness.py -m network
+
+# htdemucs bit-exact accuracy gate against a real downloaded checkpoint
+# (downloads on a cache miss; skips off the recording torch/device env)
+uv run pytest tests/test_baseline_regression.py -m realweights
 
 # rebuild registry provenance; separately reports recorded hashes and cached files verified
 uv run python tools/build_checkpoints_provenance.py

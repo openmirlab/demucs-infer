@@ -9,19 +9,26 @@ This is the constitution's "accuracy cannot drop" gate made permanent: any
 future change that alters htdemucs's numerical output -- even a refactor
 believed to be behavior-preserving -- fails this test.
 
-Requires the htdemucs checkpoint to already be cached locally (torch hub
-cache); does not download anything itself, so it is NOT marked `network`
-and runs by default. On a machine without the checkpoint cached, this test
-will attempt a download on first run (same as any normal `get_model()` call).
+Needs the real htdemucs checkpoint (`get_model('htdemucs')` downloads it via
+a real, unmocked `urlopen()` call on a cache miss -- same as any normal
+`get_model()` call) and does real GPU/CPU inference against it, so it carries
+the same `realweights` marker as `test_mlx_parity.py`'s checkpoint-backed
+parity tests (not `network`, which this repo reserves for pure checkpoint
+URL-liveness probes in `test_checkpoints_liveness.py`) and is deselected by
+default. Run it explicitly with `pytest -m realweights`.
 """
 import json
 import sys
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 import capture_baseline  # noqa: E402
+
+pytestmark = pytest.mark.realweights
 
 FIXTURE_PATH = REPO_ROOT / "tests" / "fixtures" / "baseline_htdemucs.json"
 
@@ -42,7 +49,6 @@ def _env_matches(meta):
 def test_baseline_matches_fixture():
     with open(FIXTURE_PATH) as f:
         expected = json.load(f)
-    import pytest
     ok, why = _env_matches(expected["meta"])
     if not ok:
         pytest.skip("bit-exact baseline valid only on recording env: " + why)

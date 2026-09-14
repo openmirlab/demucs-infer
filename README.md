@@ -716,6 +716,9 @@ uv run pytest tests/ --cov=demucs_infer
 
 # Run network tests too (checkpoint URL liveness; deselected by default)
 uv run pytest tests/ -v -m "network"
+
+# Run tests needing a real downloaded checkpoint (deselected by default)
+uv run pytest tests/ -v -m "realweights"
 ```
 
 See [CLAUDE.md](CLAUDE.md) for the bit-for-bit accuracy gate that any change
