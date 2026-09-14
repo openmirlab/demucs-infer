@@ -259,7 +259,7 @@ main branch — functionally identical to 4.1.3. All changes below ship in 4.2.1
   `gdown`).
 - **Checksum verification for community models**: `GDriveRepo` downloads
   are now sha256-verified via the existing `repo.check_checksum` helper
-  (previously unverified). See `docs/checkpoints_provenance.json`.
+  (previously unverified). See `tools/checkpoints_provenance.json`.
 - **`tests/test_checkpoints_liveness.py`**: HEADs every official + community
   checkpoint URL; marked `network`, deselected by default
   (`pytest -m network` to run).

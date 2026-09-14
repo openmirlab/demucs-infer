@@ -84,7 +84,7 @@ def test_all_hashes_are_full_and_match_embedded_filename_prefixes():
 
 def test_provenance_record_matches_every_schema_v2_artifact():
     provenance = json.loads(
-        (REPO_ROOT / "docs/checkpoints_provenance.json").read_text(encoding="utf-8")
+        (REPO_ROOT / "tools/checkpoints_provenance.json").read_text(encoding="utf-8")
     )
     registry = checkpoint_config()
     assert len(provenance["official"]) == 27

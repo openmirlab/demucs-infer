@@ -731,8 +731,8 @@ to `demucs_infer/` must pass.
 
 ### Documentation
 
-- **[Migration Guide](docs/MIGRATION.md)** - Migrate from original Demucs
-- **[Implementation Notes](docs/dev/IMPLEMENTATION_NOTES.md)** - Technical details
+- **Migration Guide** (`docs/MIGRATION.md`, local-only, not on GitHub) - Migrate from original Demucs
+- **Implementation Notes** (`docs/dev/IMPLEMENTATION_NOTES.md`, local-only, not on GitHub) - Technical details
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
 - **[Test Examples](tests/test_import.py)** - Import verification
 
@@ -747,7 +747,7 @@ See [LICENSE](LICENSE) for details.
 
 ## Support
 
-- **Migration Help**: See [MIGRATION.md](docs/MIGRATION.md)
+- **Migration Help**: See `docs/MIGRATION.md` (local-only, not on GitHub)
 - **Version History**: See [CHANGELOG.md](CHANGELOG.md)
 - **Bug Reports**: [GitHub Issues](https://github.com/openmirlab/demucs-infer/issues)
 - **Original Demucs**: [facebookresearch/demucs](https://github.com/facebookresearch/demucs)

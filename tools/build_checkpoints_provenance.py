@@ -86,7 +86,7 @@ def main():
             cached_verified["community"] += 1
         out["community"][sig] = entry
 
-    out_path = REPO_ROOT / "docs" / "checkpoints_provenance.json"
+    out_path = REPO_ROOT / "tools" / "checkpoints_provenance.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2, sort_keys=True)

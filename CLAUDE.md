@@ -1,5 +1,10 @@
 # demucs-infer
 
+**`docs/`** is local-only by policy (2026-09-14): kept on disk, gitignored,
+never pushed to GitHub. The checkpoint provenance audit record moved to
+`tools/checkpoints_provenance.json` (it's read by
+`tests/test_checkpoint_config.py`, so it couldn't stay under docs/).
+
 Inference-only fork of Meta's Demucs (music source separation). Training
 code has been stripped; this package only loads pretrained checkpoints and
 runs separation.

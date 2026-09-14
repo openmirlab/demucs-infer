@@ -22,7 +22,7 @@ from .states import load_model
 logger = logging.getLogger(__name__)
 
 # Registry of community models: signature -> download metadata.
-# `sha256` is the full checkpoint hash (see docs/checkpoints_provenance.json,
+# `sha256` is the full checkpoint hash (see tools/checkpoints_provenance.json,
 # tools/build_checkpoints_provenance.py), verified on every load via
 # repo.check_checksum -- unlike the official Meta-hosted models (whose
 # integrity torch.hub.load_state_dict_from_url(check_hash=True) verifies
