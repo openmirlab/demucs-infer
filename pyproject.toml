@@ -72,10 +72,15 @@ quantized = [
 community = [
     "gdown>=5.0.0",
 ]
+# Optional: native HTDemucs checkpoints without pickle deserialization
+safetensors = [
+    "safetensors>=0.4.2",
+]
 # Development dependencies
 dev = [
     "black",
     "ruff",
+    "safetensors>=0.4.2",
 ]
 
 [project.scripts]
@@ -100,6 +105,7 @@ packages = ["demucs_infer"]
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
+    "safetensors>=0.4.2",
 ]
 
 [tool.pytest.ini_options]

@@ -144,7 +144,8 @@ uv add "demucs-infer[mp3]"         # MP3 output support
 uv add "demucs-infer[quantized]"   # Quantized models
 uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
 uv add "demucs-infer[torchcodec]"  # Restore torchaudio's own decoders on torchaudio>=2.11
-uv add "demucs-infer[mp3,quantized,community,torchcodec]"  # all of the above
+uv add "demucs-infer[safetensors]" # Native HTDemucs safetensors checkpoints
+uv add "demucs-infer[mp3,quantized,community,torchcodec,safetensors]"  # all of the above
 ```
 
 **With pip:**
@@ -153,7 +154,8 @@ pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
 pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
 pip install demucs-infer[community]   # Adds: gdown>=5.0.0
 pip install demucs-infer[torchcodec]  # Adds: torchcodec
-pip install "demucs-infer[mp3,quantized,community,torchcodec]"
+pip install demucs-infer[safetensors] # Adds: safetensors>=0.4.2
+pip install "demucs-infer[mp3,quantized,community,torchcodec,safetensors]"
 ```
 
 ## Quick Start
@@ -218,6 +220,41 @@ Named models download to `~/.cache/demucs-infer/` by default. Pass
 `DemucsSeparator` to override that location. `checkpoint_path` remains the
 single-file override, while explicit legacy `get_model(name, repo=Path(...))`
 repositories remain supported for existing callers.
+
+Native HTDemucs safetensors files use a strict, pickle-free loader from the
+optional `safetensors` extra. Load one directly when composing the lower-level
+API:
+
+```python
+from demucs_infer.safetensors import load_safetensors_model
+
+model = load_safetensors_model("5c90dfd2.safetensors")
+model.eval()
+```
+
+The same format works with task-level checkpoint overrides. URL overrides
+still require a full SHA-256 and determine the format from the URL pathname,
+including URLs with query parameters:
+
+```python
+from demucs_infer import DemucsSession
+
+local = DemucsSession(
+    checkpoint_path="5c90dfd2.safetensors",
+    checkpoint_sha256="<full-sha256>",
+    device="cpu",
+)
+remote = DemucsSession(
+    checkpoint_url="https://example.test/5c90dfd2.safetensors?download=1",
+    checkpoint_sha256="<full-sha256>",
+    device="cpu",
+)
+```
+
+The loader accepts only native `HTDemucs` metadata (`klass`, `args`, and
+`kwargs`) and a flat tensor state. It rejects unknown classes, nested state
+structures, malformed metadata, and state-dict mismatches without falling back
+to legacy `.th` deserialization.
 
 The facade is additive: advanced users can continue composing
 `demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and

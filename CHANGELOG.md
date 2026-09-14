@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Add an optional `safetensors` extra and public
+  `demucs_infer.safetensors.load_safetensors_model()` loader for native
+  HTDemucs checkpoints. Explicit `.safetensors` path and URL overrides now
+  use strict metadata, constructor, and state-dict validation without pickle
+  fallback; URL overrides remain full-SHA-256 verified before construction.
 - Add schema-v2 registry recipes for `uvr_demucs_model_1`,
   `uvr_demucs_model_2`, `uvr_demucs_model_bag`, `cdx23_dnr`, and
   `msst_htdemucs_vocals`. The six source artifacts carry full SHA-256,
