@@ -17,7 +17,7 @@ The original [Demucs](https://github.com/facebookresearch/demucs) repository by 
 
 **demucs-infer** re-provides the same models and separation quality as an inference-only, PyPI-installable package:
 
-1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+ (the optional `[mlx]` extra needs Python 3.10+; see "Requirements" below).
+1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+.
 2. **Continue development** — addresses issues and papers over gaps (e.g. torchaudio 2.11+ dropping its bundled decoders) that the unmaintained upstream never will.
 3. **Focus on inference** — training code, evaluation scripts, and dataset utilities are removed for a leaner package.
 4. **Serve the community** — lets researchers and developers keep using these models without maintaining a fork themselves.
@@ -131,9 +131,7 @@ pip install demucs-infer
 
 ### Requirements
 
-- **Python**: 3.8+ (the optional `[mlx]` extra needs Python 3.10+, MLX's own
-  floor; below 3.10 the extra installs nothing and `backend="mlx"` refuses
-  loudly rather than silently falling back to Torch)
+- **Python**: 3.8+
 - **PyTorch**: 2.0 or later
 - **OS**: Linux, macOS, Windows
 - **GPU**: Optional (CUDA-capable GPU recommended for speed)
@@ -146,7 +144,6 @@ uv add "demucs-infer[mp3]"         # MP3 output support
 uv add "demucs-infer[quantized]"   # Quantized models
 uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
 uv add "demucs-infer[torchcodec]"  # Restore torchaudio's own decoders on torchaudio>=2.11
-uv add "demucs-infer[mlx]"         # Apple Silicon MLX backend, needs Python 3.10+ (see "Backends" below)
 uv add "demucs-infer[mp3,quantized,community,torchcodec]"  # all of the above
 ```
 
@@ -156,7 +153,6 @@ pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
 pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
 pip install demucs-infer[community]   # Adds: gdown>=5.0.0
 pip install demucs-infer[torchcodec]  # Adds: torchcodec
-pip install demucs-infer[mlx]         # Adds: mlx>=0.31, mlx-spectro>=0.7 (Apple Silicon, Python 3.10+)
 pip install "demucs-infer[mp3,quantized,community,torchcodec]"
 ```
 
@@ -206,7 +202,7 @@ callable form, `session(...)`, remains lazy for backward compatibility.
 `release()` clears the in-memory model but keeps disk checkpoints cached and
 permits a later reload; `close()` is terminal and idempotent. Device requests
 preserve legacy `None`/`auto` selection and accept explicit `cpu`, `cuda`,
-`cuda:N`, or available `mps`, rejecting invalid/unavailable requests before
+or `cuda:N`, rejecting invalid/unavailable requests before
 loading. `status` reports `new`, `loading`, `ready`, `failed`, `released`, or
 `closed`. A custom checkpoint
 can be supplied with `checkpoint_path`, or downloaded with
@@ -227,71 +223,6 @@ The facade is additive: advanced users can continue composing
 `demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and
 `demucs_infer.apply.apply_model` directly. Optional backends remain lazy and
 retain their existing installation requirements.
-
-## Backends and devices
-
-`Separator` and `DemucsSeparator`/`DemucsSession` accept an additive
-`backend=` keyword, independent of `device=`: `None`/`"torch"` (default,
-unchanged behaviour), `"mlx"` (native Apple Silicon via `mlx`/`mlx-spectro`,
-needs the `[mlx]` extra), or `"auto"` (prefers `"mlx"` when it can actually
-run the given model, otherwise `"torch"`). `device` keeps its existing Torch
-meaning either way -- it is not overloaded to mean "Apple Silicon" --
-`backend="mlx"` owns its own Apple Silicon execution and accepts only
-`None`/`"auto"`/`"mps"` for `device`, refusing anything else rather than
-silently reinterpreting it:
-
-```python
-from demucs_infer.api import Separator
-
-separator = Separator(model="htdemucs", backend="mlx")          # Apple Silicon
-separator = Separator(model="htdemucs", backend="auto")         # mlx if it can run this model, else torch
-wav, stems = separator.separate_audio_file("song.wav")
-```
-
-There is no `--backend` CLI flag yet (`demucs_infer/separate.py`'s argparse
-surface has no such option) -- the compute-framework switch is Python-API-only
-for now; the CLI examples below always run the default Torch backend.
-
-### The MLX backend
-
-Install it with the extra, which is never part of the core install:
-
-```bash
-pip install "demucs-infer[mlx]"
-```
-
-`backend="mlx"` is **refused explicitly**, not silently downgraded or
-mis-run, for:
-
-- **A `BagOfModels` of two or more sub-models** -- the fine-tuned and
-  MDX-challenge ensemble entries in "Available Models" below (their model
-  cards note the ensemble). A length-1 bag (which is what most single-
-  checkpoint registry entries actually resolve to internally) is unwrapped
-  and runs normally, since it is mathematically identical to its one
-  submodel.
-- **Any architecture other than `HDemucs`/`HTDemucs`** -- covers every
-  currently supported registry entry; a future architecture without an MLX
-  port raises rather than running incorrectly.
-- **A checkpoint whose configuration would exercise Wiener filtering**
-  (`cac=False` or `wiener_iters != 0`) -- not ported; `htdemucs` and
-  `hdemucs_mmi` both ship `cac=True, wiener_iters=0` and are unaffected.
-
-Measured Torch-vs-MLX parity on the real `htdemucs` checkpoint through the
-public `separate_audio_file()` API, worst-case max-abs divergence across a
-clean-signal / zero-padded-tail / near-silent-tail fixture (Apple M-series,
-torch 2.13.0, mlx 0.31.2): 5.4e-07 / 1.9e-07 / 1.9e-07.
-
-MPS and MLX both need an **arm64 Python interpreter**. Under Rosetta/x86_64
-they report as unavailable rather than failing loudly -- an x86_64
-interpreter makes `torch.backends.mps.is_available()` return `False`, and MLX
-ships no macOS x86_64 wheel at all, so it cannot even be installed there
-(published wheels are macosx arm64, manylinux aarch64/x86_64, and win); an
-accelerated path just looks absent rather than misconfigured. This is easy to
-hit without noticing: an x86_64 `uv` resolves x86_64 interpreters, so
-`uv sync` can silently produce an environment where the accelerated paths
-structurally cannot exist. Check with
-`python -c "import platform; print(platform.machine())"` -- it must print
-`arm64`.
 
 ```python
 from demucs_infer.pretrained import get_model

@@ -50,10 +50,5 @@ TRUSTED_PUBLISHING_SETUP.md
 # Claude Code
 .claude/
 
-# Vendored reference checkouts (cloned for porting/attribution verification,
-# never shipped -- see demucs_infer/mlx/ file headers for the pinned revision
-# actually vendored from).
-.refs/
-
 # docs/ is kept local-only by policy (not tracked on GitHub) -- see CLAUDE.md
 docs/
