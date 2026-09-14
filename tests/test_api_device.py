@@ -21,17 +21,11 @@ def _bare_separator():
     """A `Separator` with none of `__init__`'s side effects (no model load).
 
     Mirrors the pattern `clean_api.py`'s `_get_separator` already uses for
-    checkpoint-override construction (`Separator.__new__(Separator)`), which
-    -- like `__init__` -- sets `_backend_name`/`_compute` before ever calling
-    `update_parameter` (see `checkpoint_runtime.load_separator`).
+    checkpoint-override construction (`Separator.__new__(Separator)`, see
+    `checkpoint_runtime.load_separator`) -- these device-resolution-only
+    tests never touch `self._model`.
     """
     separator = Separator.__new__(Separator)
-    separator._backend_name = "torch"
-    separator._compute = None
-    # A device update also (re)points the compute backend at `self._model`
-    # (`_sync_compute_backend`); for the torch backend that's a cheap,
-    # non-validating wrap, so `None` is a safe stand-in for these
-    # device-resolution-only tests.
     separator._model = None
     return separator
 
@@ -68,18 +62,17 @@ def test_resolve_device_rejects_invalid_or_unavailable_requests(monkeypatch):
         _resolve_device("cuda:1")
 
 
-def test_resolve_device_rejects_unavailable_mps(monkeypatch):
-    monkeypatch.setattr(th.backends.mps, "is_available", lambda: False)
-    with pytest.raises(RuntimeError, match="MPS"):
+def test_resolve_device_rejects_mps_unconditionally():
+    """MLX/MPS support was removed before ever shipping in a release (see
+    CHANGELOG's `[Unreleased]` "Removed" entry) -- `"mps"` is refused
+    outright now, not merely when unavailable."""
+    with pytest.raises(ValueError, match="mps"):
         _resolve_device("mps")
 
 
 def test_default_unset_device_matches_auto_resolution():
     """The unset-device default is `None`, resolved lazily (not a literal
-    baked in at class-definition time as it used to be) -- required so
-    `backend="mlx"` doesn't inherit a Torch-flavoured `"cuda"`/`"cpu"`
-    default it would then reject (see `backends/mlx_backend.py`'s
-    `_select_device`). For `backend="torch"` (the default), `None` must
+    baked in at class-definition time as it used to be) -- `None` must
     still resolve identically to the explicit `"auto"` sentinel."""
     default_device = inspect.signature(Separator.__init__).parameters["device"].default
     assert default_device is None

@@ -13,7 +13,7 @@ module's full-digest verification against the registry), not the same
 decision duplicated in two places.
 
 Reads: checkpoint_catalog, states, htdemucs.HTDemucs, apply.BagOfModels,
-api.Separator, backends.resolve_backend_name.
+api.Separator.
 """
 
 from __future__ import annotations
@@ -293,19 +293,12 @@ class CheckpointRuntime:
         separator._model = model
         separator._audio_channels = model.audio_channels
         separator._samplerate = model.samplerate
-        separator_options = dict(separator_options)
-        requested_backend = separator_options.pop("backend", None)
-        from .backends import resolve_backend_name
-
-        separator._backend_name = resolve_backend_name(requested_backend, model=model)
-        separator._compute = None
         import inspect
 
         defaults = {
             name: parameter.default
             for name, parameter in inspect.signature(Separator).parameters.items()
-            if name not in {"model", "repo", "backend"}
-            and parameter.default is not inspect.Parameter.empty
+            if name not in {"model", "repo"} and parameter.default is not inspect.Parameter.empty
         }
         defaults.update(separator_options)
         separator.update_parameter(**defaults)

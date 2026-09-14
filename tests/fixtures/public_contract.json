@@ -392,7 +392,7 @@
   },
   "schema_version": 1,
   "signatures": {
-    "api.Separator": "(model: str = 'htdemucs', repo: Optional[pathlib.Path] = None, device: Optional[str] = '<cuda-if-available-else-cpu>', backend: Optional[str] = None, shifts: int = 1, overlap: float = 0.25, split: bool = True, segment: Optional[int] = None, jobs: int = 0, progress: bool = False, callback: Optional[Callable[[dict], NoneType]] = None, callback_arg: Optional[dict] = None)",
+    "api.Separator": "(model: str = 'htdemucs', repo: Optional[pathlib.Path] = None, device: Optional[str] = '<cuda-if-available-else-cpu>', shifts: int = 1, overlap: float = 0.25, split: bool = True, segment: Optional[int] = None, jobs: int = 0, progress: bool = False, callback: Optional[Callable[[dict], NoneType]] = None, callback_arg: Optional[dict] = None)",
     "api.Separator.separate_audio_file": "(self, file: pathlib.Path)",
     "api.Separator.separate_tensor": "(self, wav: torch.Tensor, sr: Optional[int] = None) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]",
     "api.Separator.update_parameter": "(self, device: Union[str, demucs_infer.api._NotProvided] = '<not-provided>', shifts: Union[int, demucs_infer.api._NotProvided] = '<not-provided>', overlap: Union[float, demucs_infer.api._NotProvided] = '<not-provided>', split: Union[bool, demucs_infer.api._NotProvided] = '<not-provided>', segment: Union[int, demucs_infer.api._NotProvided, NoneType] = '<not-provided>', jobs: Union[int, demucs_infer.api._NotProvided] = '<not-provided>', progress: Union[bool, demucs_infer.api._NotProvided] = '<not-provided>', callback: Union[Callable[[dict], NoneType], demucs_infer.api._NotProvided, NoneType] = '<not-provided>', callback_arg: Union[dict, demucs_infer.api._NotProvided, NoneType] = '<not-provided>')",
