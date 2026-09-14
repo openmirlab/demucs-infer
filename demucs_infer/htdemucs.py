@@ -640,14 +640,6 @@ class HTDemucs(nn.Module):
         x = x.view(B, S, -1, Fq, T)
         x = x * std[:, None] + mean[:, None]
 
-        # to cpu as mps doesnt support complex numbers
-        # demucs issue #435 ##432
-        # NOTE: in this case z already is on cpu
-        # TODO: remove this when mps supports complex numbers
-        x_is_mps = x.device.type == "mps"
-        if x_is_mps:
-            x = x.cpu()
-
         zout = self._mask(z, x)
         if self.use_train_segment:
             if self.training:
@@ -656,10 +648,6 @@ class HTDemucs(nn.Module):
                 x = self._ispec(zout, training_length)
         else:
             x = self._ispec(zout, length)
-
-        # back to mps device
-        if x_is_mps:
-            x = x.to("mps")
 
         if self.use_train_segment:
             if self.training:
