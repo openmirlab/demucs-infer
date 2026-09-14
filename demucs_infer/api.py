@@ -7,23 +7,18 @@
 """High-level Separator API -- the primary entry point for using demucs-infer
 programmatically.
 
-Reads: apply (_replace_dict), audio (AudioFile, convert_audio, save_audio),
-backends (get_backend, resolve_backend_name), model_info (ModelInfo,
-LoadModelError, list_models, get_model_info, list_supported_separation_types,
-KNOWN_MODELS, SEPARATION_TYPES, SOURCE_TRANSLATIONS -- re-exported for
-backward compat), pretrained (get_model)
+Reads: apply (apply_model, _replace_dict), audio (AudioFile, convert_audio,
+save_audio), model_info (ModelInfo, LoadModelError, list_models,
+get_model_info, list_supported_separation_types, KNOWN_MODELS,
+SEPARATION_TYPES, SOURCE_TRANSLATIONS -- re-exported for backward compat),
+pretrained (get_model)
 
-Wraps model loading (pretrained.get_model / repo.*Repo) behind a single
-Separator class, plus audio I/O convenience (load, save, format conversion).
-The chunking/shifting loop itself lives behind `backends/` (`SeparationBackend`
--- see its module docstring): `Separator._load_model()` keeps sole ownership
-of checkpoint resolution and model construction as before, and
-`_sync_compute_backend()` wraps the resulting Torch model in whichever
-backend `backend=` resolved to (`torch`, unchanged, wraps `apply.apply_model`;
-`mlx`, optional, converts to the vendored MLX model). Downstream callers
-wanting the raw model + apply_model call pattern directly (bypassing this
-class) can still do so -- see apply.py and pretrained.py, the same functions
-this module composes.
+Wraps model loading (pretrained.get_model / repo.*Repo) and the low-level
+apply.apply_model chunking/shifting loop behind a single Separator class,
+plus audio I/O convenience (load, save, format conversion). Downstream
+callers wanting the raw model + apply_model call pattern directly
+(bypassing this class) can still do so -- see apply.py and pretrained.py,
+the same functions this module composes.
 
 Model discovery/metadata (ModelInfo, get_model_info, list_models,
 list_supported_separation_types, KNOWN_MODELS, SEPARATION_TYPES,
@@ -55,9 +50,8 @@ from typing import Callable, Dict, Optional, Tuple, Union
 import torch as th
 import torchaudio as ta
 
-from .apply import _replace_dict
+from .apply import _replace_dict, apply_model
 from .audio import AudioFile, convert_audio, save_audio
-from .backends import get_backend, resolve_backend_name
 
 # Re-exported for backward compatibility: these used to be defined directly
 # in this module (see model_info.py's header for why they moved).
@@ -104,7 +98,13 @@ NotProvided = _NotProvided()
 
 
 def _resolve_device(device):
-    """Resolve legacy automatic selection and validate explicit devices."""
+    """Resolve legacy automatic selection and validate explicit devices.
+
+    `"mps"` is rejected outright, not merely when unavailable: Apple Silicon
+    (MPS/MLX) support was removed before ever shipping in a release (see
+    CHANGELOG's `[Unreleased]` "Removed" entry) -- it is not a supported
+    device on any host now.
+    """
     if device is None or device == "auto":
         return "cuda" if th.cuda.is_available() else "cpu"
     if isinstance(device, th.device):
@@ -112,18 +112,15 @@ def _resolve_device(device):
     if device == "cpu":
         return "cpu"
     if not isinstance(device, str):
-        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', 'cuda:N', or 'mps'")
+        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', or 'cuda:N'")
     if device == "mps":
-        mps = getattr(th.backends, "mps", None)
-        if mps is None or not mps.is_available():
-            raise RuntimeError("MPS was explicitly requested but is not available")
-        return "mps"
+        raise ValueError("device 'mps' is not supported (MLX/MPS support was removed)")
     if device == "cuda":
         if not th.cuda.is_available():
             raise RuntimeError("CUDA was explicitly requested but is not available")
         return "cuda"
     if not device.startswith("cuda:"):
-        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', 'cuda:N', or 'mps'")
+        raise ValueError("device must be None, 'auto', 'cpu', 'cuda', or 'cuda:N'")
     index_text = device[5:]
     if not index_text.isdigit():
         raise ValueError("CUDA device index must be a non-negative integer")
@@ -140,7 +137,6 @@ class Separator:
         model: str = "htdemucs",
         repo: Optional[Path] = None,
         device: Optional[str] = None,
-        backend: Optional[str] = None,
         shifts: int = 1,
         overlap: float = 0.25,
         split: bool = True,
@@ -175,19 +171,10 @@ class Separator:
             `wav.device`, only local computations will be on `device`, while the entire tracks \
             will be stored on `wav.device`. If not specified, will use the command line option. \
             The literal string `"auto"` is also accepted, and resolves to the same \
-            cuda-if-available-else-cpu choice as leaving `device` unset. Leaving `device` unset \
-            (or `None`/`"auto"`) with `backend="mlx"` resolves to `"mps"` instead -- `device` \
-            keeps its Torch meaning per backend, it is not overloaded to mean "Apple Silicon".
-        backend: Which framework computes the separation: `None`/`"torch"` (default, unchanged \
-            behaviour), `"mlx"` (Apple Silicon via the optional `demucs-infer[mlx]` extra -- \
-            raises `backends.BackendUnavailable` if the extra is missing, the model is a \
-            `BagOfModels`, or the model's architecture/config has no MLX port), or `"auto"` \
-            (prefers `"mlx"` when it is genuinely importable and can run this model, otherwise \
-            falls back to `"torch"`). An explicitly requested backend is always honoured or \
-            refused, never silently downgraded.
+            cuda-if-available-else-cpu choice as leaving `device` unset. `"mps"` is not \
+            supported (Apple Silicon MPS/MLX support was removed before release).
         jobs: Number of jobs. This can increase memory usage but will be much faster when \
-            multiple cores are available. If not specified, will use the command line option. \
-            Ignored by `backend="mlx"`, which does not thread-pool across chunks.
+            multiple cores are available. If not specified, will use the command line option.
         callback: A function will be called when the separation of a chunk starts or finished. \
             The argument passed to the function will be a dict. For more information, please see \
             the Callback section.
@@ -214,8 +201,6 @@ class Separator:
         self._name = model
         self._repo = repo
         self._load_model()
-        self._backend_name = resolve_backend_name(backend, model=self._model)
-        self._compute = None
         self.update_parameter(device=device, shifts=shifts, overlap=overlap, split=split,
                               segment=segment, jobs=jobs, progress=progress, callback=callback,
                               callback_arg=callback_arg)
@@ -283,13 +268,7 @@ class Separator:
         - `models`: Count of submodels in the model.
         """
         if not isinstance(device, _NotProvided):
-            if self._backend_name == "mlx":
-                from .backends.mlx_backend import MLXBackend
-
-                self._device = MLXBackend._select_device(device)
-            else:
-                self._device = _resolve_device(device)
-            self._sync_compute_backend()
+            self._device = _resolve_device(device)
         if not isinstance(shifts, _NotProvided):
             self._shifts = shifts
         if not isinstance(overlap, _NotProvided):
@@ -313,27 +292,6 @@ class Separator:
             raise LoadModelError("Failed to load model")
         self._audio_channels = self._model.audio_channels
         self._samplerate = self._model.samplerate
-
-    def _sync_compute_backend(self):
-        """(Re)point the compute backend at `self._device`.
-
-        The heavy step -- converting `self._model` into the backend's own
-        representation -- happens at most once per `Separator`: for
-        `backend='torch'` that's just wrapping the resident model, but for
-        `backend='mlx'` it is a real weight conversion
-        (`MLXBackend.from_torch_model`), so a plain device update (which for
-        MLX only ever re-validates the same `"mps"` sentinel, per
-        `backends/base.py`'s contract that MLX owns its own execution
-        target) must not re-trigger it.
-        """
-        if self._compute is None:
-            backend_cls = get_backend(self._backend_name)
-            if self._backend_name == "mlx":
-                self._compute = backend_cls.from_torch_model(self._model, device=self._device)
-            else:
-                self._compute = backend_cls(self._model, self._device)
-        else:
-            self._compute._device = self._device
 
     def _load_audio(self, track: Path):
         """Load `track`, preferring ffmpeg (via AudioFile), then falling
@@ -430,21 +388,31 @@ class Separator:
         -----
         Use this function with cautiousness. This function does not provide data verifying.
         """
-        wav, out = self._compute.separate(
-            wav,
-            sr,
-            shifts=self._shifts,
-            overlap=self._overlap,
-            split=self._split,
+        if sr is not None and sr != self.samplerate:
+            wav = convert_audio(wav, sr, self._samplerate, self._audio_channels)
+        ref = wav.mean(0)
+        wav = wav - ref.mean()
+        wav = wav / (ref.std() + 1e-8)
+        out = apply_model(
+            self._model,
+            wav[None],
             segment=self._segment,
-            jobs=self._jobs,
-            progress=self._progress,
+            shifts=self._shifts,
+            split=self._split,
+            overlap=self._overlap,
+            device=self._device,
+            num_workers=self._jobs,
             callback=self._callback,
             callback_arg=_replace_dict(self._callback_arg, ("audio_length", wav.shape[1])),
+            progress=self._progress,
         )
         if out is None:
             raise KeyboardInterrupt
-        return (wav, dict(zip(self._compute.sources, out[0])))
+        out = out * (ref.std() + 1e-8)
+        out = out + ref.mean()
+        wav = wav * (ref.std() + 1e-8)
+        wav = wav + ref.mean()
+        return (wav, dict(zip(self._model.sources, out[0])))
 
     def separate_audio_file(self, file: Path):
         """
