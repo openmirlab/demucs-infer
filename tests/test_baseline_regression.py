@@ -11,11 +11,10 @@ believed to be behavior-preserving -- fails this test.
 
 Needs the real htdemucs checkpoint (`get_model('htdemucs')` downloads it via
 a real, unmocked `urlopen()` call on a cache miss -- same as any normal
-`get_model()` call) and does real GPU/CPU inference against it, so it carries
-the same `realweights` marker as `test_mlx_parity.py`'s checkpoint-backed
-parity tests (not `network`, which this repo reserves for pure checkpoint
-URL-liveness probes in `test_checkpoints_liveness.py`) and is deselected by
-default. Run it explicitly with `pytest -m realweights`.
+`get_model()` call) and does real GPU/CPU inference against it, so it
+carries the `realweights` marker (not `network`, which this repo reserves
+for pure checkpoint URL-liveness probes in `test_checkpoints_liveness.py`)
+and is deselected by default. Run it explicitly with `pytest -m realweights`.
 """
 import json
 import sys

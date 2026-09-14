@@ -72,27 +72,6 @@ quantized = [
 community = [
     "gdown>=5.0.0",
 ]
-# Optional: Apple Silicon (MLX) backend. Floors only, no ceilings:
-# `import demucs_infer` never imports mlx (backends/mlx_backend.py's imports
-# are all lazy -- see tests/test_backends.py). mlx-audio-separator was
-# deliberately NOT taken as a dependency: it pulls in mlx-audio-io (a
-# compiled backend) and pins mlx to an exact version, the same shape as the
-# numba/llvmlite backtrack trap this org avoids elsewhere. This package
-# vendors only the model math it actually needs from it (demucs_infer/mlx/,
-# MIT, revision recorded in file headers) and depends on mlx-spectro for
-# STFT/iSTFT instead of re-implementing it -- the same choice the sibling
-# bs-roformer-infer/mdxnet-infer packages made for their own MLX backends.
-# The markers are not a workaround -- MLX's own floor is Python 3.10, while
-# this package's core stays at 3.8. Without them a universal resolve (uv lock,
-# which solves every extra across the whole requires-python range at once) has
-# no solution on the 3.8/3.9 split and the repo cannot be synced at all. Below
-# 3.10 the extra installs nothing and `backend="mlx"` then refuses loudly via
-# BackendUnavailable, which is the same answer a 3.10+ host without the extra
-# gets -- never a silent fallback to torch.
-mlx = [
-    "mlx>=0.31; python_version >= '3.10'",
-    "mlx-spectro>=0.7; python_version >= '3.10'",
-]
 # Development dependencies
 dev = [
     "black",
@@ -126,7 +105,7 @@ dev = [
 [tool.pytest.ini_options]
 markers = [
     "network: hits real network endpoints (checkpoint URL liveness); deselected by default, run with `pytest -m network`",
-    "realweights: needs a real downloaded checkpoint (and, for MLX tests, an Apple Silicon host with the `[mlx]` extra); deselected by default, run with `pytest -m realweights`",
+    "realweights: needs a real downloaded checkpoint; deselected by default, run with `pytest -m realweights`",
 ]
 addopts = "-m \"not network and not realweights\""
 
