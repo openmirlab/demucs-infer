@@ -253,8 +253,19 @@ remote = DemucsSession(
 
 The loader accepts only native `HTDemucs` metadata (`klass`, `args`, and
 `kwargs`) and a flat tensor state. It rejects unknown classes, nested state
-structures, malformed metadata, and state-dict mismatches without falling back
-to legacy `.th` deserialization.
+structures, malformed metadata (including non-finite numeric values), and
+state-dict mismatches without falling back
+to legacy `.th` deserialization. Existing named models, `.th` files and bag
+recipes keep their loading paths. Automatic safetensors discovery, quantized
+states and conversion are outside this loader's scope.
+
+For a reproducible real-checkpoint comparison, use
+`uv run --extra safetensors python tools/verify_safetensors_parity.py
+--checkpoint /path/model.th=SHA256 --audio /path/stereo-music.wav
+--device cuda --report /tmp/parity.json`
+with a trusted legacy checkpoint and its independently verified digest. The
+verifier compares all session outputs in memory on real music, a silent tail,
+full silence and seeded synthetic input; temporary serialization is discarded.
 
 The facade is additive: advanced users can continue composing
 `demucs_infer.api.Separator`, `demucs_infer.pretrained.get_model`, and

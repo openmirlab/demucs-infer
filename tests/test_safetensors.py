@@ -166,10 +166,8 @@ def test_rejects_truncated_safetensors(monkeypatch, tmp_path):
         safetensors_loader.load_safetensors_model(path)
 
 
-def test_round_trips_actual_tiny_htdemucs_state(tmp_path):
-    from demucs_infer.htdemucs import HTDemucs
-
-    kwargs = {
+def _tiny_model_kwargs():
+    return {
         "sources": ["one", "two"],
         "audio_channels": 1,
         "channels": 2,
@@ -180,6 +178,12 @@ def test_round_trips_actual_tiny_htdemucs_state(tmp_path):
         "dconv_comp": 1,
         "segment": Fraction(1, 1),
     }
+
+
+def test_round_trips_actual_tiny_htdemucs_state(tmp_path):
+    from demucs_infer.htdemucs import HTDemucs
+
+    kwargs = _tiny_model_kwargs()
     expected = HTDemucs(**kwargs)
     metadata_kwargs = dict(kwargs)
     metadata_kwargs["segment"] = {
@@ -207,6 +211,26 @@ def test_round_trips_actual_tiny_htdemucs_state(tmp_path):
         torch.equal(actual.state_dict()[key], value)
         for key, value in expected.state_dict().items()
     )
+
+
+@pytest.mark.parametrize("number", ["NaN", "Infinity", "-Infinity", "1e999"])
+def test_rejects_nonfinite_metadata_with_valid_model_state(tmp_path, number):
+    from demucs_infer.htdemucs import HTDemucs
+
+    kwargs = _tiny_model_kwargs()
+    model = HTDemucs(**kwargs)
+    raw_kwargs = json.dumps({**kwargs, "segment": "INVALID_NUMBER"})
+    path = _write_checkpoint(
+        tmp_path,
+        metadata={
+            "klass": "demucs_infer.htdemucs.HTDemucs",
+            "args": "[]",
+            "kwargs": raw_kwargs.replace('"INVALID_NUMBER"', number),
+        },
+        tensors={key: value.contiguous() for key, value in model.state_dict().items()},
+    )
+    with pytest.raises(ValueError, match="non-finite"):
+        safetensors_loader.load_safetensors_model(path)
 
 
 def test_safe_local_signature_collision_uses_only_explicit_checksum(

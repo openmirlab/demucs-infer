@@ -16,6 +16,7 @@ Reads: htdemucs.HTDemucs.
 from __future__ import annotations
 
 import json
+import math
 import typing as tp
 from fractions import Fraction
 from pathlib import Path
@@ -79,6 +80,8 @@ def _decode_metadata_json(value: str, field: str) -> tp.Any:
 
 
 def _decode_json(value: tp.Any) -> tp.Any:
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError("Demucs safetensors metadata contains a non-finite number.")
     if isinstance(value, dict):
         if "_type" in value:
             if (

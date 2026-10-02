@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   HTDemucs checkpoints. Explicit `.safetensors` path and URL overrides now
   use strict metadata, constructor, and state-dict validation without pickle
   fallback; URL overrides remain full-SHA-256 verified before construction.
+  Non-finite constructor metadata is rejected, including overflowing JSON
+  numbers. Real-checkpoint session parity is recorded for six HTDemucs
+  components, including real music and silence.
 - Add schema-v2 registry recipes for `uvr_demucs_model_1`,
   `uvr_demucs_model_2`, `uvr_demucs_model_bag`, `cdx23_dnr`, and
   `msst_htdemucs_vocals`. The six source artifacts carry full SHA-256,
