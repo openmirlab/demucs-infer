@@ -656,9 +656,14 @@ See [CLAUDE.md](CLAUDE.md) for the bit-for-bit accuracy gate that any change
 to `demucs_infer/` must pass.
 
 **Continuous Integration:**
-- GitHub Actions runs the test suite as a release gate: nothing publishes to PyPI without it passing first (`.github/workflows/publish.yml`)
-- Tests validate both library API and CLI commands
-- Python 3.10 with PyTorch 2.x compatibility verified
+- GitHub Actions runs the complete offline suite on pull requests and on
+  release-gate publishes (`.github/workflows/ci.yml`,
+  `.github/workflows/publish.yml`).
+- The matrix matches the advertised Python support: 3.8, 3.9, 3.10, 3.11,
+  and 3.12.
+- Each matrix job builds a wheel from the sdist, installs that wheel from
+  outside the checkout, imports the public package, and verifies packaged
+  checkpoint/remote resources are present.
 
 ### Documentation
 

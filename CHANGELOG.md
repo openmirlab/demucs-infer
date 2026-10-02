@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### CI
+- Add a pull-request CI workflow and upgrade the release publish gate to run
+  the complete offline test suite across Python 3.8, 3.9, 3.10, 3.11, and
+  3.12, matching the package's advertised support.
+- Add delivery smoke checks that build a wheel from the sdist, install that
+  wheel outside the checkout, import public package symbols, and verify
+  package data such as `config/checkpoints.toml` and `remote/files.txt`.
+- Pin the Python 3.8 pytest tool resolution below 8.4 while retaining the
+  existing runtime Python support.
+- Stabilize the offline suite across the supported Python matrix by
+  normalizing Python 3.8 typing signature repr in the public-contract capture
+  and by skipping the wiener bit-exact fixture on Python <3.10, where the
+  fixture's recorded torch string is not enough environment metadata to make
+  the digest valid.
+
 ### Added
 - Add schema-v2 registry recipes for `uvr_demucs_model_1`,
   `uvr_demucs_model_2`, `uvr_demucs_model_bag`, `cdx23_dnr`, and
