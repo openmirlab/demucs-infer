@@ -109,6 +109,12 @@ print('bit-identical')
 # fast suite (default: network and realweights tests deselected)
 uv run pytest tests/
 
+# CI/release delivery gate (GitHub Actions): run the complete offline suite
+# on Python 3.8-3.12, build a wheel from the sdist, install it outside the
+# checkout, then smoke import public symbols and packaged resources.
+# Python 3.8 pins pytest below 8.4 because newer pytest releases dropped
+# Python 3.8 support while this package still advertises it.
+
 # frozen public API and legacy metadata contract
 uv run python tools/capture_public_contract.py --compare tests/fixtures/public_contract.json
 

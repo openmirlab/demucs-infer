@@ -37,7 +37,21 @@ def normalized_signature(callable_object, *, dynamic_device: bool = False) -> st
         elif dynamic_device and parameter.name == "device":
             parameters[index] = parameter.replace(default=AUTO_DEVICE_DEFAULT)
     signature = signature.replace(parameters=parameters)
-    return str(signature)
+    return stable_signature_text(str(signature))
+
+
+def stable_signature_text(text: str) -> str:
+    """Normalize typing repr differences between supported Python minors."""
+    replacements = {
+        "Union[pathlib.Path, NoneType]": "Optional[pathlib.Path]",
+        "Union[str, NoneType]": "Optional[str]",
+        "Union[int, NoneType]": "Optional[int]",
+        "Union[dict, NoneType]": "Optional[dict]",
+        "Union[Callable[[dict], NoneType], NoneType]": "Optional[Callable[[dict], NoneType]]",
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text
 
 
 def public_identity(value) -> str:

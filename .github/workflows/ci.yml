@@ -1,30 +1,20 @@
-name: Publish to PyPI
-
-# This workflow publishes the package to PyPI when a GitHub Release is created.
-# It uses PyPI's trusted publishing feature, which must be configured on PyPI
-# for the GitHub organization (openmirlab) and repository (demucs-infer).
+name: CI
 
 "on":
-  release:
-    types: [published]
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish (e.g., 4.1.0)'
-        required: false
-        type: string
 
 jobs:
-  test:
-    # Test-gate (constitution art.7 amendment, ADOPT campaign P5): nothing
-    # publishes to PyPI without the complete offline suite and package smoke
-    # passing across every Python version this package advertises.
+  offline-suite:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,43 +66,3 @@ jobs:
           assert config["package"]["name"] == "demucs-infer"
           assert config["schema"]["version"] == 2
           PY
-
-  publish:
-    needs: [test]
-    runs-on: ubuntu-latest
-    # Note: Environment is optional. If you want to add protection rules later,
-    # create an environment named "pypi" in repository settings → Environments
-    permissions:
-      id-token: write  # Required for trusted publishing (OIDC)
-      contents: read    # Required to checkout code
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      
-      - name: Install build dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build hatchling
-      
-      - name: Build package
-        run: python -m build
-      
-      - name: Validate package
-        run: |
-          # Basic validation - check that dist/ contains expected files
-          if [ ! -f dist/*.whl ] || [ ! -f dist/*.tar.gz ]; then
-            echo "❌ Package build failed: missing wheel or source distribution"
-            exit 1
-          fi
-          echo "✅ Package built successfully"
-      
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
