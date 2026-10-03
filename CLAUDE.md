@@ -21,6 +21,34 @@ working on current PyTorch/torchaudio. The package-owned schema-v2 registry
 also exposes verified compatible Demucs checkpoints without changing model
 architectures or the inference algorithms.
 
+## Native safetensors loading
+
+The optional `safetensors` extra adds a strict native HTDemucs loader for
+explicit paths and verified URL overrides. Its only accepted metadata fields
+are `klass`, JSON `args`, and JSON `kwargs`; only the two HTDemucs class tags
+are allowed. Recursive Fraction decoding rejects malformed values and every
+non-finite float, including JSON exponent overflow. Flat tensors strict-load
+without importing arbitrary metadata classes or falling back to pickle.
+Existing named `.th` models, registry bags and aliases retain their paths.
+Discovery, checkpoint conversion, quantized safetensors and safetensors bag
+acquisition are outside the supported surface.
+
+`tools/verify_safetensors_parity.py` compares trusted legacy checkpoint bytes
+with a temporary safetensors encoding using both public session paths. It
+checks constructor metadata, every state tensor and every returned float
+output. Inputs include non-trivial real music, a one-second silent tail,
+full silence and seeded synthetic input. Temporary files are deleted; this
+is a verification tool, not a conversion API. Seed stdlib random before each
+inference arm as well as NumPy/Torch; do not change the model's segment.
+
+On 2026-10-02, htdemucs, htdemucs_6s and the four htdemucs_ft components passed
+all 128 mixture/stem comparisons exactly on Torch 2.8.0+cu128 / RTX 4090.
+Recorded inputs, checkpoint digests, environment and scale-relative errors
+are in `tools/safetensors_parity.json`. This proves format/session parity
+against the legacy loader, not new upstream model accuracy or automatic bag
+support. The historical baseline's unavailable real excerpt remains a separate
+limitation; the committed baseline test still guards its available inputs.
+
 ## Testing philosophy
 
 Two tiers, both pytest-based:
@@ -108,6 +136,11 @@ print('bit-identical')
 ```bash
 # fast suite (default: network and realweights tests deselected)
 uv run pytest tests/
+
+# safetensors metadata and runtime dispatch (install the optional extra first)
+uv run --extra safetensors pytest tests/test_safetensors.py -q
+# Repeat --checkpoint for each trusted component; digest comes from the registry
+uv run --extra safetensors python tools/verify_safetensors_parity.py --checkpoint /path/model.th=SHA256 --audio /path/stereo-music.wav --device cuda --report /tmp/safetensors-parity.json
 
 # CI/release delivery gate (GitHub Actions): run the complete offline suite
 # on Python 3.8-3.12, build a wheel from the sdist, install it outside the

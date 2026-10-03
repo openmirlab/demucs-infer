@@ -1,0 +1,1712 @@
+{
+  "torch": "2.8.0+cu128",
+  "cuda": "12.8",
+  "device": "cuda",
+  "audio": "scnet-infer/tests/fixtures/music_delta_disco_10s/mixture.wav",
+  "audio_sha256": "28695573b3fbc581acfceeca1cbb74afd02c823eaae179063fb4615955375257",
+  "checkpoints": [
+    {
+      "checkpoint": "955717e8-8726e21a.th",
+      "sha256": "8726e21a993978c7ba086d3872e7608d7d5bfca646ca4aca459ffda844faa8b4",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07719806710000332,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.052666673553252316,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.027855788227237006,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05980841809850448,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07358044422860703,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05017850500408632,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.026451203732068874,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.057128273570839695,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.007815834423826095,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0005194498739731008,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.044440879820814926,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0008175803903757228,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "5c90dfd2-34c22ccb.th",
+      "sha256": "34c22ccb381c6f9fdbf324f04e1e2fe21aaaf293f5ded163a162697ff9a02ddd",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07667754748903167,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.052787287209179606,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 3.191866891417298e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05944458927482366,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "guitar",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.028921124847282334,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "piano",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 6.965964742612495e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07299540384306084,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05031589686781804,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 3.0260250828294748e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.056613046235694034,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "guitar",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.027471718794637046,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "piano",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 6.565685416591273e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "guitar",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "piano",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.046772802826857404,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 9.911289645057153e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.005091838894959799,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 7.513641758268107e-05,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "guitar",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.00012057306453983304,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "piano",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0002207235628860178,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "f7e0c4bc-ba3fe64a.th",
+      "sha256": "ba3fe64ae8ef66ac9a4857222ce48efbdc5eb3ad375cb79dd13debee5aaa4066",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07710793413735895,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.03277049687764031,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.02916053766513132,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.06043187559878741,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.07337824592268312,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.031236080795828968,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.02777041137501461,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.057579197862561014,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0034626055192670314,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0010461564630924903,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.04506644003527776,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.010899422619667082,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "d12395a8-e57c48e6.th",
+      "sha256": "e57c48e6b0e38af4f7118d7bd08c49f0a0c0edf7d09143bdd902ea0d237303e6",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.051765256206205354,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05284394096329667,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.031284429598130915,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.061079761378700886,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.049410027853011865,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.050396375290008705,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.02979814461193204,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05821914750575752,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0024864989798072455,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.000527069552602202,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.03246464455403513,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.018391563603949907,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "92cfc3b6-ef3bcb9c.th",
+      "sha256": "ef3bcb9c8b40d14ae5d51b6db2587339cc12c6b77c0be151ce6d69002e087bf2",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05683561171820654,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.04228101627895071,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.02859846251672695,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.06341289669926828,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05410141881381026,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.04031086106506057,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.027215056337067126,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0606115094340516,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.01069438289197891,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0010826464575044582,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.03731670278707721,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0064002556398764935,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    },
+    {
+      "checkpoint": "04573f0d-f3cf25b2.th",
+      "sha256": "f3cf25b222c4eed7cd49dd8b2c9597d50c18bd154090f7b919cfa5f93cf22c49",
+      "outputs": [
+        {
+          "input": "music",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.1186652476944982,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.06311080176310223,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.014478431125907788,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.03475346912341958,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0605587196999657,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "mixture",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.11314287433026923,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "drums",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.059379208875640445,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "bass",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.013821917713589357,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "other",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.033022293264352104,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "music_silent_tail",
+          "stem": "vocals",
+          "shape": [
+            2,
+            485100
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.057822295853550365,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "silence",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "mixture",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.05002841964312965,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "drums",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.003100988292446681,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "bass",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.0012589847882215042,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "other",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.01408293669420048,
+          "relative_rmse": 0.0,
+          "exact": true
+        },
+        {
+          "input": "synthetic",
+          "stem": "vocals",
+          "shape": [
+            2,
+            441000
+          ],
+          "max_abs": 0.0,
+          "rmse": 0.0,
+          "reference_rms": 0.00011971371029993599,
+          "relative_rmse": 0.0,
+          "exact": true
+        }
+      ]
+    }
+  ],
+  "hardware": "NVIDIA GeForce RTX 4090",
+  "audio_description": "Music Delta - Disco, 30-40 seconds; stereo 44100 Hz",
+  "checked_on": "2026-10-02"
+}

@@ -24,6 +24,7 @@ import typing as tp
 from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
+from urllib.parse import urlsplit
 from urllib.request import urlopen
 
 from .checkpoint_catalog import (
@@ -136,19 +137,27 @@ class CheckpointRuntime:
         metadata = get_checkpoint_metadata(self.model_name)
         if self.checkpoint_path is not None:
             signature = self.checkpoint_path.stem.split("-", 1)[0]
-            expected = self.checkpoint_sha256 or (
-                get_checkpoint_metadata(signature) or {}
-            ).get("sha256")
+            is_safetensors = self.checkpoint_path.suffix.lower() == ".safetensors"
+            expected = self.checkpoint_sha256
+            if expected is None and not is_safetensors:
+                expected = (get_checkpoint_metadata(signature) or {}).get("sha256")
             return _Resolution(
                 "checkpoint_path",
                 (self.checkpoint_path,),
                 signature=signature,
                 expected_sha256=expected,
-                reported_sha256=self.checkpoint_sha256 or (metadata or {}).get("sha256"),
+                reported_sha256=(
+                    self.checkpoint_sha256
+                    if is_safetensors
+                    else self.checkpoint_sha256 or (metadata or {}).get("sha256")
+                ),
                 checkpoint_url=self.checkpoint_url or (metadata or {}).get("url"),
             )
         if self.checkpoint_url:
-            path = self._cache_root(create=False) / Path(self.checkpoint_url).name
+            url_path = Path(urlsplit(self.checkpoint_url).path)
+            if not url_path.name:
+                raise ValueError("checkpoint_url must contain a checkpoint filename")
+            path = self._cache_root(create=False) / url_path.name
             return _Resolution(
                 "checkpoint_url",
                 (path,),
@@ -276,9 +285,14 @@ class CheckpointRuntime:
         resolution = self.resolve()
         if resolution.mode in {"checkpoint_path", "checkpoint_url"}:
             path, signature = self.materialize_override(resolution)
-            from .states import load_model
+            if path.suffix.lower() == ".safetensors":
+                from .safetensors import load_safetensors_model
 
-            model = load_model(path)
+                model = load_safetensors_model(path)
+            else:
+                from .states import load_model
+
+                model = load_model(path)
             repo = path.parent
         elif resolution.mode in {"named_recipe", "named_artifact"}:
             model = self.load_registered_model(resolution)

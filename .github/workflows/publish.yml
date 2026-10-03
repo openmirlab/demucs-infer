@@ -42,7 +42,7 @@ jobs:
           else
             python -m pip install "pytest>=8.3.5"
           fi
-          python -m pip install -e .
+          python -m pip install -e ".[safetensors]"
 
       - name: Run complete offline suite
         run: python -m pytest tests/
