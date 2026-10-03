@@ -54,13 +54,16 @@ Use these examples as templates for your own audio separation scripts.
 import torch
 from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model
-import torchaudio
+from demucs_infer.audio import AudioFile
 
 # Load model
 model = get_model("htdemucs_ft").eval()
 
-# Load audio
-wav, sr = torchaudio.load("song.wav")
+# Load audio at the model's required sample rate and channel count.
+sr = model.samplerate
+wav = AudioFile("song.wav").read(
+    streams=0, samplerate=sr, channels=model.audio_channels
+)
 wav = wav.unsqueeze(0)  # Add batch dimension
 
 # Separate
@@ -111,4 +114,3 @@ See the main [README.md](../README.md) for:
 - API documentation
 - Advanced features
 - Troubleshooting
-
