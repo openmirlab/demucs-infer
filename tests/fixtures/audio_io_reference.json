@@ -1,0 +1,97 @@
+{
+  "source": "Generated stereo tones/noise with a 0.25-second silent tail; no third-party audio.",
+  "recorded_from": "demucs-infer v4.3.0 / TorchAudio 2.8.0+cu128 / soundfile 0.14.0",
+  "sample_rate": 44100,
+  "input_sha256": "b88d028db7117e1dc46fb5ad52b5d86656c36d657ed654f6d35b752eecc1340d",
+  "pcm": {
+    "wav_16_pcm": {
+      "dtype": "int16",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "88327a96f41e7f81919abc12ed51713637ea516a872f7d607f286dd79326666c"
+    },
+    "wav_24_pcm": {
+      "dtype": "int32",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "b199820e6cf7aeddb89d3163612f1cb4eb57c4f16520fb4e53856cf0750513dc"
+    },
+    "wav_32_pcm": {
+      "dtype": "int32",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "3b5d1ba467ce110395e4f8f31d566d1a46126935f176bd1c440bfb3fe5d06945"
+    },
+    "wav_32_float": {
+      "dtype": "float32",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "d8c79636d62095421555bfc18d37fa3121d37cccb993b2145fa4050ad1b7ed95"
+    },
+    "flac_16_pcm": {
+      "dtype": "int16",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "88327a96f41e7f81919abc12ed51713637ea516a872f7d607f286dd79326666c"
+    },
+    "flac_24_pcm": {
+      "dtype": "int32",
+      "shape": [
+        44100,
+        2
+      ],
+      "sha256": "b199820e6cf7aeddb89d3163612f1cb4eb57c4f16520fb4e53856cf0750513dc"
+    }
+  },
+  "mp3_reference": {
+    "fixture": "audio_io_mp3_v430.npz",
+    "decoder": "TorchAudio 2.8.0 FFmpeg backend with system ffmpeg executable forced unavailable",
+    "fields": {
+      "mp3_mixture": {
+        "shape": [
+          2,
+          44100
+        ],
+        "sha256": "f50107fa4b21cc5f1b7cae19405badbf3522db97ab360e967e59cc02b5007b5c"
+      },
+      "mp3_drums": {
+        "shape": [
+          2,
+          44100
+        ],
+        "sha256": "e891652d0ec042ec0c487456c268d7c59850d81dce78f0cc85dec783871292bf"
+      },
+      "mp3_bass": {
+        "shape": [
+          2,
+          44100
+        ],
+        "sha256": "b6ad6fcdee08b659ab197642a3fb0ead3ae86f0510fc0bc8398a3f10646b1590"
+      },
+      "mp3_other": {
+        "shape": [
+          2,
+          44100
+        ],
+        "sha256": "c18e21220e2b9c48c81ebb8d547ae547ed03d9dd5708940906f0f7dbebe7d0a5"
+      },
+      "mp3_vocals": {
+        "shape": [
+          2,
+          44100
+        ],
+        "sha256": "d495c636ef7f62d0c4a19e5a8a61f8fbfb7d44f8283763b730797b739c60f66d"
+      }
+    }
+  }
+}

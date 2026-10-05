@@ -1,8 +1,16 @@
-"""Smoke test: every public-facing module must import cleanly with only
-this package's declared dependencies installed (torch, torchaudio,
-soundfile, einops, julius, numpy, pyyaml, tqdm -- no openunmix, see ADOPT
-P1)."""
+"""Smoke test: public modules import with the declared inference dependencies.
+
+TorchAudio and TorchCodec are outside this package's install and import path.
+"""
 import importlib
+import subprocess
+import sys
+from pathlib import Path
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.8-3.10
+    import tomli as tomllib
 
 import pytest
 
@@ -48,3 +56,41 @@ def test_version_is_single_sourced():
     import demucs_infer
     assert isinstance(demucs_infer.__version__, str)
     assert demucs_infer.__version__
+
+
+def test_public_audio_api_imports_when_torchaudio_is_unavailable():
+    """A fresh package import must not transitively require torchaudio."""
+    code = """
+import importlib.abc
+import sys
+
+class BlockTorchAudio(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == 'torchaudio' or fullname.startswith('torchaudio.'):
+            raise RuntimeError('torchaudio imported')
+
+sys.meta_path.insert(0, BlockTorchAudio())
+from demucs_infer import DemucsSession
+from demucs_infer.api import Separator
+from demucs_infer.audio import AudioFile, save_audio
+assert callable(DemucsSession) and callable(Separator)
+assert callable(AudioFile) and callable(save_audio)
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=Path(__file__).resolve().parent.parent,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+
+
+def test_package_metadata_does_not_pull_torchaudio_or_torchcodec():
+    with (Path(__file__).resolve().parent.parent / "pyproject.toml").open("rb") as stream:
+        project = tomllib.load(stream)["project"]
+    requirements = list(project["dependencies"])
+    for extra in project.get("optional-dependencies", {}).values():
+        requirements.extend(extra)
+    assert all(not requirement.lower().startswith(("torchaudio", "torchcodec"))
+               for requirement in requirements)

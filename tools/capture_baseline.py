@@ -22,7 +22,8 @@ Usage:
     python tools/capture_baseline.py [--out PATH] [--device cuda|cpu]
                                       [--skip-real] [--model NAME]
 
-Reads: demucs_infer (pretrained.get_model, apply.apply_model)
+Reads: demucs_infer (audio.AudioFile, pretrained.get_model,
+apply.apply_model)
 """
 
 import argparse
@@ -35,13 +36,13 @@ from pathlib import Path
 
 import numpy as np
 import torch
-import torchaudio
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 from demucs_infer.pretrained import get_model  # noqa: E402
 from demucs_infer.apply import apply_model  # noqa: E402
+from demucs_infer.audio import AudioFile  # noqa: E402
 
 SAMPLE_RATE = 44100
 DURATION_S = 10.0
@@ -88,9 +89,14 @@ def make_synthetic_clip(seed=SEED_SYNTH, duration=DURATION_S, sr=SAMPLE_RATE):
 
 
 def load_real_clip(path, duration=DURATION_S, sr=SAMPLE_RATE):
-    wav, orig_sr = torchaudio.load(str(path))
+    audio = AudioFile(path)
+    orig_sr = audio.samplerate()
     if orig_sr != sr:
-        wav = torchaudio.functional.resample(wav, orig_sr, sr)
+        raise ValueError(
+            f"Real-audio baseline requires {sr} Hz input; received {orig_sr} Hz. "
+            "Resampling would change the historical baseline."
+        )
+    wav = audio.read(streams=0)
     if wav.shape[0] == 1:
         wav = wav.repeat(2, 1)
     elif wav.shape[0] > 2:

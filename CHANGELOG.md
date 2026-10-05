@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0]
+
+### Fixed
+- Remove the `torchaudio` dependency and all package runtime imports, so
+  TorchAudio's TorchCodec requirement cannot break demucs-infer installation,
+  imports, audio loading, or stem saving (issue #1).
+- Read audio with FFmpeg first, then the declared `soundfile` dependency for
+  WAV, FLAC, and supported lossy formats when FFmpeg is unavailable. MP3
+  fallback decoding can differ slightly between backends; a real HTDemucs
+  comparison of all stems on a generated stereo fixture bounds the difference.
+- Write WAV/FLAC with `soundfile`, preserving the v4.3.0 decoded PCM samples
+  exactly on the recorded 16/24/32-bit formats through explicit rounding.
+- Remove the obsolete `torchcodec` extra. Document replacement calls for
+  applications that directly use `torchaudio.load`, which demucs-infer does
+  not control.
+
 ## [4.3.0]
 
 This release makes the `DemucsSession` and `DemucsSeparator` APIs available to

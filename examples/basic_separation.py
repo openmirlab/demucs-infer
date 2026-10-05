@@ -15,11 +15,8 @@ from demucs_infer.pretrained import get_model
 from demucs_infer.apply import apply_model
 from demucs_infer.audio import AudioFile, save_audio
 
-# Note: this loads via AudioFile (demucs-infer's own FFmpeg-based reader,
-# the same one Separator._load_audio tries first) rather than calling
-# torchaudio.load directly. torchaudio>=2.11 dropped its bundled decoders
-# and raises ImportError without the separate torchcodec package -- see
-# README's "torchaudio 2.11+ and audio decoders" section.
+# AudioFile reads through the package's FFmpeg reader; Separator also falls
+# back to soundfile when FFmpeg is unavailable.
 
 
 def separate_audio(
@@ -115,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
