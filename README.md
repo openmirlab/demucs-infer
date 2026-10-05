@@ -122,17 +122,14 @@ To retrain or evaluate against the original benchmarks, use the upstream [facebo
 
 ## Install
 
-demucs-infer is available on [PyPI](https://pypi.org/project/demucs-infer/) and supports both **UV** (recommended, faster) and **pip** (traditional).
-
-The `DemucsSession` and `DemucsSeparator` examples require v4.3.0 or later.
-The `torchaudio`-free audio path requires v4.4.0 or later; until that release
-is on PyPI, install it from source with
-`pip install "git+https://github.com/openmirlab/demucs-infer.git@main"`.
+Install the current source from GitHub with uv or pip. These commands include
+the `DemucsSession`, `DemucsSeparator`, and torchaudio-free audio paths shown
+below; historical PyPI releases do not receive those updates.
 
 **With UV:**
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh   # if you don't have UV yet
-uv add demucs-infer
+uv add "demucs-infer @ git+https://github.com/openmirlab/demucs-infer.git"
 ```
 
 **With pip:**
@@ -152,11 +149,11 @@ pip install "demucs-infer @ git+https://github.com/openmirlab/demucs-infer.git"
 
 **With UV:**
 ```bash
-uv add "demucs-infer[mp3]"         # MP3 output support
-uv add "demucs-infer[quantized]"   # Quantized models
-uv add "demucs-infer[community]"   # Community model downloads (Google Drive)
-uv add "demucs-infer[safetensors]" # Native HTDemucs safetensors checkpoints
-uv add "demucs-infer[mp3,quantized,community,safetensors]"  # all of the above
+uv add "demucs-infer[mp3] @ git+https://github.com/openmirlab/demucs-infer.git"         # MP3 output support
+uv add "demucs-infer[quantized] @ git+https://github.com/openmirlab/demucs-infer.git"   # Quantized models
+uv add "demucs-infer[community] @ git+https://github.com/openmirlab/demucs-infer.git"   # Community model downloads (Google Drive)
+uv add "demucs-infer[safetensors] @ git+https://github.com/openmirlab/demucs-infer.git" # Native HTDemucs safetensors checkpoints
+uv add "demucs-infer[mp3,quantized,community,safetensors] @ git+https://github.com/openmirlab/demucs-infer.git"  # all of the above
 ```
 
 **With pip:**
@@ -165,7 +162,7 @@ pip install "demucs-infer[mp3] @ git+https://github.com/openmirlab/demucs-infer.
 pip install "demucs-infer[quantized] @ git+https://github.com/openmirlab/demucs-infer.git"   # Adds: diffq>=0.2.1
 pip install "demucs-infer[community] @ git+https://github.com/openmirlab/demucs-infer.git"   # Adds: gdown>=5.0.0
 pip install "demucs-infer[safetensors] @ git+https://github.com/openmirlab/demucs-infer.git" # Adds: safetensors>=0.4.2
-pip install "demucs-infer[mp3,quantized,community,safetensors]"
+pip install "demucs-infer[mp3,quantized,community,safetensors] @ git+https://github.com/openmirlab/demucs-infer.git"
 ```
 
 ## Quick Start
