@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [4.3.0] - pending release
+## [4.3.0]
 
 This release makes the `DemucsSession` and `DemucsSeparator` APIs available to
 PyPI users. They existed on `main` after v4.2.2 but were absent from the
