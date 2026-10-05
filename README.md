@@ -1,11 +1,13 @@
 # demucs-infer
 
+> **Current installation:** `pip install "demucs-infer @ git+https://github.com/openmirlab/demucs-infer.git"`
+> OpenMIRLab no longer publishes new versions to PyPI. Any existing PyPI releases are historical snapshots.
+
 **Inference-only distribution of Demucs for PyTorch 2.x**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
-[![PyPI](https://img.shields.io/pypi/v/demucs-infer)](https://pypi.org/project/demucs-infer/)
 
 High-quality audio source separation models for extracting vocals, drums, bass, and other instruments from music tracks.
 
@@ -19,7 +21,7 @@ High-quality audio source separation models for extracting vocals, drums, bass, 
 
 The original [Demucs](https://github.com/facebookresearch/demucs) repository by Meta AI Research is **no longer actively maintained**. The models remain state-of-the-art, but the package never received updates for modern PyTorch: it pins `torchaudio<2.1`, carries training-only dependencies (`dora-search`, `hydra`) that most inference users never need, and its packaging predates PEP 621.
 
-**demucs-infer** re-provides the same models and separation quality as an inference-only, PyPI-installable package:
+**demucs-infer** re-provides the same models and separation quality as an inference-only, Git-installable package:
 
 1. **Maintain compatibility** — works with PyTorch 2.x (no `torchaudio<2.1` restriction) and Python 3.8+.
 2. **Continue development** — addresses issues and compatibility gaps in modern audio and PyTorch stacks.
@@ -136,7 +138,7 @@ uv add demucs-infer
 **With pip:**
 ```bash
 python -m venv .venv && source .venv/bin/activate  # recommended
-pip install demucs-infer
+pip install "demucs-infer @ git+https://github.com/openmirlab/demucs-infer.git"
 ```
 
 ### Requirements
@@ -159,10 +161,10 @@ uv add "demucs-infer[mp3,quantized,community,safetensors]"  # all of the above
 
 **With pip:**
 ```bash
-pip install demucs-infer[mp3]         # Adds: lameenc>=1.2
-pip install demucs-infer[quantized]   # Adds: diffq>=0.2.1
-pip install demucs-infer[community]   # Adds: gdown>=5.0.0
-pip install demucs-infer[safetensors] # Adds: safetensors>=0.4.2
+pip install "demucs-infer[mp3] @ git+https://github.com/openmirlab/demucs-infer.git"         # Adds: lameenc>=1.2
+pip install "demucs-infer[quantized] @ git+https://github.com/openmirlab/demucs-infer.git"   # Adds: diffq>=0.2.1
+pip install "demucs-infer[community] @ git+https://github.com/openmirlab/demucs-infer.git"   # Adds: gdown>=5.0.0
+pip install "demucs-infer[safetensors] @ git+https://github.com/openmirlab/demucs-infer.git" # Adds: safetensors>=0.4.2
 pip install "demucs-infer[mp3,quantized,community,safetensors]"
 ```
 
@@ -565,7 +567,7 @@ audio, sample_rate = sf.read("song.wav", dtype="float32", always_2d=True)
 ```bash
 # Make sure you installed demucs-infer, not demucs
 pip uninstall demucs
-pip install demucs-infer
+pip install "demucs-infer @ git+https://github.com/openmirlab/demucs-infer.git"
 ```
 
 ### CUDA Out of Memory

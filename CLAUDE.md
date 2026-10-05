@@ -234,3 +234,7 @@ docstring already say everything -- don't force the convention there.
   semantics for the conflict. Recommendation: fix in a dedicated,
   narrowly-scoped change with its own before/after behavioral tests, not
   bundled into an unrelated refactor.
+
+## Distribution policy (2026-10-05)
+
+Install the current source from `https://github.com/openmirlab/demucs-infer`. GitHub release workflows verify and build distributions but do not upload to PyPI. Existing PyPI versions, where any exist, are historical snapshots. Update installation examples to use Git when changing this package.
