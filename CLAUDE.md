@@ -17,12 +17,12 @@ to PyPI as `demucs-infer`; GitHub Actions gates every release on the test
 suite (`.github/workflows/publish.yml`) -- nothing publishes without it
 passing. Upstream `facebookresearch/demucs` is no longer actively
 maintained; this fork exists specifically to keep pretrained-model inference
-working on current PyTorch/torchaudio. The package-owned schema-v2 registry
+working on current PyTorch. The package-owned schema-v2 registry
 also exposes verified compatible Demucs checkpoints without changing model
 architectures or the inference algorithms.
-`DemucsSession` and `DemucsSeparator` are included in v4.3.0;
-published v4.2.2 does not export them. Verify the PyPI release
-version before recommending a `pip install` path for those classes.
+`DemucsSession` and `DemucsSeparator` are included in v4.3.0 and later.
+The dependency-free-from-TorchAudio audio path is introduced in v4.4.0;
+verify the published PyPI version before recommending that behavior.
 
 ## Native safetensors loading
 
@@ -133,6 +133,29 @@ assert a == b, 'baseline drifted!'
 print('bit-identical')
 "
 ```
+
+The v4.3.0 audio I/O reference in `tests/fixtures/audio_io_reference.json`
+and `audio_io_mp3_v430.npz` was captured before the v4.4.0 dependency swap.
+It includes generated stereo tones/noise, genuine silence at the end, six
+decoded PCM encodings, and real HTDemucs inference on MP3 when the system
+FFmpeg reader is unavailable. Regenerate it only in the recorded Torch
+2.8.0+cu128 / soundfile 0.14.0 environment with the original v4.3.0 source;
+the script refuses to run against v4.4.0:
+
+```bash
+git worktree add --detach /tmp/demucs-v430 4c4a623e2ad3f6317335d0300251eb3cc02bc4b8
+cd /tmp/demucs-v430
+PYTHONPATH=/tmp/demucs-v430 /path/to/recording-venv/bin/python \
+  /path/to/current-demucs-infer/tools/capture_audio_io_reference.py \
+  --out /tmp/demucs-io-reference
+```
+
+The script regenerates the source MP3 using FFmpeg 6.1.1 / libmp3lame 192k.
+Compare its outputs to the committed files before intentional replacement.
+The regular suite checks exact PCM hashes; the opt-in `realweights` test
+compares every inference field against the MP3 reference with error bounds
+relative to the nontrivial input RMS. Across the recorded environment,
+the worst MP3 decoded-sample difference was `6.94e-6` of input RMS.
 
 ## Verification commands
 

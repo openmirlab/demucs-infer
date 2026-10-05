@@ -4,8 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 """Audio I/O: loading (AudioFile), resampling/channel conversion, and saving
-(save_audio) stems back to disk (wav via torchaudio/soundfile, or mp3 via
-encode_mp3's ffmpeg subprocess).
+(save_audio) stems back to disk (wav/flac via soundfile, mp3 via lameenc).
 
 save_audio's defaults (clip mode, bit depth) are load-bearing beyond this
 package: downstream callers that read stems back off disk (e.g.
@@ -23,7 +22,6 @@ from pathlib import Path
 import julius
 import numpy as np
 import torch
-import torchaudio as ta
 import typing as tp
 
 from .utils import temp_filenames
@@ -257,17 +255,20 @@ def prevent_clip(wav, mode='rescale'):
 
 def _save_audio_soundfile(wav: torch.Tensor, path: Path, samplerate: int,
                           bits_per_sample: int = 16, as_float: bool = False):
-    """Save audio using soundfile as fallback when torchaudio fails."""
+    """Write PCM with the published encoder's sample-level rounding.
+
+    The v4.3.0 TorchAudio writer rounded WAV16 to nearest-even and floored
+    FLAC24 on the verified Torch 2.8 environment. Explicit integers retain
+    those samples when soundfile writes them; other formats already matched
+    soundfile's direct float conversion in the recorded fixture.
+    """
     try:
         import soundfile as sf
-    except ImportError:
-        raise ImportError(
-            "Neither torchaudio nor soundfile could save the audio. "
-            "Install soundfile with: pip install soundfile"
-        )
+    except ImportError as exc:
+        raise ImportError("Install soundfile with: pip install soundfile") from exc
 
     # Convert to numpy and transpose from [channels, time] to [time, channels]
-    audio_np = wav.cpu().numpy().T
+    audio_np = wav.detach().cpu().numpy().T
 
     # Determine subtype based on bits_per_sample and as_float
     if as_float:
@@ -279,7 +280,23 @@ def _save_audio_soundfile(wav: torch.Tensor, path: Path, samplerate: int,
     elif bits_per_sample == 32:
         subtype = 'PCM_32'
     else:
-        subtype = 'PCM_16'
+        raise ValueError(f"Unsupported bits_per_sample: {bits_per_sample}")
+
+    if np.issubdtype(audio_np.dtype, np.floating) and not as_float:
+        if path.suffix.lower() == '.wav' and bits_per_sample == 16:
+            audio_np = np.clip(
+                np.rint(audio_np.astype(np.float64) * (1 << 15)),
+                -(1 << 15), (1 << 15) - 1,
+            ).astype(np.int16)
+        elif path.suffix.lower() == '.flac' and bits_per_sample == 24:
+            # The legacy encoder rounded to signed 32-bit first, then
+            # discarded the low byte. Quantizing directly at 24 bits misses
+            # rare samples just below an integer boundary.
+            values = np.clip(
+                np.rint(audio_np.astype(np.float64) * (1 << 31)),
+                -(1 << 31), (1 << 31) - 1,
+            ).astype(np.int64)
+            audio_np = (np.floor_divide(values, 256) * 256).astype(np.int32)
 
     sf.write(str(path), audio_np, samplerate, subtype=subtype)
 
@@ -305,20 +322,8 @@ def save_audio(wav: torch.Tensor,
     elif suffix == ".wav":
         if as_float:
             bits_per_sample = 32
-            encoding = 'PCM_F'
-        else:
-            encoding = 'PCM_S'
-        try:
-            ta.save(str(path), wav, sample_rate=samplerate,
-                    encoding=encoding, bits_per_sample=bits_per_sample)
-        except ImportError:
-            # Fallback to soundfile if torchaudio fails (e.g., missing torchcodec)
-            _save_audio_soundfile(wav, path, samplerate, bits_per_sample, as_float)
+        _save_audio_soundfile(wav, path, samplerate, bits_per_sample, as_float)
     elif suffix == ".flac":
-        try:
-            ta.save(str(path), wav, sample_rate=samplerate, bits_per_sample=bits_per_sample)
-        except ImportError:
-            # Fallback to soundfile for FLAC as well
-            _save_audio_soundfile(wav, path, samplerate, bits_per_sample, as_float)
+        _save_audio_soundfile(wav, path, samplerate, bits_per_sample, as_float)
     else:
         raise ValueError(f"Invalid suffix for path: {suffix}")

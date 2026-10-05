@@ -48,7 +48,6 @@ from pathlib import Path
 from typing import Callable, Dict, Optional, Tuple, Union
 
 import torch as th
-import torchaudio as ta
 
 from .apply import _replace_dict, apply_model
 from .audio import AudioFile, convert_audio, save_audio
@@ -70,24 +69,6 @@ from .pretrained import get_model
 
 class LoadAudioError(Exception):
     pass
-
-
-# Extensions where soundfile's decode is empirically bit-identical to
-# torchaudio's (verified: torchaudio==2.7.0+cpu vs soundfile==0.14.0,
-# 16/24/32-bit PCM wav + flac, mono and stereo, `np.array_equal` exact --
-# see tests/test_audio_fallback.py and the 4.2.2 CHANGELOG entry). For
-# these, soundfile is tried as soon as ffmpeg is unavailable, ahead of
-# torchaudio -- not merely as a last-resort fallback -- since there is no
-# accuracy cost either way.
-#
-# mp3 (and anything else) is deliberately excluded: the same verification
-# measured torchaudio's and soundfile's mp3 decodes to differ by up to
-# ~7e-7 per sample (different underlying decoders, ffmpeg vs libmpg123),
-# so silently decoding mp3 via soundfile would change existing users'
-# output. Lossy formats stay on torchaudio only; if it can't decode
-# (torchaudio>=2.11 without the separate torchcodec package), _load_audio
-# raises a clear, actionable error instead of silently switching decoders.
-_LOSSLESS_SOUNDFILE_EXTS = {".wav", ".flac"}
 
 
 class _NotProvided:
@@ -294,12 +275,12 @@ class Separator:
         self._samplerate = self._model.samplerate
 
     def _load_audio(self, track: Path):
-        """Load `track`, preferring ffmpeg (via AudioFile), then falling
-        back by format: soundfile first for lossless wav/flac (bit-identical
-        to torchaudio, see `_LOSSLESS_SOUNDFILE_EXTS`'s comment above),
-        otherwise torchaudio only -- lossy formats never silently fall back
-        to soundfile, since its decode isn't guaranteed to match
-        torchaudio's for those."""
+        """Load with FFmpeg first, then the declared soundfile decoder.
+
+        The second path keeps WAV/FLAC usable without an FFmpeg executable.
+        It also covers MP3 where libsndfile supports it; that decoder can
+        differ slightly from FFmpeg, so FFmpeg remains the primary path.
+        """
         track = Path(track)
         errors = {}
         wav = None
@@ -312,27 +293,8 @@ class Separator:
         except subprocess.CalledProcessError:
             errors["ffmpeg"] = "FFmpeg could not read the file."
 
-        is_lossless = track.suffix.lower() in _LOSSLESS_SOUNDFILE_EXTS
-
-        if wav is None and is_lossless:
-            wav = self._try_soundfile_load(track, errors)
-
         if wav is None:
-            try:
-                raw, sr = ta.load(str(track))
-            except Exception as err:
-                msg = str(err.args[0]) if err.args else str(err)
-                if not is_lossless:
-                    msg += (
-                        " -- demucs-infer does not fall back to soundfile for "
-                        "lossy formats like this one (different decoders "
-                        "produce different samples); install torchcodec "
-                        "(`pip install demucs-infer[torchcodec]`) or convert "
-                        "the file to wav/flac."
-                    )
-                errors["torchaudio"] = msg
-            else:
-                wav = convert_audio(raw, sr, self._samplerate, self._audio_channels)
+            wav = self._try_soundfile_load(track, errors)
 
         if wav is None:
             raise LoadAudioError(
@@ -340,14 +302,12 @@ class Separator:
                     f"When trying to load using {backend}, got the following error: {error}"
                     for backend, error in errors.items()
                 )
+                + "\nInstall FFmpeg or use an audio format supported by soundfile."
             )
         return wav
 
     def _try_soundfile_load(self, track: Path, errors: dict):
-        """soundfile-based load for lossless formats (wav/flac) -- see
-        `_LOSSLESS_SOUNDFILE_EXTS`. Returns None (and records into `errors`)
-        on failure instead of raising, so callers can continue falling
-        back."""
+        """Decode with soundfile, recording failure for the caller's error."""
         try:
             import soundfile as sf
             audio_np, sr = sf.read(str(track))
