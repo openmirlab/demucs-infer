@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.0] - pending release
+
+This release makes the `DemucsSession` and `DemucsSeparator` APIs available to
+PyPI users. They existed on `main` after v4.2.2 but were absent from the
+published v4.2.2 wheel (see issue #5).
+
 ### CI
 - Add a pull-request CI workflow and upgrade the release publish gate to run
   the complete offline test suite across Python 3.8, 3.9, 3.10, 3.11, and
