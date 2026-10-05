@@ -20,6 +20,9 @@ maintained; this fork exists specifically to keep pretrained-model inference
 working on current PyTorch/torchaudio. The package-owned schema-v2 registry
 also exposes verified compatible Demucs checkpoints without changing model
 architectures or the inference algorithms.
+`DemucsSession` and `DemucsSeparator` are included in the v4.3.0 release
+candidate; published v4.2.2 does not export them. Verify the PyPI release
+version before recommending a `pip install` path for those classes.
 
 ## Native safetensors loading
 

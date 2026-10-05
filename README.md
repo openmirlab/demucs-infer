@@ -9,12 +9,11 @@
 
 High-quality audio source separation models for extracting vocals, drums, bass, and other instruments from music tracks.
 
-> **Release status:** This README describes the current `main` branch. The latest
-> published package is `v4.2.2`, which does not yet export `DemucsSession` or
-> `DemucsSeparator`. If you installed from PyPI, use the
-> [v4.2.2 README](https://github.com/openmirlab/demucs-infer/blob/v4.2.2/README.md)
-> for its supported API. The examples below that use those classes require a
-> source install from `main` until a new release is published.
+> **Version compatibility:** `DemucsSession` and `DemucsSeparator` are included
+> in v4.3.0 and later. Published v4.2.2 does not export them; use its
+> [versioned README](https://github.com/openmirlab/demucs-infer/blob/v4.2.2/README.md)
+> for the older API. Until v4.3.0 appears on PyPI, the examples below require
+> a source install from `main`.
 
 ---
 
@@ -124,9 +123,8 @@ To retrain or evaluate against the original benchmarks, use the upstream [facebo
 
 demucs-infer is available on [PyPI](https://pypi.org/project/demucs-infer/) and supports both **UV** (recommended, faster) and **pip** (traditional).
 
-The PyPI commands below install the latest published release (`v4.2.2`), not
-the unreleased API described in the `DemucsSession` and `DemucsSeparator`
-examples. To try that API from source, use
+The `DemucsSession` and `DemucsSeparator` examples require v4.3.0 or later.
+Until that version is published on PyPI, install it from source with
 `pip install "git+https://github.com/openmirlab/demucs-infer.git@main"`.
 
 **With UV:**
